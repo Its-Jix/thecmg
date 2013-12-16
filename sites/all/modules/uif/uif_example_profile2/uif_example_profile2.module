@@ -1,0 +1,42 @@
+<?php
+/**
+ * @file
+ * An example module showing how to import user data stored in Profile 2 profile.
+*/
+
+/**
+ * Implementation of hook_uif_post_create().
+ *
+ * Use this if you need to do something after user_save() is called for a new user.
+ */
+function uif_example_profile2_uif_post_create($account, $user_data, $form_state) {
+  uif_example_profile2_assign_fields($account, $user_data);
+}
+
+/**
+ * Implementation of hook_uif_post_update().
+ *
+ * Use this if you need to do something after user_save() is called for an updated user.
+ */
+function uif_example_profile2_uif_post_update($account, $user_data, $form_state) {
+  uif_example_profile2_assign_fields($account, $user_data);
+}
+
+/**
+ * Assign Profile 2 fields during create or update.
+ *
+ * This demonstrates basic support for Profile 2 fields.
+ * See project page at http://drupal.org/project/profile2
+ */
+function uif_example_profile2_assign_fields($account, $user_data) {
+  // If a profile doesn't exist for this user we create one first
+  $profile = profile2_load_by_user($account, 'main');
+  if (empty($profile)) {
+    $profile = profile2_create(array('user' => $account, 'type' => 'main'));
+  }
+  
+  $profile->field_first_name[LANGUAGE_NONE][0]['value'] = $user_data['first_name'];
+  $profile->field_last_name[LANGUAGE_NONE][0]['value'] = $user_data['last_name'];
+  
+  profile2_save($profile);
+}
