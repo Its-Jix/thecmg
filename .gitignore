@@ -7,3 +7,19 @@ sites/*/private
 
 # Don't ignore the htaccess in files anymore
 !sites/*/files/.htaccess
+
+# Special cal mens files
+css
+css/*
+elgg
+elgg/*
+img
+img/*
+tmp
+tmp/*
+webmail
+webmail/*
+squirrelmail
+squirrelmail/*
+test
+
