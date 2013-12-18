@@ -11,12 +11,12 @@
  * appear at the bottom of the node or on a separate tab, this function is
  * shared by multiple callers.
  *
- * @param stdClass $node
+ * @param $node
  *   The fully loaded node object.
- * @param string $type
+ * @param $type
  *   The kind of output would we render: can be either 'node' or 'tab'.
  *
- * @return string
+ * @return
  *   The fully rendered HTML for all signup-related forms and info.
  *
  * @see signup_nodeapi()
@@ -145,10 +145,10 @@ function signup_user_list_output($node) {
  * output to appear on a separate tab, instead of directly embedded in the
  * node.
  *
- * @param stdClass $node
+ * @param $node
  *   The node to generate a signup tab for.
  *
- * @return string
+ * @return
  *   The contents of the signup tab.
  *
  * @see _signup_node_output()

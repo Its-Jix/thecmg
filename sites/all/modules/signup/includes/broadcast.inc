@@ -7,7 +7,7 @@
 /**
  * Form builder for the signup broadcast form.
  *
- * @param stdClass $node
+ * @param $node
  *   The node that the broadcast form is being attached to.
  */
 function signup_broadcast_form($form, $form_state, $node) {
@@ -88,9 +88,9 @@ function signup_broadcast_form($form, $form_state, $node) {
 /**
  * Submit callback for the signup broadcast form.
  *
- * @param array $form
+ * @param $form
  *   The broadcast form being submitted.
- * @param array $form_state
+ * @param $form_state
  *   The state of the submitted form (including values).
  *
  * @see signup_send_broadcast()
@@ -109,17 +109,17 @@ function signup_broadcast_form_submit($form, &$form_state) {
 /**
  * Send an email message to users who have signed up to a node.
  *
- * @param int $nid
+ * @param $nid
  *   Node ID of the signup node to send a broadcast about.
- * @param string $subject
+ * @param $subject
  *   The subject of the broadcast message to send.
- * @param string $body
+ * @param $body
  *   The body of the broadcast message to send.
- * @param string $from
+ * @param $from
  *   The from address to use when sending the broadcast message.
- * @param bool $copy
+ * @param $copy
  *   Optional boolean indicating if the current user should get a copy.
- * @param array $signups
+ * @param $signups
  *   Optional array of signup objects to send the broadcast to.  Each object
  *   in the array should at least contain the following fields:
  *   - "sid": The unique signup ID

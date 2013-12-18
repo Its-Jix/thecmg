@@ -305,9 +305,10 @@ function relation_wizard_ui_edit_form($form, &$form_state) {
   }
 
   $form['buttons']['cancel'] = array(
-    '#type' => 'button',
+    '#type' => 'submit',
+    '#op' => 'cancel',
     '#value' => t('Cancel'),
-    '#attributes' => array('class' => array('ctools-close-modal')),
+    '#attributes' => array('class' => array('button-no')),
   );
 
   return $form;
@@ -528,18 +529,6 @@ function relation_wizard_ui_add_form_step2($form, &$form_state) {
  * @param $form
  * @param $form_state
  */
-function relation_wizard_ui_add_form_step2_validate(&$form, &$form_state) {
-  $endpoint2 = $form_state['values']['relation_endpoint'];
-  preg_match('/(.*?(?=\[))\[([\w\d]+):(\d+)\]/', $endpoint2, $matches);
-  if(!$matches) {
-    form_set_error('relation_endpoint');
-  }
-}
-
-/**
- * @param $form
- * @param $form_state
- */
 function relation_wizard_ui_add_form_step2_submit(&$form, &$form_state) {
   $form_state['object']->endpoint2 = $form_state['values']['relation_endpoint'];
   $form_state['object']->type = $form_state['values']['type'];
@@ -563,15 +552,15 @@ function relation_wizard_ui_add_form_step3($form, &$form_state) {
   $direction_id = $form_state['object']->direction_id;
 
   $matches = array();
-  preg_match('/(.*?(?=\[))\[([\w\d]+):(\d+)\]/', $endpoint2, $matches);
-
-  $entity_keys[] = array(
-    'entity_label' => $matches[1],
-    'entity_type' => $matches[2],
-    'entity_id' => $matches[3],
-    'r_index' => $direction_id,
-  );
-
+  preg_match('/([\w\s]*)\[([\w\d]+):(\d+)\]/', $endpoint2, $matches);
+  if ($matches) {
+    $entity_keys[] = array(
+      'entity_label' => $matches[1],
+      'entity_type' => $matches[2],
+      'entity_id' => $matches[3],
+      'r_index' => $direction_id,
+    );
+  }
   $form_state['object']->entity_keys = $entity_keys;
 
   $form['from'] = array(
@@ -780,8 +769,7 @@ function _relation_wizard_ui_get_table($entity, $entity_type, $direct = TRUE) {
         array('data' => t('Title'), 'style' => 'width:40%'),
         array('data' => t('Type'), 'style' => 'width:30%'),
         array('data' => t('Actions'), 'style' => 'width:30%'),
-      ),
-      'rows' => $rows
+      ), 'rows' => $rows
     ));
 
     $output .= theme('pager', array('element' => ($direct) ? 1 : 2));

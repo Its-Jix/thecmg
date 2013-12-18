@@ -33,11 +33,11 @@
  * If you do not want any additional fields, the function can simply
  * return an empty array: "return array();"
  *
- * @param array $variables
+ * @param $variables
  *   An array of variables including:
  *   - 'node': The fully loaded node object where this signup form is appearing.
  *
- * @return array
+ * @return
  *   Array defining the form to present to the user to signup for a node.
  *
  * @see theme_signup_anonymous_username()
@@ -82,12 +82,12 @@ function theme_signup_user_form($variables) {
  * This value is used for the %user_name email token for anonymous users, and
  * also to identify a particular anonymous signup in various places in the UI.
  *
- * @param array $variables
+ * @param $variables
  *   An array of variables including:
  *   - 'form_data': Array of custom signup form values for the current signup.
  *   - 'email': E-mail address of the anonymous user who signed up.
  *
- * @return string
+ * @return
  *   A string with the proper value for the %user_name email token.
  *
  * @see theme_signup_user_form()
