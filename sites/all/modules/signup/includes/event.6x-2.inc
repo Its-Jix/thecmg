@@ -90,10 +90,10 @@ function _signup_event_format_date($node) {
 /**
  * Determine if the given node has a start time managed by the event.module.
  *
- * @param stdClass $node
+ * @param $node
  *   Fully loaded node object to test.
  *
- * @return string
+ * @return
  *   'event' if this is an event node, otherwise 'none'.
  *
  * @see _signup_get_node_scheduler()

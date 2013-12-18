@@ -28,6 +28,7 @@
                     if (oSettings) {
                         oTable.$('tr').click(function () {
                             var data = oTable.fnGetData(this);
+                            console.log(data);
                             var value = data[0] + ' [' + data[1] + ':' + data[2] + ']';
                             $('input[id=edit-relation-endpoint]').val(value);
 

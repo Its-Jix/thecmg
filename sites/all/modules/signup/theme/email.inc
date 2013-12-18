@@ -7,11 +7,8 @@
 /**
  * Return the value for the %user_signup_info email token for custom signup data.
  *
- * @param array $signup_data
- *   Custom data for a particular signup.
- *
- * @return string
- *   Plain text output.
+ * @param $signup_data
+ *   Array of custom data for a particular signup.
  *
  * @see theme_signup_user_form()
  * @see theme_signup_custom_data_email()
@@ -27,10 +24,10 @@ function theme_signup_email_token_custom_data($variables) {
  * nested data), so if you override it, be sure not to change the part
  * where it does "call_user_func(__FUNCTION__)".
  *
- * @param array $data
- *   An array of custom user signup data.
+ * @param $data
+ *   Array of custom user signup data.
  *
- * @return string
+ * @return
  *   Plain text output with newlines.
  *
  * @see theme_signup_user_form()
@@ -56,12 +53,12 @@ function theme_signup_custom_data_email($variables) {
 /**
  * Renders a single custom signup form field into unfiltered output.
  *
- * @param string $key
+ * @param $key
  *   Name of the custom signup field (the array key).
- * @param string $value
+ * @param $value
  *   Value of the custom signup field (the array value).
  *
- * @return string
+ * @return
  *   Plain text output to display this key/value pair.
  *
  * @see theme_signup_user_form()
@@ -82,12 +79,12 @@ function theme_signup_custom_data_field_text($variables) {
 /**
  * Controls the body of the copy of the broadcast message sent to the sender.
  *
- * @param string $raw_message
+ * @param $raw_message
  *   The raw message typed in by the sender with no tokens replaced.
- * @param string $cooked_message
+ * @param $cooked_message
  *   The message after all the tokens have been replaced.
  *
- * @return string
+ * @return
  *   The final text to put in the email body sent to the broadcast sender.
  */
 function theme_signup_broadcast_sender_copy($variables) {

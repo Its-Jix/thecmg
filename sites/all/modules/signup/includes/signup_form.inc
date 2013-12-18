@@ -7,18 +7,15 @@
 /**
  * Build the user signup form.
  *
- * @param stdClass $node
+ * @param $node
  *   The fully loaded node object.
- * @param string $signup_type
+ * @param $signup_type
  *   Determines what kind of signup to generate a form for. Possible values:
  *    'auth' -- regular authenticated user signup form
  *    'anon' -- anonymous user signup form (includes required email field).
  *    'admin' -- admin form to signup another user (includes user selector).
- * @param bool $fieldset
+ * @param $fieldset
  *   Boolean that indicates if the signup form should be in a fieldset.
- *
- * @return array
- *   An FAPI array defining the signup form.
  */
 function signup_form($form, &$form_state, $node, $signup_type = 'auth', $fieldset = TRUE) {
   global $user;
@@ -106,9 +103,9 @@ function signup_form($form, &$form_state, $node, $signup_type = 'auth', $fieldse
 /**
  * Submit handler for the user signup form.
  *
- * @param array $form
+ * @param $form
  *   The form being submitted.
- * @param array $form_values
+ * @param $form_values
  *   The state of the form, including the submitted values.
  */
 function signup_form_submit($form, &$form_state) {
@@ -124,9 +121,9 @@ function signup_form_submit($form, &$form_state) {
 /**
  * Validate handler for the email address on the anonymous user signup form.
  *
- * @param array $form
+ * @param $form
  *   Form array for the anonymous user email field.
- * @param array $form_state
+ * @param $form_state
  *   State of the form, including the submitted values to validate.
  */
 function signup_form_validate_anon($form, $form_state) {
@@ -138,11 +135,11 @@ function signup_form_validate_anon($form, $form_state) {
 /**
  * Validate the email address for an anonymous signup.
  *
- * @param int $nid
+ * @param $nid
  *   The node the user is signing up for.
- * @param string $anon_mail
+ * @param $anon_mail
  *   The anonymous email address to validate.
- * @param string|false $name
+ * @param $name
  *   The form element being validated (optional).
  *
  * @return Boolean.
@@ -178,10 +175,10 @@ function signup_validate_anon_email($nid, $anon_mail, $name = FALSE) {
 /**
  * Validates the username on the admin form to signup another user.
  *
- * @param array $form
+ * @param $form
  *   Form array for the username field.
- * @param array $form_state
- *   The form state array containing node ID of the node the user is being signed up for.
+ * @param $nid
+ *   Node id of the node the user is being signed up for.
  */
 function signup_form_validate_username($form, $form_state) {
   $nid = $form_state['values']['nid'];

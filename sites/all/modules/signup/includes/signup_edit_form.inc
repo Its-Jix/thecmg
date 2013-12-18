@@ -7,16 +7,16 @@
 /**
  * Build the form for editing existing signups.
  *
- * @param array $form
+ * @param $form
  *   An associative array containing the structure of the form.
- * @param array $form_state
+ * @param $form_state
  *   The state of the form to build (not currently used).
- * @param stdClass $signup
+ * @param $signup
  *   The fully-loaded signup object with data about the signup to edit.
- * @param string $type
+ * @param $type
  *   The type of signup edit form to render, can be 'node', 'tab', or 'admin'.
  *
- * @return array
+ * @return
  *   The FAPI form array for the signup edit form.
  */
 function signup_edit_form($form, &$form_state, $signup, $type) {
@@ -182,10 +182,10 @@ function signup_edit_form_save_submit($form, $form_state) {
 /**
  * Page handler for the administrator page to edit an existing signup.
  *
- * @param stdClass $signup
+ * @param $signup
  *   The fully-loaded signup object to edit.
  *
- * @return string
+ * @return
  *   The HTML to use for the signup edit page.
  */
 function signup_edit_page($signup) {

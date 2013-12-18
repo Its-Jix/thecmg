@@ -29,10 +29,10 @@ function signup_site_has_dates() {
 /**
  * Determine which scheduler backend to use for the given node.
  *
- * @param stdClass $node
+ * @param $node
  *   Fully loaded node object to test.
  *
- * @return string
+ * @return
  *   'event' to use the event.module, 'date' for the date.module, or 'none' if
  *   the node is untimed.
  *
@@ -56,10 +56,10 @@ function _signup_get_node_scheduler($node) {
 /**
  * Determine which scheduler backend to use for the given node type.
  *
- * @param string $type
+ * @param $type
  *   Machine-readable name of the node type to test.
  *
- * @return string
+ * @return
  *   'event' to use the event.module, 'date' for the date.module, or 'none' if
  *   the node type is untimed.
  */

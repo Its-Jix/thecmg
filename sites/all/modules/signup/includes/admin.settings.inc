@@ -188,10 +188,8 @@ function signup_settings_form($form, &$form_state) {
 /**
  * Submits the signup settings form
  *
- * @param string $form_id
- *   The ID of the form being submitted.
- * @param array $form_values
- *   The constructed form values array of the submitted form.
+ * @param $form_id The ID of the form being submitted.
+ * @param $form_values The constructed form values array of the submitted form.
  */
 function signup_settings_form_submit($form, &$form_state) {
   $op = isset($form_state['values']['op']) ? $form_state['values']['op'] : '';
@@ -245,12 +243,12 @@ function signup_settings_form_submit($form, &$form_state) {
 /**
  * Generates the appropriate selector label for a given view.
  *
- * @param views_view $view
+ * @param $view
  *   An object containing data about the view to generate a label for.
  *   Contains at least a name (string), description (string), page
  *   (bool), and block (bool) fields.
  *
- * @return string
+ * @return
  *   The plain text (no HTML allowed) to include as the label for this view in
  *   the drop-down selector for which view to embed on the site-wide signup
  *   settings page.

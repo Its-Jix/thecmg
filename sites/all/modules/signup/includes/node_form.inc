@@ -20,10 +20,13 @@
  * properly signup-enabled (these settings can be changed by visiting the
  * "Settings" subtab under the "Signups" tab at node/N/signups/settings).
  *
- * @param stdClass $node
+ * @param $node
  *   The node object given to signup_nodeapi().
- * @param string $op
+ * @param $op
  *   The hook_nodeapi() operation, either 'insert' or 'update'.
+ *
+ * @return
+ *   Nothing, this function is expected to update the database.
  *
  * @see signup_nodeapi()
  */

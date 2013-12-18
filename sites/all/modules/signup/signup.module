@@ -410,9 +410,9 @@ function signup_menu() {
  * This ensures that the node is signup enabled, and that that the current
  * user should have permission to view the requested menu item type.
  *
- * @param stdClass $node
+ * @param $node
  *   The fully loaded node object from the menu autoloader.
- * @param string $menu_type
+ * @param $menu_type
  *   String specifying what kind of menu item to test access for.  Can be:
  *   'signup': the signup form
  *   'list': the signup attendee listing
@@ -423,7 +423,7 @@ function signup_menu() {
  *   'broadcast': for the broadcast tab
  *   'any': if the user has permission to see any of these
  *
- * @return bool
+ * @return
  *   TRUE if the current node is signup enabled and the current user has
  *   permisison to access to requested menu item, otherwise FALSE.
  *
@@ -518,12 +518,12 @@ function signup_menu_load($sid) {
 /**
  * Determine menu access callback for a specific signup.
  *
- * @param stdClass $signup
+ * @param $signup
  *   The fully-loaded signup object that would be affected.
- * @param string $op
+ * @param $op
  *   The operation the menu item would perform. Can be 'edit' or 'cancel'.
  *
- * @return bool
+ * @return
  *   TRUE if the operation should be permitted, otherwise FALSE.
  */
 function _signup_menu_signup_access($signup, $op) {
@@ -563,8 +563,11 @@ function signup_current_user_signup_page($node) {
  * see if they can administer signups and redirect there. Finally, if they can
  * at least send a signup broadcast, go there.
  *
- * @param stdClass $node
+ * @param $node
  *   Fully loaded node object to generate the node/N/signup menu handler for.
+ *
+ * @return
+ *   Either the output of the default task ("Sign up") or redirect to a tab.
  *
  * @see signup_menu()
  * @see _signup_menu_access()
@@ -752,8 +755,6 @@ function signup_form_alter(&$form, &$form_state, $form_id) {
 }
 
 /**
- * Implements hook_form_FORM_ID_alter().
- *
  * Alters the form for administrator settings per node type.
  * (admin/content/types)
  */
@@ -927,11 +928,9 @@ function signup_node_view($node, $view_mode = 'full') {
  * Helper function that determines if a given node should have any
  * signup-related output.
  *
- * @param stdClass $node
- *   A fully loaded node object.
+ * @param $node A fully loaded node object.
  *
- * @return bool
- *   TRUE if this node should have signup output, FALSE if not.
+ * @return TRUE if this node should have signup output, FALSE if not.
  *
  * @see signup_nodeapi()
  */
@@ -974,7 +973,7 @@ function signup_action_info() {
 /**
  * Action callback to cancel a given signup.
  *
- * @param stdClass $signup
+ * @param $signup
  *   Reference to a fully-loaded signup object to cancel.
  *
  * @see signup_load_signup()
@@ -988,10 +987,10 @@ function signup_cancel_action($signup) {
 /**
  * Action callback to mark a given signup that the user attended the node.
  *
- * @param stdClass $signup
+ * @param $signup
  *   Reference to a fully-loaded signup object to record attendance on.
  *
- * @return none
+ * @return
  *   Nothing: $signup object is modified by reference and the {signup_log}
  *   table is directly UPDATE'ed in the database.
  */
@@ -1011,10 +1010,10 @@ function signup_mark_attended_action(&$signup) {
 /**
  * Action callback to mark a given signup that the user didn't attend the node.
  *
- * @param stdClass $signup
+ * @param $signup
  *   Reference to a fully-loaded signup object to record attendance on.
  *
- * @return none
+ * @return
  *   Nothing: $signup object is modified by reference and the {signup_log}
  *   table is directly UPDATE'ed in the database.
  */
@@ -1054,10 +1053,10 @@ function signup_views_bulk_operations_object_info() {
  * method also adds a "label" member to the object which is used by Views bulk
  * operations (VBO) in various parts of its UI.
  *
- * @param int $sid
+ * @param $sid
  *   Signup ID to load.
  *
- * @return stdClass
+ * @return
  *   Fully loaded $signup object corresponding to the given ID.
  */
 function signup_load_signup($sid) {
@@ -1072,10 +1071,10 @@ function signup_load_signup($sid) {
 /**
  * Save a $signup object to the database.
  *
- * @param stdClass $signup
+ * @param $signup
  *   Fully-loaded signup object to save.
  *
- * @return SAVED_NEW|SAVED_UPDATED|false
+ * @return
  *   The return value from drupal_write_record().
  *
  * @see signup_load_signup()
@@ -1114,10 +1113,10 @@ function signup_save_signup(&$signup) {
 /**
  * Retrieve a list of all users who have signed up for a node.
  *
- * @param int $nid
+ * @param $nid
  *   The node ID to retrieve signups for.
  *
- * @return array
+ * @return
  *   An array of $signup objects containing all columns from {signup_log}
  *   along with the 'name', 'mail', and 'language' columns from {users}.
  */
@@ -1157,11 +1156,11 @@ function signup_content_extra_fields($type_name) {
 /**
  * Cancel the given signup.
  *
- * @param stdClass $signup
+ * @param $signup
  *   Information about the signup to cancel. Can be either the integer signup
  *   ID (sid), or a full object of data about the signup (a complete row from
  *   the {signup_log} table.
- * @param bool $notify_user
+ * @param $notify_user
  *   When set to TRUE, a confirmation message is displayed via
  *   drupal_set_message().
  */
@@ -1217,13 +1216,7 @@ function signup_valid_token($token, $sid, $operation) {
 }
 
 /**
- * Callback function for closing signups.
- *
- * @param int $nid
- *   The node ID of the node to which signups are being opened.
- * @param string $cron
- *   A string indicating whether the callback is being executed by cron.
- *
+ * Callback function for closing signups
  * @ingroup signup_callback
  */
 function signup_close_signup($nid, $cron = 'no') {
@@ -1246,13 +1239,7 @@ function signup_close_signup($nid, $cron = 'no') {
 }
 
 /**
- * Callback function for reopening signups.
- *
- * @param int $nid
- *   The node ID of the node to which signups are being opened.
- * @param string $cron
- *   A string indicating whether the callback is being executed by cron.
- *
+ * Callback function for reopening signups
  * @ingroup signup_callback
  */
 function signup_open_signup($nid, $cron = 'no') {
@@ -1295,32 +1282,31 @@ function signup_content_types() {
  * NOTE: other modules can call this function. To do so, $signup_form
  * must be as follows:
  *
- * @param array $signup_form
- *   $signup_form['nid'] : nid of the node to which the user will be signed up
- *   $signup_form['uid'] : uid of the user to sign up
- *   $signup_form['signup_anon_mail'] : Optional. An email address of an
- *     anonymous user to sign up. Only include this if the user is not
- *     already registered with the site.  $signup_form['uid'] will
- *     automatically be set to 0 if this element is passed in. NOTE: It's
- *     highly recommended to call the signup_validate_anon_email
- *     function in the external module's validation cycle or perform
- *     that function's validation logic prior to passing in this element!
- *   $signup_form['signup_form_data'] : an array of key/value pairs --
- *     key is the data category, value is the user input
+ * $signup_form['nid'] : nid of the node to which the user will be signed up
+ * $signup_form['uid'] : uid of the user to sign up
+ * $signup_form['signup_anon_mail'] : Optional. An email address of an
+ *   anonymous user to sign up. Only include this if the user is not
+ *   already registered with the site.  $signup_form['uid'] will
+ *   automatically be set to 0 if this element is passed in. NOTE: It's
+ *   highly recommended to call the signup_validate_anon_email
+ *   function in the external module's validation cycle or perform
+ *   that function's validation logic prior to passing in this element!
+ * $signup_form['signup_form_data'] : an array of key/value pairs --
+ *   key is the data category, value is the user input
  *
- * @param bool $notify_user
+ * @param $notify_user
  *   When set to TRUE, confirmation messages are displayed via
  *   drupal_set_message() and confirmation/forwarding emails are sent if
  *   enabled for the current node.
  *
- * @param bool $reset_node_load
+ * @param $reset_node_load
  *   When set to TRUE, node_load() is called with the optional reset
  *   argument as TRUE. This can sometimes be helpful when signups
  *   have been opened with signup_open_signup() since that function
  *   can cause static caching of the node object, thus leading to the
  *   $node->signup_status check here failing when it should not.
  *
- * @return int|false
+ * @return
  *   The signup id (SID) if the user was successfully signed up, FALSE if the
  *   user is already signed up or signups are not allowed on the given node.
  */
@@ -1446,12 +1432,12 @@ function signup_sign_up_user($signup_form, $notify_user = TRUE, $reset_node_load
  * If callers wish to honor this configuration, they must test
  * $node->signup_send_confirmation themselves.
  *
- * @param stdClass $signup
+ * @param $signup
  *   The fully-loaded signup object representing the user's signup.
- * @param stdClass $node
+ * @param $node
  *   The fully-loaded node object which the user signed up to.
  *
- * @return array|false
+ * @return
  *   The return value from drupal_mail() if the mail is sent, or FALSE if the
  *   confirmation was aborted for some reason (node not configured to send it,
  *   user doesn't have a valid e-mail address, etc).
@@ -1478,12 +1464,12 @@ function signup_send_confirmation_mail($signup, $node) {
 /**
  * Send the signup forwarding mail when a user signs up for something.
  *
- * @param stdClass $signup
+ * @param $signup
  *   The fully-loaded signup object representing the user's signup.
- * @param stdClass $node
+ * @param $node
  *   The fully-loaded node object which the user signed up to.
  *
- * @return array|false
+ * @return
  *   The return value from drupal_mail() if the mail is sent, or FALSE if the
  *   messsage is aborted for some reason (node not configured to send it,
  *   user doesn't have a valid e-mail address, etc).
@@ -1538,12 +1524,12 @@ function signup_send_forwarding_mail($signup, $node) {
  * signup status (open vs. closed) and prints a message indicating
  * what happened.
  *
- * @param stdClass $node
+ * @param $node
  *  The node to update, can be a full $node object or a numeric nid.
- * @param stdClass $type
+ * @param $type
  *  String indicating what changed -- can be either 'limit' or 'total'.
  *
- * @return int
+ * @return
  *  A flag indicating what change (if any) to the signup status was
  *  required due to the change in limit.  0 if there was no change, -1
  *  if signups are now closed, and 1 if signups are now open.
@@ -1632,11 +1618,11 @@ function signup_views_api() {
  *
  * Constructs all of the email messages generated by the signup module.
  *
- * @param string $key
+ * @param $key
  *   Unique key to indicate what message to build.
- * @param array $message
+ * @param $message
  *   Reference to the message array being built.
- * @param array $params
+ * @param $params
  *   Array of parameters to indicate what text to include in the message body.
  *   If $params['ignore_tokens'] is TRUE, none of the signup-provided tokens
  *   in the message body will be replaced, otherwise, tokens are replaced
@@ -1668,13 +1654,13 @@ function signup_mail($key, &$message, $params) {
  * These are the hard-coded tokens provided by signup.module which are
  * available even when token.module is not enabled.
  *
- * @param stdClass $node
+ * @param $node
  *   An object with info about the signup-enabled node. Must contain
  *   at least 'nid', 'title', and 'TODO: time?' fields.
- * @param stdClass $signup
+ * @param $signup
  *   An object with info about the user who signed up.
  *
- * @return array
+ * @return
  *   An array of tokens and their replacement values.
  */
 function _signup_get_email_tokens($node, $signup) {
@@ -1715,10 +1701,10 @@ function _signup_get_email_tokens($node, $signup) {
 /**
  * Get the email address to use for a given signup.
  *
- * @param stdClass $signup
+ * @param $signup
  *   An object containing signup data, in particular 'mail' and 'anon_mail'.
  *
- * @return string
+ * @return
  *   The appropriate email address to use to contact the signed up user.
  */
 function _signup_get_email($signup) {
@@ -1728,13 +1714,13 @@ function _signup_get_email($signup) {
 /**
  * Get the name to use for a given signup.
  *
- * @param stdClass $signup
+ * @param $signup
  *   A fully-loaded signup object.
- * @param bool $link
+ * @param $link
  *   Optional boolean indicating that the name should be rendered as a link to
  *   the user's profile (if it's an authenticated signup).
  *
- * @return string
+ * @return
  *   The appropriate name to use for the signed up user.
  */
 function _signup_get_username($signup, $link = FALSE) {
@@ -1763,9 +1749,6 @@ function _signup_get_username($signup, $link = FALSE) {
 
 /**
  * Generate a link to cancel a given signup.
- *
- * @param int $sid
- *   The signup ID.
  */
 function _signup_get_cancel_link($sid) {
   $token = signup_get_token($sid, 'cancel');
@@ -1775,11 +1758,11 @@ function _signup_get_cancel_link($sid) {
 /**
  * Implements hook_panels_include_directory().
  *
- * @param string $plugin_type
+ * @param $plugin_type
  *   The plugin type for which the Panels engine is currently requesting the
  *   location of an include directory.
  *
- * @return string
+ * @return
  *   The location of the include directory for plugin type being requested,
  *   relative to the base directory of the module implementing this hook.
  */

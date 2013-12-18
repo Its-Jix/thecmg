@@ -7,9 +7,9 @@
 /**
  * Private function to generate HTML for showing the available tokens.
  *
- * @param array $form
+ * @param $form
  *   Reference to the form array to include the help fieldset in.
- * @param string $element_name
+ * @param $element_name
  *   Name of the form element to use for the help fieldset.
  */
 function _signup_token_help(&$form, $element_name) {

@@ -9,10 +9,3 @@ features[rules_config][] = "rules_notify_node_author_on_new_comments"
 name = "Notify node authors about new comments"
 package = "Features"
 php = "5.2.4"
-
-; Information added by drupal.org packaging script on 2013-10-01
-version = "7.x-1.x-dev"
-core = "7.x"
-project = "rb"
-datestamp = "1380624844"
-
