@@ -1,5 +1,6 @@
 # Ignore configuration files that may contain sensitive information.
 sites/*/settings*.php
+sites/*/civicrm.settings*.php
 
 # Ignore paths that contain user-generated content.
 sites/*/files
@@ -7,3 +8,18 @@ sites/*/private
 
 # Don't ignore the htaccess in files anymore
 !sites/*/files/.htaccess
+
+# Special cal mens files
+/css
+/css/*
+/elgg
+/elgg/*
+/img
+/img/*
+/tmp
+/tmp/*
+/webmail
+/webmail/*
+/squirrelmail
+/squirrelmail/*
+/test
