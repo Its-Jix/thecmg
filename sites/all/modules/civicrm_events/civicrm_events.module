@@ -143,8 +143,15 @@
  
     while ( $dao->fetch( ) ) {
       if ( $dao->title ) { 
+
+if (isset($dao->start_date)){
         $startDate = date("Y,n,j", strtotime( $dao->start_date ) );
 	$endDate   = date("Y,n,j", strtotime( $dao->end_date ) );
+} elseif ($dao->start){
+        $startDate = date("Y,n,j", strtotime( $dao->start ) );
+	$endDate   = date("Y,n,j", strtotime( $dao->end ) );
+}        
+
 	$dao->url =   CRM_Utils_System::url( 'civicrm/event/info', 'id=' . $dao->id );
       }
       $eventData = array();
@@ -158,4 +165,3 @@
   
     return "<div id='calendar'></div>";
 }
-

@@ -1,4 +1,3 @@
-
 /**
  * @file
  * Styles for system messages.
@@ -18,11 +17,11 @@ div.status {
 }
 div.status,
 .ok {
-  color: #234600;
+  color: black;
 }
 div.status,
 table tr.ok {
-  background-color: #f8fff0;
+  background-color: #3f3;
 }
 
 div.warning {

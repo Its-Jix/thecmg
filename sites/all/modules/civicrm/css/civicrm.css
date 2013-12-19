@@ -373,6 +373,10 @@ div.spacer,
     margin-left:16%;
 }
 
+#crm-container .pay_later-section {
+background-color: #3f3;
+}
+
 #crm-container .no-label .content {
     margin-left: 0px;
 }

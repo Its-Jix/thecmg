@@ -92,9 +92,9 @@ settings[grid_adjusted_regions_fluid][content][] = sidebar_second
 ; Nested group fluid width adjustments: regions inside a parent group to subtract to get remaining width
 settings[grid_adjusted_groups_fluid][content_group][] = sidebar_second
 
-; Information added by drupal.org packaging script on 2013-09-30
+; Information added by drupal.org packaging script on 2011-06-07
 version = "7.x-1.x-dev"
 core = "7.x"
 project = "acquia_prosper"
-datestamp = "1380552389"
+datestamp = "1307404938"
 

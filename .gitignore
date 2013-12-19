@@ -9,17 +9,17 @@ sites/*/private
 !sites/*/files/.htaccess
 
 # Special cal mens files
-css
-css/*
-elgg
-elgg/*
-img
-img/*
-tmp
-tmp/*
-webmail
-webmail/*
-squirrelmail
-squirrelmail/*
-test
+/css
+/css/*
+/elgg
+/elgg/*
+/img
+/img/*
+/tmp
+/tmp/*
+/webmail
+/webmail/*
+/squirrelmail
+/squirrelmail/*
+/test
 

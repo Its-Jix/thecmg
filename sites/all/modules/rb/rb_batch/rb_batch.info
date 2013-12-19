@@ -4,3 +4,10 @@ package = Rules
 core = 7.x
 files[] = rb_batch.rules.inc
 dependencies[] = rules
+
+; Information added by drupal.org packaging script on 2012-02-28
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "rb"
+datestamp = "1330389204"
+

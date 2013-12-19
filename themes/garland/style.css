@@ -492,6 +492,7 @@ body.two-sidebars #squeeze {
   float: left; /* LTR */
   z-index: 2;
   position: relative;
+  overflow-x: scroll;
 }
 
 #wrapper #container .sidebar .block {
@@ -1252,4 +1253,10 @@ table.system-status-report tr.ok,
 table.system-status-report tr.ok th {
   background-color: #dfd;
   border-color: #beb;
+}
+
+#main-menu-links {
+  font-size: 0.8em;
+margin-right: 0px;
+padding: 0 1px;
 }

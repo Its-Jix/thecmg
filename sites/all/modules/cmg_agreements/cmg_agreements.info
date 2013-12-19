@@ -1,0 +1,6 @@
+name = verify email hook
+description = CMG Module to verify email and clear agreements
+dependencies[] = civicrm
+package = CiviCRM
+core = 7.x
+version = 1.0

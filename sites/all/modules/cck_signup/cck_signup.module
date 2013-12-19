@@ -98,7 +98,7 @@ function _cck_signup_validate_signup_node($form, &$form_state) {
   $field_name = variable_get('cck_signup_signup_type_' . $type, FALSE);
   $override = user_access('override cck signup restrictions');
   $event = FALSE;
-  $language = $values['language'];
+  $language = 'und';
   if (!$event = node_load($values[$field_name][$language][0]['nid'])) {
     return;
   }

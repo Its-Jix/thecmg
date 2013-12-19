@@ -27,3 +27,10 @@ features[variable][] = "node_options_article_promotion"
 features[variable][] = "node_submitted_article_promotion"
 name = "Example rule: Promotion syncronization"
 package = "Features"
+
+; Information added by drupal.org packaging script on 2012-02-28
+version = "7.x-1.x-dev"
+core = "7.x"
+project = "rb"
+datestamp = "1330389204"
+

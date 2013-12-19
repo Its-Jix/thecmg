@@ -8,9 +8,6 @@
   display: inline-block;
   vertical-align: top;
   word-spacing: normal;
-  /* hack for IE 6&7 */
-  zoom: 1;
-  *display: inline;
 }
 
 .webform-layout-box.horiz > * + * {

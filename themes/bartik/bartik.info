@@ -1,4 +1,3 @@
-
 name = Bartik
 description = A flexible, recolorable theme with many regions.
 package = Core
@@ -9,6 +8,7 @@ stylesheets[all][] = css/layout.css
 stylesheets[all][] = css/style.css
 stylesheets[all][] = css/colors.css
 stylesheets[print][] = css/print.css
+scripts[] = scripts.js
 
 regions[header] = Header
 regions[help] = Help
