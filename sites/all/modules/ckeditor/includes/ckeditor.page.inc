@@ -67,7 +67,7 @@ function ckeditor_help_delegate($path, $arg) {
                     '<p>' . t('Useful links: !ckeditorlink | !devguidelink | !userguidelink.',
                             array(
                                 '!ckeditorlink' => l(t('CKEditor website'), 'http://ckeditor.com'),
-                                '!devguidelink' => l(t('Developer\'s Guide'), 'http://docs.cksource.com/CKEditor_3.x/Developers_Guide'),
+                                '!devguidelink' => l(t('CKEditor for Drupal Documentation'), 'http://docs.cksource.com/CKEditor_for_Drupal'),
                                 '!userguidelink' => l(t('User\'s Guide'), 'http://docs.cksource.com/CKEditor_3.x/Users_Guide')
                     )) . '</p></div>' .
                     '<p>' . t('Profiles are linked with input format types. A CKEditor profile defines which buttons are available in the editor, how the editor is displayed, and a few other editor functions. The Global Profile stores some general information about CKEditor.') . '</p>';
@@ -82,7 +82,7 @@ function ckeditor_help_delegate($path, $arg) {
             $output .= '<p>' . t('Useful links: !ckeditorlink | !devguidelink | !userguidelink.',
                             array(
                                 '!ckeditorlink' => l(t('CKEditor website'), 'http://ckeditor.com'),
-                                '!devguidelink' => l(t('Developer\'s Guide'), 'http://docs.cksource.com/CKEditor_3.x/Developers_Guide'),
+                                '!devguidelink' => l(t('CKEditor for Drupal Documentation'), 'http://docs.cksource.com/CKEditor_for_Drupal'),
                                 '!userguidelink' => l(t('User\'s Guide'), 'http://docs.cksource.com/CKEditor_3.x/Users_Guide')
                                 )) . '</p>';
             $output .= '<h4>' . t('Configuration') . '</h4>';
@@ -96,10 +96,9 @@ function ckeditor_help_delegate($path, $arg) {
                                 '!filterlink' => l(t('filters'), 'admin/config/content/formats'),
                     )) .
                    '<br /><code>' . htmlspecialchars('<a> <p> <span> <div> <h1> <h2> <h3> <h4> <h5> <h6> <img> <map> <area> <hr> <br> <br /> <ul> <ol> <li> <dl> <dt> <dd> <table> <tbody> <th> <tr> <td> <em> <b> <u> <i> <strong> <del> <ins> <sub> <sup> <quote> <blockquote> <pre> <address> <code> <cite> <embed> <object> <param> <strike> <caption> <iframe>') . '</code><br />';
-            $output .= t('<strong>Note:</strong> be careful when granting users access to create tags like %iframe.<br />If you are going to use CKEditor with the <strong>Filtered HTML</strong> input format, please read the "Setting up filters" section in the <code>!readme</code> file.',
+            $output .= t('<strong>Note:</strong> be careful when granting users access to create tags like %iframe.',
                             array(
                                '%iframe' => '<iframe>',
-                                '!readme' => l(t('README.txt'), $base_url . '/' . drupal_get_path('module', 'ckeditor') . '/README.txt', array('absolute' => TRUE))
                     )) . '</li>';
             $output .= '<li>' . t('To have better control over line breaks, you should disable the <strong>%settingname</strong> setting in the chosen Text format (recommended).',
                             array(
@@ -120,20 +119,6 @@ function ckeditor_help_delegate($path, $arg) {
             $output .= ' ' . t('If you are looking for more information, have any trouble with the configuration, or found an issue with the CKEditor module, please visit the !officiallink.', array('!officiallink' => l(t('official project page'), 'http://drupal.org/project/ckeditor')));
             $output .= ' ' . t('More information about how to customize CKEditor for your theme can be found !herelink.', array('!herelink' => l(t('here'), 'http://drupal.ckeditor.com/tricks')));
             $output .= '</p>';
-
-            $output .= '<h3>' . t('Uploading images and files') . '</h3>';
-            $output .= '<p>' . t('There are three ways for uploading files:') . '</p>';
-            $output .= '<ol>';
-            $output .= '<li>' . t('By using !ckfinder (commercial), an advanced Ajax file manager.',
-                            array(
-                                '!ckfinder' => l(t('CKFinder'), 'http://ckfinder.com'),
-                    )) . '</li>';
-            $output .= '<li>' . t('By using a dedicated module like !imcelink.',
-                            array(
-                                '!imcelink' => l(t('IMCE'), 'http://drupal.org/project/imce')
-                    )) . '</li>';
-            $output .= '<li>' . t('By using the core upload module.') . '</li>';
-            $output .= '</ol>';
 
             break;
     }
