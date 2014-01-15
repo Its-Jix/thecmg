@@ -59,7 +59,7 @@ define( 'CIVICRM_UF'               , 'Drupal'        );
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-define( 'CIVICRM_UF_DSN'           , 'mysql://drupal_4:i3h9CT8k$F@localhost/drupal_5?new_link=true' );
+define( 'CIVICRM_UF_DSN'           , 'mysql://cmg_prod:AKJBS8sKYTmzFFybH2ZO@localhost/cmg_prod?new_link=true' );
 
 /**
  * CiviCRM Database Settings
@@ -80,7 +80,7 @@ define( 'CIVICRM_UF_DSN'           , 'mysql://drupal_4:i3h9CT8k$F@localhost/drup
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
-define( 'CIVICRM_DSN'          , 'mysql://drupal_4:i3h9CT8k$F@localhost/drupal_5?new_link=true' );
+define( 'CIVICRM_DSN'          , 'mysql://cmg_prod:AKJBS8sKYTmzFFybH2ZO@localhost/cmg_prod?new_link=true' );
 
 /**
  * CiviCRM Logging Database
@@ -124,8 +124,8 @@ define('CIVICRM_LOGGING_DSN', CIVICRM_DSN);
 
 global $civicrm_root;
 
-$civicrm_root = '/var/www/vhosts/server.thecmg.info/cmg/sites/all/modules/civicrm';
-define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/var/www/vhosts/server.thecmg.info/cmg/sites/default/files/civicrm/templates_c/' );
+$civicrm_root = '/var/www/thecmg.info/sites/all/modules/civicrm';
+define( 'CIVICRM_TEMPLATE_COMPILEDIR', '/var/www/thecmg.info/sites/default/files/civicrm/templates_c/' );
 
 /**
  * Site URLs:

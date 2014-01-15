@@ -184,11 +184,11 @@ $databases = array (
   array (
     'default' => 
     array (
-      'database' => 'drupal_5',
-      'username' => 'drupal_4',
-      'password' => 'i3h9CT8k$F',
+      'database' => 'cmg_prod',
+      'username' => 'cmg_prod',
+      'password' => 'AKJBS8sKYTmzFFybH2ZO',
       'host' => 'localhost',
-      'port' => '3306',
+      'port' => '',
       'driver' => 'mysql',
       'prefix' => '',
     ),
