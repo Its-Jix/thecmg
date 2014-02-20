@@ -20,7 +20,8 @@ table,
 input, 
 textarea, 
 select, 
-a.button {
+a.button,
+fieldset legend {
   font-family: 'Open Sans', Arial, Helvetica, "Nimbus Sans L", sans-serif;
   letter-spacing: .02em;
 }
@@ -40,11 +41,101 @@ h6 {
   font-weight: bold;
 }
 
- {
-  font-weight: bold;
+div.status, 
+table tr.ok {
+  background-color: #AED67D;
+}
+
+div.status p, 
+table tr.ok p {
+  margin: 0;
 }
 
 #highlighted {
   border-bottom: none;
   padding-bottom: 1em;
+}
+
+.page-user-register fieldset legend {
+  background: none;
+  border: 0;
+  border-radius: none;
+  -moz-border-radius: none;
+  -webkit-border-radius: none;
+  font-size: 1.357em;
+  font-weight: bold;
+  height: auto;
+  margin: 0 0 0.5em;
+  position: inherit;
+  text-indent: 0;
+  text-shadow: 0 0 0 0;
+  width: auto;
+}
+
+.page-user-register fieldset {
+  border: 0;
+  float: left;
+  margin-bottom: 0;
+  position: inherit;
+  width: 48%;
+}
+
+.page-user-register #crm-container .crm-section .label, 
+.page-user-register .crm-section .label {
+  float: none;
+  text-align: left;
+  width: auto;
+}
+
+.page-user-register #crm-container .crm-section .content, 
+.page-user-register .crm-section .content {
+  margin: 0;
+}
+
+.crm-marker {
+  color: #FF0000;
+}
+
+.page-user-register tr, 
+.page-user-register tr.even {
+  background: none;
+}
+
+.page-user-register tr td input.form-checkbox, 
+.page-user-register tr td input.form-radio {
+  float: left;
+  margin-right: 6px;
+}
+
+.page-user-register tr td label {
+  font-size: 100%;
+  font-weight: normal;
+}
+
+.page-user-register #editrow-custom_12:before {
+  clear: both;
+}
+
+.page-user-register #editrow-custom_12,
+.page-user-register #editrow-custom_11 {
+  float: left;
+  margin-right: 2em;
+}
+
+.page-user-register input.form-submit, 
+.page-user-register a.button {
+  background: #0ABBED;
+  border: 0;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  color: #FFFFFF;
+  font-size: 1.357em;
+  font-weight: bold;
+  padding: .5em 1em;
+} 
+
+.page-user-register input.form-submit:hover,
+.page-user-register a.button:hover {
+  background: #0383BC;
 }
