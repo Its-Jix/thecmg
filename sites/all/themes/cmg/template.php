@@ -1,6 +1,38 @@
 <?php
 
 /**
+ * Implements theme_preprocess_html()
+ *
+ **/
+
+function cmg_preprocess_html(&$vars, $hook)
+{
+  drupal_add_css(
+    '//fonts.googleapis.com/css?family=Open+Sans:300,300italic,700,700italic',
+    array('type' => 'external')
+  );
+}
+
+/**
+ * Implements theme_preprocess_page()
+ *
+ **/
+
+function cmg_preprocess_page(&$variables) 
+{
+  if (arg(0) == 'user' && arg(1) == '') {
+    $variables['title'] =t('');
+  }
+  if (arg(0) == 'user' && arg(1) == 'register') {
+    $variables['title'] =t('');
+  }
+  if (arg(0) == 'user' && arg(1) == 'password') {
+    $variables['title'] =t('');
+  }
+}
+
+
+/**
  * Implements hook_theme()
  *
  **/

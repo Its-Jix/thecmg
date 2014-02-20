@@ -1,1 +1,50 @@
 /* CSS for CMG Theme */
+
+body,
+#site-slogan, 
+.ui-widget, 
+.comment-form label,
+#header, 
+#footer-wrapper, 
+#skip-link, 
+ul.contextual-links, 
+ul.links, 
+ul.primary, 
+.item-list .pager, 
+div.field-type-taxonomy-term-reference, 
+div.messages, 
+div.meta, 
+p.comment-time, 
+table, 
+.breadcrumb,
+input, 
+textarea, 
+select, 
+a.button {
+  font-family: 'Open Sans', Arial, Helvetica, "Nimbus Sans L", sans-serif;
+  letter-spacing: .02em;
+}
+
+strong {
+  font-weight: 700;
+}
+
+a,
+#site-name a,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+ {
+  font-weight: bold;
+}
+
+#highlighted {
+  border-bottom: none;
+  padding-bottom: 1em;
+}
