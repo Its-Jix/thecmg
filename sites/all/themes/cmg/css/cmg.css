@@ -127,6 +127,10 @@ tr td label {
   font-weight: normal;
 }
 
+.profile[typeof*="UserAccount"] .label {
+  font-weight: bold;
+}
+
 #editrow-custom_12:before {
   clear: both;
 }
