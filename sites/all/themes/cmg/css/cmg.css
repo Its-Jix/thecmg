@@ -51,12 +51,17 @@ table tr.ok p {
   margin: 0;
 }
 
+.block-menu ul li.leaf {
+  list-style-image: none;
+  list-style-type: none;
+}
+
 #highlighted {
   border-bottom: none;
   padding-bottom: 1em;
 }
 
-.page-user-register fieldset legend {
+fieldset legend {
   background: none;
   border: 0;
   border-radius: none;
@@ -72,7 +77,7 @@ table tr.ok p {
   width: auto;
 }
 
-.page-user-register fieldset {
+fieldset {
   border: 0;
   float: left;
   margin-bottom: 0;
@@ -80,15 +85,20 @@ table tr.ok p {
   width: 48%;
 }
 
-.page-user-register #crm-container .crm-section .label, 
-.page-user-register .crm-section .label {
+#crm-container .crm-section .label, 
+.crm-section .label {
   float: none;
   text-align: left;
   width: auto;
 }
 
-.page-user-register #crm-container .crm-section .content, 
-.page-user-register .crm-section .content {
+#crm-container input[type="radio"] + label {
+  font-weight: normal;
+  margin-right: 12px;
+}
+
+#crm-container .crm-section .content, 
+.crm-section .content {
   margin: 0;
 }
 
@@ -96,46 +106,98 @@ table tr.ok p {
   color: #FF0000;
 }
 
-.page-user-register tr, 
-.page-user-register tr.even {
+tr, 
+tr.even {
   background: none;
 }
 
-.page-user-register tr td input.form-checkbox, 
-.page-user-register tr td input.form-radio {
+tr td input.form-checkbox, 
+tr td input.form-radio {
   float: left;
   margin-right: 6px;
 }
 
-.page-user-register tr td label {
+input.form-checkbox,
+input.form-radio {
+  margin-right: 6px; 
+}
+
+tr td label {
   font-size: 100%;
   font-weight: normal;
 }
 
-.page-user-register #editrow-custom_12:before {
+#editrow-custom_12:before {
   clear: both;
 }
 
-.page-user-register #editrow-custom_12,
-.page-user-register #editrow-custom_11 {
+#crm-container #editrow-custom_12.form-item,
+#crm-container #editrow-custom_11.form-item {
   float: left;
   margin-right: 2em;
 }
 
-.page-user-register input.form-submit, 
-.page-user-register a.button {
+#crm-container label {
+  font-weight: bold;
+}
+
+#crm-container .font-light label {
+  font-weight: normal; 
+}
+
+.form-wrapper {
+  clear: both;
+} 
+
+input.form-submit, 
+a.button,
+#crm-container .crm-button,
+#crm-container a.button, 
+#crm-create-new-link, 
+#crm-participant-link, 
+#crm-event-links-link, 
+#crm-contribpage-links-link, 
+#crm-contact-actions-link, 
+#crm-container a.button:link, 
+#crm-container input.form-submit, 
+#crm-container input[type=button], 
+#crm-container input.form-submit-inline {
   background: #0ABBED;
   border: 0;
   border-radius: 0;
   -moz-border-radius: 0;
   -webkit-border-radius: 0;
+  clear: both;
   color: #FFFFFF;
   font-size: 1.357em;
   font-weight: bold;
   padding: .5em 1em;
+  text-shadow: 0 0 0;
 } 
 
-.page-user-register input.form-submit:hover,
-.page-user-register a.button:hover {
+input.form-submit:hover,
+a.button:hover {
   background: #0383BC;
+}
+
+.page-user .region-content {
+  clear: both;
+}
+
+label[for='edit-1'] {
+  font-size: 1.357em;
+  padding: .5em 1em;
+  display: none;
+}
+
+#crm-container .register_link-top {
+  display: none;
+}
+
+.crm-socialnetwork {
+  display: none;
+}
+
+#breadcrumb {
+  display: none;
 }
