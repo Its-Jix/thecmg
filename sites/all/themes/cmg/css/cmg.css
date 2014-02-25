@@ -85,6 +85,11 @@ fieldset {
   width: 48%;
 }
 
+.crm-event-register-form-block fieldset {
+  float: none;
+  width: 100%;
+}
+
 #crm-container .crm-section .label, 
 .crm-section .label {
   float: none;
@@ -194,7 +199,14 @@ label[for='edit-1'] {
   display: none;
 }
 
+#crm-container .pay_later-section {
+}
+
 #crm-container .register_link-top {
+  display: none;
+}
+
+.crm-event-register-form-block .messages {
   display: none;
 }
 
