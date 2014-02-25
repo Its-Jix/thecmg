@@ -85,6 +85,7 @@ fieldset {
   width: 48%;
 }
 
+.webform-client-form fieldset,
 .crm-event-register-form-block fieldset {
   float: none;
   width: 100%;
