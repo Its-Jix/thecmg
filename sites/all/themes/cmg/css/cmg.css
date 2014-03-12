@@ -1,0 +1,220 @@
+/* CSS for CMG Theme */
+
+body,
+#site-slogan, 
+.ui-widget, 
+.comment-form label,
+#header, 
+#footer-wrapper, 
+#skip-link, 
+ul.contextual-links, 
+ul.links, 
+ul.primary, 
+.item-list .pager, 
+div.field-type-taxonomy-term-reference, 
+div.messages, 
+div.meta, 
+p.comment-time, 
+table, 
+.breadcrumb,
+input, 
+textarea, 
+select, 
+a.button,
+fieldset legend {
+  font-family: 'Open Sans', Arial, Helvetica, "Nimbus Sans L", sans-serif;
+  letter-spacing: .02em;
+}
+
+strong {
+  font-weight: 700;
+}
+
+a,
+#site-name a,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: bold;
+}
+
+div.status, 
+table tr.ok {
+  background-color: #AED67D;
+}
+
+div.status p, 
+table tr.ok p {
+  margin: 0;
+}
+
+.block-menu ul li.leaf {
+  list-style-image: none;
+  list-style-type: none;
+}
+
+#highlighted {
+  border-bottom: none;
+  padding-bottom: 1em;
+}
+
+fieldset legend {
+  background: none;
+  border: 0;
+  border-radius: none;
+  -moz-border-radius: none;
+  -webkit-border-radius: none;
+  font-size: 1.357em;
+  font-weight: bold;
+  height: auto;
+  margin: 0 0 0.5em;
+  position: inherit;
+  text-indent: 0;
+  text-shadow: 0 0 0 0;
+  width: auto;
+}
+
+fieldset {
+  border: 0;
+  float: left;
+  margin-bottom: 0;
+  position: inherit;
+  width: 48%;
+}
+
+.webform-client-form fieldset,
+.crm-event-register-form-block fieldset {
+  float: none;
+  width: 100%;
+}
+
+#crm-container .crm-section .label, 
+.crm-section .label {
+  float: none;
+  text-align: left;
+  width: auto;
+}
+
+#crm-container input[type="radio"] + label {
+  font-weight: normal;
+  margin-right: 12px;
+}
+
+#crm-container .crm-section .content, 
+.crm-section .content {
+  margin: 0;
+}
+
+.crm-marker {
+  color: #FF0000;
+}
+
+tr, 
+tr.even {
+  background: none;
+}
+
+tr td input.form-checkbox, 
+tr td input.form-radio {
+  float: left;
+  margin-right: 6px;
+}
+
+input.form-checkbox,
+input.form-radio {
+  margin-right: 6px; 
+}
+
+tr td label {
+  font-size: 100%;
+  font-weight: normal;
+}
+
+.profile[typeof*="UserAccount"] .label {
+  font-weight: bold;
+}
+
+#editrow-custom_12:before {
+  clear: both;
+}
+
+#crm-container #editrow-custom_12.form-item,
+#crm-container #editrow-custom_11.form-item {
+  float: left;
+  margin-right: 2em;
+}
+
+#crm-container label {
+  font-weight: bold;
+}
+
+#crm-container .font-light label {
+  font-weight: normal; 
+}
+
+.form-wrapper {
+  clear: both;
+} 
+
+input.form-submit, 
+a.button,
+#crm-container .crm-button,
+#crm-container a.button, 
+#crm-create-new-link, 
+#crm-participant-link, 
+#crm-event-links-link, 
+#crm-contribpage-links-link, 
+#crm-contact-actions-link, 
+#crm-container a.button:link, 
+#crm-container input.form-submit, 
+#crm-container input[type=button], 
+#crm-container input.form-submit-inline {
+  background: #0ABBED;
+  border: 0;
+  border-radius: 0;
+  -moz-border-radius: 0;
+  -webkit-border-radius: 0;
+  clear: both;
+  color: #FFFFFF;
+  font-size: 1.357em;
+  font-weight: bold;
+  padding: .5em 1em;
+  text-shadow: 0 0 0;
+} 
+
+input.form-submit:hover,
+a.button:hover {
+  background: #0383BC;
+}
+
+.page-user .region-content {
+  clear: both;
+}
+
+label[for='edit-1'] {
+  font-size: 1.357em;
+  padding: .5em 1em;
+  display: none;
+}
+
+#crm-container .pay_later-section {
+}
+
+#crm-container .register_link-top {
+  display: none;
+}
+
+.crm-event-register-form-block .messages {
+  display: none;
+}
+
+.crm-socialnetwork {
+  display: none;
+}
+
+#breadcrumb {
+  display: none;
+}
