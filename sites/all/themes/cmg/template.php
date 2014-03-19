@@ -76,6 +76,6 @@ function cmg_preprocess_user_register_form(&$vars) {
 }
 
 function cmg_preprocess_user_pass(&$vars) {
-    $vars['intro_text'] = t('<h1 class="title">Request a new password</h1>');
+  $vars['intro_text'] = t('<h1 class="title">Request a new password</h1><p>Need an account? <a href="/user/register">Click here to create one</a>.</p>');
     $vars['form']['actions']['submit']['#value'] = t('Submit');
 }
