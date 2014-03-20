@@ -218,3 +218,7 @@ label[for='edit-1'] {
 #breadcrumb {
   display: none;
 }
+
+.editrow_phone-Primary-1-section.form-item {
+  margin-bottom: 0;
+}
