@@ -222,3 +222,13 @@ label[for='edit-1'] {
 .editrow_phone-Primary-1-section.form-item {
   margin-bottom: 0;
 }
+
+.editrow_do_not_email-section .label {
+  float: right;
+  padding-top: 2px;
+  width: 94%;
+}
+
+.editrow_do_not_email-section label {
+  font-weight: normal;
+}
