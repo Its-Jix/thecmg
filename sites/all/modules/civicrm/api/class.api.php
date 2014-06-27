@@ -1,241 +1,330 @@
 <?php
+
 /**
+ *
  * This class allows to consume the API, either from within a module that knows civicrm already:
- require_once('api/class/api.php');
- $api = new civicrm_api3();
-or from any code on the same server as civicrm
-  require_once('/your/civi/folder/api/class.api.php');
-  $api = new civicrm_api3 (array('conf_path'=> '/your/path/to/your/civicrm/or/joomla/site)); //the path to civicrm.settings.php
-or to query a remote server via the rest api
-  $api = new civicrm_api3 (array ('server' => 'http://example.org','api_key'=>'theusersecretkey','key'=>'thesitesecretkey'));
-
-no matter how initialised and if civicrm is local or remote, you use the class the same way
-
-  $api->{entity}->{action}($params);
-
-so to get the individual contacts
-  if ($api->Contact->Get(array('contact_type'=>'Individual','return'=>'sort_name,current_employer')) {
-    echo "\n contacts found " . $api->count; // each key of the result array is an attribute of the api
-    foreach ($api->values as $c) {
-       echo "\n".$c->sort_name. " working for ". $c->current_employer;
-    }
-
-
-  }else { // in theory, doesn't append
-    echo $api->errorMsg();
-  }
-
-or to create an event
-  if ($api->Event->Create(array('title'=>'Test','event_type_id' => 1,'is_public' => 1,'start_date' => 19430429))) {
-    echo "created event id:". $api->id;
-  } else {
-    echo $api->errorMsg();
-  }
-
-To make it easier, the Actions can either take for input an associative array $params, or simply an id
-$api->Activity->Get (42);
-being the same as:
-$api->Activity->Get (array('id'=>42));
-
-you can too get the result like what civicrm_api does, but as an object instead of an array (eg $entity->attribute  instead of $entity['attribute']
-  $result = $api->result;
-
-echo $api;// is the json encoded result
-
+ *
+ * @code
+ *   require_once('api/class/api.php');
+ *   $api = new civicrm_api3();
+ * @endcode
+ *
+ * or from any code on the same server as civicrm
+ *
+ * @code
+ *   require_once('/your/civi/folder/api/class.api.php');
+ *   // the path to civicrm.settings.php
+ *   $api = new civicrm_api3 (array('conf_path'=> '/your/path/to/your/civicrm/or/joomla/site));
+ * @endcode
+ *
+ * or to query a remote server via the rest api
+ *
+ * @code
+ *   $api = new civicrm_api3 (array ('server' => 'http://example.org','api_key'=>'theusersecretkey','key'=>'thesitesecretkey'));
+ * @endcode
+ *
+ * No matter how initialised and if civicrm is local or remote, you use the class the same way.
+ *
+ * @code
+ *   $api->{entity}->{action}($params);
+ * @endcode
+ *
+ * So, to get the individual contacts:
+ *
+ * @code
+ *   if ($api->Contact->Get(array('contact_type'=>'Individual','return'=>'sort_name,current_employer')) {
+ *     // each key of the result array is an attribute of the api
+ *     echo "\n contacts found " . $api->count;
+ *     foreach ($api->values as $c) {
+ *       echo "\n".$c->sort_name. " working for ". $c->current_employer;
+ *     }
+ *     // in theory, doesn't append
+ *   } else {
+ *     echo $api->errorMsg();
+ *   }
+ * @endcode
+ *
+ * Or, to create an event:
+ *
+ * @code
+ *   if ($api->Event->Create(array('title'=>'Test','event_type_id' => 1,'is_public' => 1,'start_date' => 19430429))) {
+ *     echo "created event id:". $api->id;
+ *   } else {
+ *     echo $api->errorMsg();
+ *   }
+ * @endcode
+ *
+ * To make it easier, the Actions can either take for input an
+ * associative array $params, or simply an id. The following two lines
+ * are equivalent.
+ *
+ * @code
+ *   $api->Activity->Get (42);
+ *   $api->Activity->Get (array('id'=>42));
+ * @endcode
+ *
+ *
+ * You can also get the result like civicrm_api does, but as an object
+ * instead of an array (eg $entity->attribute instead of
+ * $entity['attribute']).
+ *
+ * @code
+ *   $result = $api->result;
+ *   // is the json encoded result
+ *   echo $api;
+ * @endcode
  */
+class civicrm_api3 {
 
-
-class civicrm_api3  {
-
-  function __construct ($config = null) {
-    $this->local=true;
-    $this->input = array ();
-    $this->lastResult = array ();
-    if (isset ($config) &&isset($config ['server'])) {
+  /**
+   * @param array API configuration.
+   */
+  function __construct($config = NULL) {
+    $this->local      = TRUE;
+    $this->input      = array();
+    $this->lastResult = array();
+    if (isset($config) && isset($config['server'])) {
       // we are calling a remote server via REST
-      $this->local=false;
-      $this->uri = $config ['server'];
-      if (isset($config ['path']))
-        $this->uri .= "/".$config ['path'];
-      else
+      $this->local = FALSE;
+      $this->uri = $config['server'];
+      if (isset($config['path'])) {
+        $this->uri .= "/" . $config['path'];
+      }
+      else {
         $this->uri .= '/sites/all/modules/civicrm/extern/rest.php';
-      $this->uri .='?json=1';
-      if (isset($config ['key'])) {
+      }
+      $this->uri .= '?json=1';
+      if (isset($config['key'])) {
         $this->key = $config['key'];
-      }else {
-        die ("\nFATAL:param['key] missing\n");
-      }  
-      if (isset($config ['api_key'])) {
+      }
+      else {
+        die("\nFATAL:param['key] missing\n");
+      }
+      if (isset($config['api_key'])) {
         $this->api_key = $config['api_key'];
-      }else {
-        die ("\nFATAL:param['api_key] missing\n");
-      }  
-
+      }
+      else {
+        die("\nFATAL:param['api_key] missing\n");
+      }
       return;
     }
-    if (isset ($config) &&isset($config ['conf_path'] )) {
-      require_once ($config ['conf_path'] .'/civicrm.settings.php');
-      require_once 'CRM/Core/Config.php';
+    if (isset($config) && isset($config['conf_path'])) {
+      define('CIVICRM_SETTINGS_PATH', $config['conf_path'] . '/civicrm.settings.php');
+      require_once CIVICRM_SETTINGS_PATH;
+      require_once 'CRM/Core/ClassLoader.php';
       require_once 'api/api.php';
       require_once "api/v3/utils.php";
-      $this->cfg= CRM_Core_Config::singleton();
+      CRM_Core_ClassLoader::singleton()->register();
+      $this->cfg = CRM_Core_Config::singleton();
       $this->init();
-      $this->ping();
-    } else {
-      $this->cfg= CRM_Core_Config::singleton();
+    }
+    else {
+      $this->cfg = CRM_Core_Config::singleton();
     }
   }
 
-  public function __toString()
-  {
-     return json_encode($this->lastResult);
+  /**
+   *
+   */
+  public function __toString() {
+    return json_encode($this->lastResult);
   }
 
+  /**
+   *
+   */
   public function __call($action, $params) {
-    // TODO : check if it's a valid action
+    // @TODO Check if it's a valid action.
     if (isset($params[0])) {
-      return $this->call ($this->currentEntity,$action,$params[0]);
-    }else {
-      return $this->call ($this->currentEntity,$action,$this->input);
+      return $this->call($this->currentEntity, $action, $params[0]);
+    }
+    else {
+      return $this->call($this->currentEntity, $action, $this->input);
     }
   }
 
-
-  /**  As of PHP 5.3.0  */
+  /**
+   *  As of PHP 5.3.0
+   */
   public static function __callStatic($name, $arguments) {
     // Should we implement it ?
-    echo "Calling static method '$name' "
-      . implode(', ', $arguments). "\n";
+    echo "Calling static method '$name' " . implode(', ', $arguments) . "\n";
   }
 
-  function remoteCall ($entity,$action,$params = array()) {
-    $fields= "key={$this->key}&api_key={$this->api_key}";
-    $query = $this->uri."&entity=$entity&action=$action";
+  /**
+   *
+   */
+  function remoteCall($entity, $action, $params = array()) {
+    $fields = "key={$this->key}&api_key={$this->api_key}";
+    $query = $this->uri . "&entity=$entity&action=$action";
     foreach ($params as $k => $v) {
-      $fields .= "&$k=".urlencode($v);
+      $fields .= "&$k=" . urlencode($v);
     }
     if (function_exists('curl_init')) {
-      //to make it easier to debug but avoid leaking info, entity&action are the url, the rest is in the POST
+      // To facilitate debugging without leaking info, entity & action
+      // are GET, other data is POST.
       $ch = curl_init();
-      curl_setopt($ch,CURLOPT_URL,$query);
-      curl_setopt($ch,CURLOPT_POST,count($params)+2);
-      curl_setopt($ch,CURLOPT_POSTFIELDS,$fields);
-      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-
-      //execute post
+      curl_setopt($ch, CURLOPT_URL, $query);
+      curl_setopt($ch, CURLOPT_POST, count($params) + 2);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
       $result = curl_exec($ch);
+      // CiviCRM expects to get back a CiviCRM error object.
+      if (curl_errno($ch)) {
+        $res = new stdClass;
+        $res->is_error = 1;
+        $res->error_message = curl_error($ch);
+        $res->level = "cURL";
+        $res->error = array('cURL error' => curl_error($ch));
+        return $res;
+      }
       curl_close($ch);
-      return json_decode ($result);
-    } else { // not good, all in get when should be in post.
-      $result = file_get_contents($query.'&'.$fields);
-      return json_decode ($result);
     }
+    else {
+      // Should be discouraged, because the API credentials and data
+      // are submitted as GET data, increasing chance of exposure..
+      $result = file_get_contents($query . '&' . $fields);
+    }
+    if (!$res = json_decode($result)) {
+      $res = new stdClass;
+      $res->is_error = 1;
+      $res->error_message = 'Unable to parse returned JSON';
+      $res->level = 'json_decode';
+      $res->error = array('Unable to parse returned JSON' => $result);
+      $res->row_result = $result;
+    }
+    return $res;
   }
 
-  function call ($entity,$action='Get',$params = array()) {
-    if (is_int($params)) 
-      $params = array ('id'=> $params);
-    elseif (is_string($params))
-      $params = json_decode ($params);
+  function call($entity, $action = 'Get', $params = array()) {
+    if (is_int($params)) {
+      $params = array('id' => $params);
+    }
+    elseif (is_string($params)) {
+      $params = json_decode($params);
+    }
 
-    if (!isset ($params['version']))
+    if (!isset($params['version'])) {
       $params['version'] = 3;
-    if (!isset ($params['sequential']))
+    }
+    if (!isset($params['sequential'])) {
       $params['sequential'] = 1;
+    }
 
     if (!$this->local) {
-      $this->lastResult= $this->remoteCall ($entity,$action,$params);
-    } else {
-      // easiest to convert a multi-dimentional array into an object
-      $this->lastResult= json_decode ( json_encode (civicrm_api ($entity,$action,$params) ));
+      $this->lastResult = $this->remoteCall($entity, $action, $params);
     }
-    $this->input=array();//reset the input to be ready for a new call
-    if (property_exists ($this->lastResult,'is_error'))
+    else {
+      // Converts a multi-dimentional array into an object.
+      $this->lastResult = json_decode(json_encode(civicrm_api($entity, $action, $params)));
+    }
+    // Reset the input to be ready for a new call.
+    $this->input = array();
+    if (property_exists($this->lastResult, 'is_error')) {
       return !$this->lastResult->is_error;
-    return true;// getsingle doesn't have is_error
+    }
+    // getsingle doesn't have is_error.
+    return TRUE;
   }
 
-  //* helper method for long running programs (eg bots)
-  function ping () {
+  /**
+   * Helper method for long running programs (eg bots).
+   */
+  function ping() {
     global $_DB_DATAOBJECT;
-    foreach ($_DB_DATAOBJECT['CONNECTIONS'] as &$c) {
+    foreach ($_DB_DATAOBJECT['CONNECTIONS'] as & $c) {
       if (!$c->connection->ping()) {
         $c->connect($this->cfg->dsn);
         if (!$c->connection->ping()) {
-          die ("we couldn't connect");
+          die("we couldn't connect");
         }
       }
-
     }
   }
 
-  function errorMsg () {
+  /**
+   * Return the last error message.
+   */
+  function errorMsg() {
     return $this->lastResult->error_message;
   }
 
-  function init () {
-    CRM_Core_DAO::init( $this->cfg->dsn );
+  /**
+   *
+   */
+  function init() {
+    CRM_Core_DAO::init($this->cfg->dsn);
   }
 
-  /*
-   * $api->attr ('id'); // return the id
-   * or
-   * $api->attr ('id',42) //set the id
+  /**
+   *
    */
-
-  public function attr ($name,$value = null) {
-    if ($value === null) {
-      if (property_exists ($this->lastResult,$name))
+  public function attr($name, $value = NULL) {
+    if ($value === NULL) {
+      if (property_exists($this->lastResult, $name)) {
         return $this->lastResult->$name;
-    } else {
+      }
+    }
+    else {
       $this->input[$name] = $value;
     }
     return $this;
   }
 
+  /**
+   *
+   */
   public function is_error() {
-    return (property_exists ($this->lastResult,'is_error') && $this->lastResult->is_error);
+    return (property_exists($this->lastResult, 'is_error') && $this->lastResult->is_error);
   }
 
+  /**
+   *
+   */
   public function is_set($name) {
-    return (isset ($this->lastResult->$name));
+    return (isset($this->lastResult->$name));
   }
 
-/*  public function __set($name, $value)    {
-     echo "Setting '$name' to '$value'\n";
-  }
- */
-
+  /**
+   *
+   */
   public function __get($name) {
-    //TODO, test if valid entity
-    if (strtolower($name) !== $name) {//cheap and dumb test to differenciate call to $api->Entity->Action & value retrieval
+    // @TODO Test if valid entity.
+    if (strtolower($name) !== $name) {
+      // Cheap and dumb test to differentiate call to
+      // $api->Entity->Action & value retrieval.
       $this->currentEntity = $name;
       return $this;
     }
-
-    if ($name === 'result')
+    if ($name === 'result') {
       return $this->lastResult;
-    if ($name === 'values')
+    }
+    if ($name === 'values') {
       return $this->lastResult->values;
-
-    if (property_exists ($this->lastResult,$name)) 
+    }
+    if (property_exists($this->lastResult, $name)) {
       return $this->lastResult->$name;
-
+    }
     $this->currentEntity = $name;
     return $this;
-}
-
-                       
-  // or use $api->value
-  public function values () {
-    if (is_array ($this->lastResult))
-      return $this->lastResult['values'];
-    else 
-      return $this->lastResult->values;
   }
 
-  // or use $api->result
-  public function result () {
+  /**
+   * Or use $api->value.
+   */
+  public function values() {
+    if (is_array($this->lastResult)) {
+      return $this->lastResult['values'];
+    }
+    else {
+      return $this->lastResult->values;
+    }
+  }
+
+  /**
+   * Or use $api->result.
+   */
+  public function result() {
     return $this->lastResult;
   }
 }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="messages status">
+<div class="messages status no-popup">
     <div class="icon inform-icon"></div>&nbsp;
     {if $success}
         {ts 1=$display_name 2=$email}<strong>%1 - your email address '%2' has been successfully verified.</strong>{/ts}
@@ -33,6 +33,14 @@
 </div>
 
 {if $success}
+  <div id="thankyou_text" class="crm-section thankyou_text-section">
+  {if $thankyou_text}
+    {$thankyou_text}
+  {else}
     <p><div class="bold">{ts}Thank you for signing the petition.{/ts}</div></p>
+  {/if}
+  </div>
+  {if $is_share}
     {include file="CRM/Campaign/Page/Petition/SocialNetwork.tpl"}
+  {/if}
 {/if}

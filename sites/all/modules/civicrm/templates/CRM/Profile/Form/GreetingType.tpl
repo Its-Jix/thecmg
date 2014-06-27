@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,7 +24,7 @@
  +--------------------------------------------------------------------+
 *}
 {assign var="customGreeting" value=$n|cat:"_custom"}
-<span>{$form.$n.html|crmReplace:class:big}</span>&nbsp;<span id="{$customGreeting}_html" class="hiddenElement">{$form.$customGreeting.html|crmReplace:class:big}</span>
+<span>{$form.$n.html|crmAddClass:big}</span>&nbsp;<span id="{$customGreeting}_html" class="hiddenElement">{$form.$customGreeting.html|crmAddClass:big}</span>
 
 <script type="text/javascript">
 var fieldName = '{$n}';

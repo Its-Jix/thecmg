@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,6 +31,7 @@
         <table>
         <tr class="columnheader">
             <th>{ts}Membership{/ts}</th>
+            <th>{ts}Member Since{/ts}</th>
             <th>{ts}Start Date{/ts}</th>
             <th>{ts}End Date{/ts}</th>
             <th>{ts}Status{/ts}</th>
@@ -38,11 +39,12 @@
         </tr>
         {foreach from=$activeMembers item=activeMember}
         <tr class="{cycle values="odd-row,even-row"} {$activeMember.class}">
-	        <td>{$activeMember.membership_type}</td>
-	        <td>{$activeMember.start_date|crmDate}</td>
-	        <td>{$activeMember.end_date|crmDate}</td>
-	        <td>{$activeMember.status}</td>
-	        <td>{if $activeMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$activeMember.renewPageId`&mid=`$activeMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
+          <td>{$activeMember.membership_type}</td>
+    <td>{$activeMember.join_date|crmDate}</td>
+          <td>{$activeMember.start_date|crmDate}</td>
+          <td>{$activeMember.end_date|crmDate}</td>
+          <td>{$activeMember.status}</td>
+          <td>{if $activeMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$activeMember.renewPageId`&mid=`$activeMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
         </tr>
         {/foreach}
         </table>
@@ -68,11 +70,11 @@
         </tr>
         {foreach from=$inActiveMembers item=inActiveMember}
         <tr class="{cycle values="odd-row,even-row"} {$inActiveMember.class}">
-	        <td>{$inActiveMember.membership_type}</td>
-	        <td>{$inActiveMember.start_date|crmDate}</td>
-	        <td>{$inActiveMember.end_date|crmDate}</td>
-	        <td>{$inActiveMember.status}</td>
-	        <td>{if $inActiveMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$inActiveMember.renewPageId`&mid=`$inActiveMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
+          <td>{$inActiveMember.membership_type}</td>
+          <td>{$inActiveMember.start_date|crmDate}</td>
+          <td>{$inActiveMember.end_date|crmDate}</td>
+          <td>{$inActiveMember.status}</td>
+          <td>{if $inActiveMember.renewPageId}<a href="{crmURL p='civicrm/contribute/transact' q="id=`$inActiveMember.renewPageId`&mid=`$inActiveMember.id`&reset=1"}">[ {ts}Renew Now{/ts} ]</a>{/if}</td>
 
         </tr>
         {/foreach}
@@ -84,7 +86,7 @@
 {/if}
 
 {if NOT ($activeMembers or $inActiveMembers)}
-   <div class="messages status">
+   <div class="messages status no-popup">
        <div class="icon inform-icon"></div></dt>
            {ts}There are no memberships on record for you.{/ts}
    </div>

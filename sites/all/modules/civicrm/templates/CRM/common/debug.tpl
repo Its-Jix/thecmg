@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,14 +35,14 @@
 {$session->debug($smarty.get.sessionDebug)}
 {/if}
 
-{if $smarty.get.directoryCleanup} 
+{if $smarty.get.directoryCleanup}
 {$config->cleanup($smarty.get.directoryCleanup)}
 {/if}
 
-{if $smarty.get.cacheCleanup} 
+{if $smarty.get.cacheCleanup}
 {$config->clearDBCache()}
 {/if}
 
-{if $smarty.get.configReset} 
+{if $smarty.get.configReset}
 {$config->reset()}
 {/if}
