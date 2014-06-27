@@ -1,9 +1,10 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,39 +31,35 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Survey
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  */
-
-require_once 'CRM/Campaign/BAO/Survey.php';
 
 
 /**
- * create/update survey
+ * Create or update a survey
  *
- * This API is used to create new survey or update any of the existing
- * In case of updating existing survey, id of that particular survey must
- * be in $params array. 
- *
- * @param array $params  (referance) Associative array of property
+ * @param array $params  Associative array of property
  *                       name/value pairs to insert in new 'survey'
+ * @example SurveyCreate.php Std Create example
  *
- * @return array   survey array
+ * @return array api result array
  * {@getfields survey_create}
  * @access public
  */
-function civicrm_api3_survey_create( $params )
-{
-    return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+function civicrm_api3_survey_create($params) {
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
-/*
+
+/**
  * Adjust Metadata for Create action
- * 
+ *
  * The metadata is used for setting defaults, documentation & validation
  * @param array $params array or parameters determined by getfields
  */
-function _civicrm_api3_survey_create_spec(&$params){
-  $params['title']['api.required'] =1;
+function _civicrm_api3_survey_create_spec(&$params) {
+  $params['title']['api.required'] = 1;
 }
+
 /**
  * Returns array of surveys  matching a set of one or more group properties
  *
@@ -74,9 +71,8 @@ function _civicrm_api3_survey_create_spec(&$params){
  * {@getfields survey_get}
  * @access public
  */
-function civicrm_api3_survey_get( $params )
-{
-    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+function civicrm_api3_survey_get($params) {
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
@@ -93,7 +89,7 @@ function civicrm_api3_survey_get( $params )
  * {@getfields survey_delete}
  * @access public
  */
-function civicrm_api3_survey_delete( $params )
-{
-    return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+function civicrm_api3_survey_delete($params) {
+  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
+

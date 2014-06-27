@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,6 +54,8 @@
                 <td>
                    {if $row.type eq 1024}
                        {$row.value|crmMoney}
+                   {elseif $row.type eq 2}
+                       {$row.value}
                    {else}
                        {$row.value|crmNumberFormat}
                    {/if}

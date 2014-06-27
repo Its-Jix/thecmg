@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,4 +27,5 @@
 
 <div class="form-item">
     {$form.group_id.label} &nbsp; {$form.group_id.html} {$form.buttons.html}
+    {include file="CRM/Form/validate.tpl"}
 </div>

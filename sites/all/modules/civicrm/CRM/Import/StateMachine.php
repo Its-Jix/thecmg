@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,40 +28,35 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
-require_once 'CRM/Core/StateMachine.php';
-
 /**
  * State machine for managing different states of the Import process.
- *
  */
 class CRM_Import_StateMachine extends CRM_Core_StateMachine {
 
-    /**
-     * class constructor
-     *
-     * @param object  CRM_Import_Controller
-     * @param int     $action
-     *
-     * @return object CRM_Import_StateMachine
-     */
-    function __construct( &$controller, $action = CRM_Core_Action::NONE ) {
-        parent::__construct( $controller, $action );
-        
-        $this->_pages = array(
-                              'CRM_Import_Form_DataSource' => null,
-                              'CRM_Import_Form_MapField' => null,
-                              'CRM_Import_Form_Preview' => null,
-                              'CRM_Import_Form_Summary' => null,
-                              );
-        
-        $this->addSequentialPages( $this->_pages, $action );
-    }
+  /**
+   * Class constructor
+   *
+   * @param object  CRM_*_Import_Controller
+   * @param int     $action
+   *
+   */
+  function __construct($controller, $action = CRM_Core_Action::NONE) {
+    parent::__construct($controller, $action);
 
+    $classType = str_replace('_Controller', '', get_class($controller));
+    $this->_pages = array(
+      $classType . '_Form_DataSource' => NULL,
+      $classType . '_Form_MapField' => NULL,
+      $classType . '_Form_Preview' => NULL,
+      $classType . '_Form_Summary' => NULL,
+    );
+
+    $this->addSequentialPages($this->_pages, $action);
+  }
 }
-
 

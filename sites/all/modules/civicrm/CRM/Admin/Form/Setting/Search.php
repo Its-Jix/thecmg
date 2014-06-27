@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,64 +28,72 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
-require_once 'CRM/Admin/Form/Setting.php';
-
 /**
  * This class generates form components for Search Parameters
- * 
+ *
  */
-class CRM_Admin_Form_Setting_Search extends  CRM_Admin_Form_Setting
-{
-    /**
-     * Function to build the form
-     *
-     * @return None
-     * @access public
-     */
-    public function buildQuickForm( ) {
-        CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
+class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
-        $this->addYesNo( 'includeWildCardInName'   , ts( 'Automatic Wildcard' ));
-        $this->addYesNo( 'includeEmailInName'      , ts( 'Include Email' ));
-        $this->addYesNo( 'includeNickNameInName'   , ts( 'Include Nickname' ));
+  protected $_settings = array(
+    'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
+  );
 
-        $this->addYesNo( 'includeAlphabeticalPager', ts( 'Include Alphabetical Pager' ) ); 
-        $this->addYesNo( 'includeOrderByClause'    , ts( 'Include Order By Clause' ) ); 
+  /**
+   * Function to build the form
+   *
+   * @return None
+   * @access public
+   */
+  public function buildQuickForm() {
+    CRM_Utils_System::setTitle(ts('Settings - Search Preferences'));
 
-        $this->addElement('text', 'smartGroupCacheTimeout', ts('Smart group cache timeout'),
-                          array( 'size' => 3, 'maxlength' => 5 ) );
-       
-        require_once "CRM/Core/BAO/UFGroup.php";
-        $types    = array( 'Contact', 'Individual', 'Organization', 'Household' );
-        $profiles = CRM_Core_BAO_UFGroup::getProfiles( $types ); 
+    $this->addYesNo('includeWildCardInName', ts('Automatic Wildcard'));
+    $this->addYesNo('includeEmailInName', ts('Include Email'));
+    $this->addYesNo('includeNickNameInName', ts('Include Nickname'));
 
-        $this->add( 'select', 'defaultSearchProfileID', ts('Default Contact Search Profile'),
-                    array('' => ts('- select -')) + $profiles );
+    $this->addYesNo('includeAlphabeticalPager', ts('Include Alphabetical Pager'));
+    $this->addYesNo('includeOrderByClause', ts('Include Order By Clause'));
 
-        // Autocomplete for Contact Search (quick search etc.)
-        require_once 'CRM/Core/OptionGroup.php';
-        $options = array( ts('Contact Name') => 1 ) + array_flip( CRM_Core_OptionGroup::values( 'contact_autocomplete_options', 
-                                                                                                false, false, true ) );
-        $this->addCheckBox( 'autocompleteContactSearch', ts('Autocomplete Contact Search'), $options, 
-                            null, null, null, null, array( '&nbsp;&nbsp;' ) );
-        $element = $this->getElement( 'autocompleteContactSearch' );
-        $element->_elements[0]->_flagFrozen = true;
+    $this->addElement('text', 'smartGroupCacheTimeout', ts('Smart group cache timeout'),
+      array('size' => 3, 'maxlength' => 5)
+    );
 
-        // Autocomplete for Contact Reference (custom fields)
-        require_once 'CRM/Core/OptionGroup.php';
-        $optionsCR = array( ts('Contact Name') => 1 ) + array_flip( CRM_Core_OptionGroup::values( 'contact_reference_options', 
-                                                                                                false, false, true ) );
-        $this->addCheckBox( 'autocompleteContactReference', ts('Contact Reference Options'), $optionsCR, 
-                            null, null, null, null, array( '&nbsp;&nbsp;' ) );
-        $element = $this->getElement( 'autocompleteContactReference' );
-        $element->_elements[0]->_flagFrozen = true;
-        parent::buildQuickForm();    
-    }
+    $types = array('Contact', 'Individual', 'Organization', 'Household');
+    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
+
+    $this->add('select', 'defaultSearchProfileID', ts('Default Contact Search Profile'),
+      array(
+        '' => ts('- select -')) + $profiles
+    );
+
+    // Autocomplete for Contact Search (quick search etc.)
+    $options = array(
+      ts('Contact Name') => 1) + array_flip(CRM_Core_OptionGroup::values('contact_autocomplete_options',
+        FALSE, FALSE, TRUE
+      ));
+    $this->addCheckBox('autocompleteContactSearch', ts('Autocomplete Contact Search'), $options,
+      NULL, NULL, NULL, NULL, array('&nbsp;&nbsp;')
+    );
+    $element = $this->getElement('autocompleteContactSearch');
+    $element->_elements[0]->_flagFrozen = TRUE;
+
+    // Autocomplete for Contact Reference (custom fields)
+    $optionsCR = array(
+      ts('Contact Name') => 1) + array_flip(CRM_Core_OptionGroup::values('contact_reference_options',
+        FALSE, FALSE, TRUE
+      ));
+    $this->addCheckBox('autocompleteContactReference', ts('Contact Reference Options'), $optionsCR,
+      NULL, NULL, NULL, NULL, array('&nbsp;&nbsp;')
+    );
+    $element = $this->getElement('autocompleteContactReference');
+    $element->_elements[0]->_flagFrozen = TRUE;
+
+    parent::buildQuickForm();
+  }
 }
-
 

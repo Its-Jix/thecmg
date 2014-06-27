@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,52 +28,61 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
-
-function civicrm_install( ) {
-}
+function civicrm_install() {}
 
 /**
  * Implementation of hook_uninstall( )
  */
-function civicrm_uninstall( ) {
-    require_once 'civicrm.module';
+function civicrm_uninstall() {
+  require_once 'civicrm.module';
 
-    if ( ! civicrm_initialize( ) ) {
-        return;
-    }
+  if (!civicrm_initialize()) {
+    return;
+  }
 
-    require_once 'CRM/Core/Config.php';
-    $config = CRM_Core_Config::singleton();
+  require_once 'CRM/Core/Config.php';
+  $config = CRM_Core_Config::singleton();
 
-    require_once 'CRM/Core/DAO.php';
-    CRM_Core_DAO::dropAllTables( );
+  require_once 'CRM/Core/DAO.php';
+  CRM_Core_DAO::dropAllTables();
 }
 
 function civicrm_requirements($phase) {
-    $settings = glob('sites/*/civicrm.settings.php');
-    $problems = array( );
-    if ( empty($settings) && 
-         $phase == 'install' ) {
-        $problems[] = array(
-                            'title' => t('CiviCRM settings does not extist'),
-                            'description' => t('CiviCRM settings file does not extist. It should be created by CiviCRM <a href="!link">install</a>', array('!link' => substr(dirname(dirname(__FILE__)), strlen(getcwd())).'/install/index.php')),
-                            'severity' => REQUIREMENT_ERROR,
-                            );
-    }
+  global $base_url;
+  $civicrm_path = drupal_get_path('module', 'civicrm');
 
-    if ( ! empty($problems) ) {
-        return $problems;
-    }
+  //remove the last occurrence of 'drupal' from path
+  $pos = strrpos($civicrm_path, 'drupal');
+
+  if ($pos !== false) {
+    $civicrm_path = substr_replace($civicrm_path, '', $pos, strlen($civicrm_path));
+  }
+
+  $url = $base_url . '/' . $civicrm_path . 'install/index.php';
+
+  $settings = glob('sites/*/civicrm.settings.php');
+  $problems = array();
+  if (empty($settings) && $phase == 'install') {
+    $problems[] = array(
+      'title' => t('CiviCRM settings does not exist'),
+      'value' =>
+      t('CiviCRM settings file does not exist. It should be created by CiviCRM <a href="!link">install</a>',
+        array('!link' => $url)),
+      'severity' => REQUIREMENT_ERROR,
+    );
+  }
+
+  return $problems;
 }
 
 /**
  * Update CiviCRM module weight
  */
 function civicrm_update_7400(&$sandbox) {
-    db_query("UPDATE {system} SET weight = 100 WHERE name = 'civicrm'");
+  db_query("UPDATE {system} SET weight = 100 WHERE name = 'civicrm'");
 }
 

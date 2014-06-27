@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,8 +28,8 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
- * $Id: modifier.crmICalDate.php 37503 2011-11-16 13:07:53Z kurund $
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id: modifier.crmICalDate.php 45499 2013-02-08 12:31:05Z kurund $
  *
  */
 
@@ -42,12 +41,7 @@
  * @return string  formatted text
  * @access public
  */
-
-require_once 'CRM/Utils/ICalendar.php';
-
-function smarty_modifier_crmICalDate( $str, $gdata = false )
-{
-    return CRM_Utils_ICalendar::formatDate( $str, $gdata );
+function smarty_modifier_crmICalDate($str, $gdata = FALSE) {
+  return CRM_Utils_ICalendar::formatDate($str, $gdata);
 }
-
 

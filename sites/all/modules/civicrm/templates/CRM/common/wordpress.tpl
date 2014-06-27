@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,13 +27,7 @@
 {include file="CRM/common/debug.tpl"}
 {/if}
 
-<script type="text/javascript">
-<!--//--><![CDATA[//><!--
-var cj = jQuery.noConflict(); $ = cj;
-//--><!]]>
-</script>
-
-<div id="crm-container" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
+<div id="crm-container" class="crm-container{if $urlIsPublic} crm-public{/if}" lang="{$config->lcMessages|truncate:2:"":true}" xml:lang="{$config->lcMessages|truncate:2:"":true}">
 
 {* we should uncomment below code only when we are experimenting with new css for specific pages and comment css inclusion in civicrm.module*}
 {*if $config->customCSSURL}
@@ -45,7 +39,7 @@ var cj = jQuery.noConflict(); $ = cj;
             {assign var="revamp" value=1}
         {/if}
     {/foreach}
-    
+
     {if $revamp eq 0}
         <link rel="stylesheet" href="{$config->resourceBase}css/civicrm.css" type="text/css" />
     {else}
@@ -54,10 +48,8 @@ var cj = jQuery.noConflict(); $ = cj;
     <link rel="stylesheet" href="{$config->resourceBase}css/extras.css" type="text/css" />
 {/if*}
 
-{include file="CRM/common/action.tpl"}
-{if $buildNavigation }
-    {include file="CRM/common/Navigation.tpl" }
-{/if}
+
+{crmNavigationMenu is_default=1}
 
 {if $breadcrumb}
     <div class="breadcrumb">
@@ -69,36 +61,34 @@ var cj = jQuery.noConflict(); $ = cj;
       {/foreach}
     </div>
 {/if}
-	
-{* temporary hack to fix wysiysg editor failure if js compression is on *}
-{if $defaultWysiwygEditor eq 1}
-    <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/jquery.tinymce.js"></script>
-    <script type="text/javascript" src="{$config->resourceBase}packages/tinymce/jscripts/tiny_mce/tiny_mce.js"></script>
-{elseif $defaultWysiwygEditor eq 2}
-    <script type="text/javascript" src="{$config->resourceBase}packages/ckeditor/ckeditor.js"></script>
-{/if}
+
+{* include wysiwyg related files*}
+{include file="CRM/common/wysiwyg.tpl"}
 
 {if isset($browserPrint) and $browserPrint}
 {* Javascript window.print link. Used for public pages where we can't do printer-friendly view. *}
 <div id="printer-friendly">
-<a href="javascript:window.print()" title="{ts}Print this page.{/ts}">
-	<div class="ui-icon ui-icon-print"></div>
+<a href="#" onclick="window.print(); return false;" title="{ts}Print this page.{/ts}">
+  <div class="ui-icon ui-icon-print"></div>
 </a>
 </div>
 {else}
 {* Printer friendly link/icon. *}
 <div id="printer-friendly">
-<a href="{$printerFriendly}" title="{ts}Printer-friendly view of this page.{/ts}">
-	<div class="ui-icon ui-icon-print"></div>
+<a href="{$printerFriendly}" target='_blank' title="{ts}Printer-friendly view of this page.{/ts}">
+  <div class="ui-icon ui-icon-print"></div>
 </a>
 </div>
 {/if}
 
 {if $pageTitle}
-	<div class="crm-title">
-		<h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
-	</div>    
+  <div class="crm-title">
+    <h1 class="title">{if $isDeleted}<del>{/if}{$pageTitle}{if $isDeleted}</del>{/if}</h1>
+  </div>
 {/if}
+
+{crmRegion name='page-header'}
+{/crmRegion}
 {*{include file="CRM/common/langSwitch.tpl"}*}
 
 <div class="clear"></div>
@@ -109,25 +99,22 @@ var cj = jQuery.noConflict(); $ = cj;
 
 {include file="CRM/common/status.tpl"}
 
+
+{crmRegion name='page-body'}
 <!-- .tpl file invoked: {$tplFile}. Call via form.tpl if we have a form in the page. -->
 {if isset($isForm) and $isForm}
     {include file="CRM/Form/$formTpl.tpl"}
 {else}
     {include file=$tplFile}
 {/if}
+{/crmRegion}
 
+
+{crmRegion name='page-footer'}
 {if ! $urlIsPublic}
 {include file="CRM/common/footer.tpl"}
 {/if}
+{/crmRegion}
 
-{literal}
-<script type="text/javascript">
-cj(function() {
-   cj().crmtooltip(); 
-});
-</script>
-{/literal}
-{* We need to set jquery $ object back to $*}
-<script type="text/javascript">jQuery.noConflict(true);</script>
 </div> {* end crm-container div *}
 
