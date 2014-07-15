@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,6 +23,75 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-<div class="messages status float-right" style="margin-left: 1em;">
-    {ts}Total Recipients:{/ts} <strong>{$count|crmNumberFormat}</strong>
+<div class="messages status float-right no-popup">
+  {ts}Total Recipients:{/ts} <strong>{$count|crmNumberFormat}</strong>
 </div>
+{if $action eq 256 & $ssid eq null}
+  <div class="status float-right">
+    <div id="popupContainer">
+      <table id="selectedRecords" class="display crm-copy-fields">
+        <thead>
+          <tr class="columnheader">
+            <th class="contact_details">Name</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {foreach from=$value item='row'}
+          <tr class="{cycle values="odd-row,even-row"}">
+                 <td class="name">{$row}</td>
+              {/foreach}
+          </tr>
+        </tbody>
+      </table>
+    </div>
+     <a href="#" id="button"title="Contacts selected in the Find Contacts page"> {ts}View Selected Contacts{/ts}</a>
+  </div>
+{literal}
+<script type="text/javascript">
+cj("#popupContainer").hide();
+cj("#button").click(function(){
+  cj("#popupContainer").dialog({
+    title: "Selected Contacts",
+    width:700,
+    height:500,
+    modal: true,
+    overlay: {
+                 opacity: 0.5,
+                  background: "black"
+                  }
+     });
+  });
+
+    cj( function( ) {
+        var count = 0; var columns=''; var sortColumn = '';
+
+        cj('#selectedRecords th').each( function( ) {
+          if ( cj(this).attr('class') == 'contact_details' ) {
+      sortColumn += '[' + count + ', "asc" ],';
+      columns += '{"sClass": "contact_details"},';
+    } else {
+      columns += '{ "bSortable": false },';
+    }
+    count++;
+  });
+
+  columns    = columns.substring(0, columns.length - 1 );
+  sortColumn = sortColumn.substring(0, sortColumn.length - 1 );
+  eval('sortColumn =[' + sortColumn + ']');
+  eval('columns =[' + columns + ']');
+
+  //load jQuery data table.
+        cj('#selectedRecords').dataTable( {
+    "sPaginationType": "full_numbers",
+    "bJQueryUI"  : true,
+    "aaSorting"  : sortColumn,
+    "aoColumns"  : columns,
+    "bFilter"    : false
+        });
+
+    });
+
+</script>
+{/literal}
+{/if}

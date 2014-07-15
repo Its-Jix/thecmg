@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,56 +28,67 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
-
-require_once 'CRM/Core/Component/Config.php';
-
 class CRM_Mailing_Config extends CRM_Core_Component_Config {
 
-    /**
-      * What should be the verp separator we use
-      *
-      * @var char
-      */
-    public $verpSeparator = '.';
+  const OUTBOUND_OPTION_SMTP = 0;
+  const OUTBOUND_OPTION_SENDMAIL = 1;
+  const OUTBOUND_OPTION_DISABLED = 2;
+  const OUTBOUND_OPTION_MAIL = 3;
+  const OUTBOUND_OPTION_MOCK = 4; // seems to be the same as 2, but also calls Mail's pre/post hooks? - see packages/Mail
+  const OUTBOUND_OPTION_REDIRECT_TO_DB = 5;
 
-    /**
-     * How long should we wait before checking for new outgoing mailings?
-     *
-     * @var int
-     */
-    public $mailerPeriod    = 180;
+  /**
+   * What should be the verp separator we use
+   *
+   * @var char
+   */
+  public $verpSeparator = '.';
 
-   /**
-    * TODO
-    *
-    * @var int
-    */
-    public $mailerSpoolLimit = 0;
-                           
-   /**
-    * How many emails should CiviMail deliver on a given run
-    *
-    * @var int
-    */
-    public $mailerBatchLimit = 0;
+  /**
+   * How long should we wait before checking for new outgoing mailings?
+   *
+   * @var int
+   */
+  public $mailerPeriod = 180;
 
-    /**
-     * How large should each mail thread be
-     *
-     * @var int
-     */
-    public $mailerJobSize = 0;
+  /**
+   * TODO
+   *
+   * @var int
+   */
+  public $mailerSpoolLimit = 0;
 
-    /**
-     * How many parallel delivery cron jobs should we run
-     *
-     * @var int
-     */
-    public $mailerJobsMax = 0;
+  /**
+   * How many emails should CiviMail deliver on a given run
+   *
+   * @var int
+   */
+  public $mailerBatchLimit = 0;
+
+  /**
+   * How large should each mail thread be
+   *
+   * @var int
+   */
+  public $mailerJobSize = 0;
+
+  /**
+   * How many parallel delivery cron jobs should we run
+   *
+   * @var int
+   */
+  public $mailerJobsMax = 0;
+
+  /**
+   * Should we sleep after sending an email?
+   * Setting this to 0 means no sleep
+   *
+   * @var int
+   */
+  public $mailThrottleTime = 0;
 }
-
 

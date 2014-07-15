@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,57 +36,19 @@
 /**
  *
  */
-class CRM_Core_Permission_Soap {
-    /**
-     * get the current permission of this user
-     *
-     * @return string the permission of the user (edit or view or null)
-     */
-    public static function getPermission( ) {
-        return CRM_Core_Permission::EDIT;
-    }
+class CRM_Core_Permission_Soap extends CRM_Core_Permission_Base {
 
-    /**
-     * Get the permissioned where clause for the user
-     *
-     * @param int $type the type of permission needed
-     * @param  array $tables (reference ) add the tables that are needed for the select clause
-     * @param  array $whereTables (reference ) add the tables that are needed for the where clause
-     *
-     * @return string the group where clause for this user
-     * @access public
-     */
-    public static function whereClause( $type, &$tables, &$whereTables ) {
-        return '( 1 )';
-    }
+  /**
+   * given a permission string, check for access requirements
+   *
+   * @param string $str the permission to check
+   *
+   * @return boolean true if yes, else false
+   * @access public
+   */
 
-    /**
-     * Get all groups from database, filtered by permissions
-     * for this user
-     *
-     * @access public
-     * @static
-     *
-     * @return array - array reference of all groups.
-     *
-     */
-    public static function &group( $groupType = null ) {
-        return CRM_Core_PseudoConstant::allGroup( $groupType );
-    }
-
-    /**
-     * given a permission string, check for access requirements
-     *
-     * @param string $str the permission to check
-     *
-     * @return boolean true if yes, else false
-     * @static
-     * @access public
-     */
-    static function check( $str ) {
-        return true;
-    }
-
+  function check($str) {
+    return TRUE;
+  }
 }
-
 

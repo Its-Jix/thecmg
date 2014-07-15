@@ -1,6 +1,6 @@
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,123 +24,226 @@
 /*
 * Copyright (C) 2009-2010 Xavier Dutoit
 * Licensed to CiviCRM under the Academic Free License version 3.0.
-*
 */
 
-/*
-TO BE VERIFIED
-If you do not use clean urls on drupal, you have to define a variable to set the url of the server to be used for the rest
-<script type="text/javascript">
-var options {ajaxURL:"{$config->userFrameworkResourceURL}";
-</script>
+var CRM = CRM || {};
 
+(function($, CRM) {
+  /**
+   * Almost like {crmURL} but on the client side
+   * eg: var url = CRM.url('civicrm/contact/view', {reset:1,cid:42});
+   * or: $('a.my-link').crmURL();
+   */
+  var tplURL = '/civicrm/example?placeholder';
+  var urlInitted = false;
+  CRM.url = function (p, params) {
+    if (p == "init") {
+      tplURL = params;
+      urlInitted = true;
+      return;
+    }
+    if (!urlInitted) {
+      console && console.log && console.log('Warning: CRM.url called before initialization');
+    }
+    params = params || '';
+    var frag = p.split ('?');
+    var url = tplURL.replace("civicrm/example", frag[0]);
 
-*/
+    if (typeof(params) == 'string') {
+      url = url.replace("placeholder", params);
+    }
+    else {
+      url = url.replace("placeholder", $.param(params));
+    }
+    if (frag[1]) {
+      url += (url.indexOf('?') === (url.length - 1) ? '' : '&') + frag[1];
+    }
+    // remove trailing "?"
+    if (url.indexOf('?') === (url.length - 1)) {
+      url = url.slice(0, (url.length - 1));
+    }
+    return url;
+  };
 
-(function($){
-      var defaults = {
-    	  success: function(result,settings){
-    	      var successMsg = 'Saved &nbsp; <a href="#" id="closerestmsg">'+ settings.closetxt +'</a>'; 
-    	      $(settings.msgbox).addClass('msgok').html( successMsg ).show();
-    	      $("#closerestmsg").click(function(){$(settings.msgbox).fadeOut("slow");return false;});
-    	      return true;
-    	  },
-    	  callBack: function(result,settings){
-    	      if (result.is_error == 1) {
-    		  $(settings.msgbox).addClass('msgnok').html(result.error_message);
-    		  return false;
-    	      }
-    	      return settings.success(result,settings);
-    	  },
-    	  closetxt: "<div class='icon close-icon' title='Close'>[X]</div>",
-    	  ajaxURL: '/civicrm/ajax/rest',
-    	  msgbox: '#restmsg'
+  // Backwards compatible with jQuery fn
+  $.extend ({'crmURL':
+    function (p, params) {
+      console && console.log && console.log('Calling crmURL from jQuery is deprecated. Please use CRM.url() instead.');
+      return CRM.url(p, params);
+    }
+  });
+
+  $.fn.crmURL = function () {
+    return this.each(function() {
+      if (this.href) {
+        this.href = CRM.url(this.href);
+      }
+    });
+  };
+
+  /**
+   * AJAX api
+   */
+  CRM.api3 = function(entity, action, params) {
+    if (typeof(entity) === 'string') {
+      params = {
+        entity: entity,
+        action: action.toLowerCase(),
+        json: JSON.stringify(params || {})
       };
+    } else {
+      params = {
+        entity: 'api3',
+        action: 'call',
+        json: JSON.stringify(entity)
+      }
+    }
+    return $.ajax({
+      url: CRM.url('civicrm/ajax/rest'),
+      dataType: 'json',
+      data: params,
+      type: params.action.indexOf('get') < 0 ? 'POST' : 'GET'
+    });
+  };
 
-      $.fn.crmAPI = function(entity,action,params,options) {
-//    	  params ['fnName'] = "civicrm/"+entity+"/"+action;
-    	  params ['entity'] = entity;
-    	  params ['action'] = action;
-    	  params ['json'] = 1;
-    	  var settings = $.extend({}, defaults, options);
-    	  $(settings.msgbox).removeClass('msgok').removeClass('msgnok').html("");
-    	  $.getJSON(settings.ajaxURL,params,function(result){return settings.callBack(result,settings);});
-      };
-
-    $.fn.crmAutocomplete = function (params,options) {
-      if (typeof params == 'undefined') params = {};
-      if (typeof options == 'undefined') options = {};
-      $().extend(params, {
-        rowCount:35,
-        json:1,
-        entity:'Contact',
-        action:'quicksearch',
-        sequential:1
+  /**
+   * @deprecated
+   * AJAX api
+   */
+  CRM.api = function(entity, action, params, options) {
+    // Default settings
+    var settings = {
+      context: null,
+      success: function(result, settings) {
+        return true;
+      },
+      error: function(result, settings) {
+        $().crmError(result.error_message, ts('Error'));
+        return false;
+      },
+      callBack: function(result, settings) {
+        if (result.is_error == 1) {
+          return settings.error.call(this, result, settings);
+        }
+        return settings.success.call(this, result, settings);
+      },
+      ajaxURL: 'civicrm/ajax/rest'
+    };
+    action = action.toLowerCase();
+    // Default success handler
+    switch (action) {
+      case "update":
+      case "create":
+      case "setvalue":
+      case "replace":
+        settings.success = function() {
+          CRM.alert('', ts('Saved'), 'success');
+          return true;
+        };
+        break;
+      case "delete":
+        settings.success = function() {
+          CRM.alert('', ts('Removed'), 'success');
+          return true;
+        };
+    }
+    params = {
+      entity: entity,
+      action: action,
+      json: JSON.stringify(params)
+    };
+    // Pass copy of settings into closure to preserve its value during multiple requests
+    (function(stg) {
+      $.ajax({
+        url: stg.ajaxURL.indexOf('http') === 0 ? stg.ajaxURL : CRM.url(stg.ajaxURL),
+        dataType: 'json',
+        data: params,
+        type: action.indexOf('get') < 0 ? 'POST' : 'GET',
+        success: function(result) {
+          stg.callBack.call(stg.context, result, stg);
+        }
       });
-        //'return':'sort_name,email'
+    })($.extend({}, settings, options));
+  };
 
-      options = $().extend({}, {
-          result: function(data){
-               console.log(data);
-          return false;
-        },
-        parse: function (data){
-    			     var acd = new Array();
-    			     for(cid in data.values){
-                 delete data.values[cid]["data"];// to be removed once quicksearch doesn't return data
-    				     acd.push({ data:data.values[cid], value:data.values[cid].sort_name, result:data.values[cid].sort_name });
-    			     }
-    			     return acd;
-        },
-    	  delay:100,
-        minChars:1
-        },options
-      );
-	    var contactUrl = defaults.ajaxURL + "?"+ $.param(params);
-	  
-	  //    contactUrl = contactUrl + "fnName=civicrm/contact/search&json=1&";
-	  //var contactUrl = "/civicrm/ajax/rest?fnName=civicrm/contact/search&json=1&return[sort_name]=1&return[email]&rowCount=25";
-	  
-	  return this.each(function() {
-		  var selector = this;
-		  if (typeof $.fn.autocomplete != 'function') 
-		      $.fn.autocomplete = cj.fn.autocomplete;//to work around the fubar cj
-		      $(this).autocomplete( contactUrl, {
-    			  dataType:"json",
-    			      extraParams:{name:function () {
-    				  return $(selector).val();}
-    			  },
-    			  formatItem: function(data,i,max,value,term){
-              var tmp = [];
-              for (attr in data) {
-                if (attr != "id")
-                 tmp.push(data[attr]);
-              }
-              return  tmp.join(' :: '); 
-    			  },    			
-    			  parse: function(data){ return options.parse(data);},
-    			  width: 250,
-    			  delay:options.delay,
-    			  max:25,
-    			  minChars:options.minChars,
-    			  selectFirst: true
-    		 }).result(function(event, data, formatted) {
-              options.result(data);       
-          });    
-       });
-     }
+  // Backwards compatible with jQuery fn
+  $.fn.crmAPI = function(entity, action, params, options) {
+    console && console.log && console.log('Calling crmAPI from jQuery is deprecated. Please use CRM.api() instead.');
+    return CRM.api.call(this, entity, action, params, options);
+  };
 
-})(jQuery);
+  /**
+   * FIXME: This function is not documented, is not used anywhere in the codebase, and doesn't
+   * clearly differentiate field elements which store the "contact id" versus the "contact label".
+   * My guess is that it's designed more for "quick-search" and less for "CRUD forms".
+   *
+   * @param params
+   * @param options
+   * @return {*}
+   */
+  $.fn.crmAutocomplete = function (params, options) {
+    if (typeof params == 'undefined') params = {};
+    if (typeof options == 'undefined') options = {};
+    params = $().extend({
+      rowCount:35,
+      json:1,
+      entity:'Contact',
+      action:'getquick',
+      sequential:1
+    }, params);
 
-/* Depreciated as of 3.2. kept for backward compatibility reason. */
-function civiREST (entity,action,params,close) {
-    var options = null;
-    if( close ){
-	    options = {closetxt : close}; 
-    }
-    if ( typeof close == "function"){
-	    options = {success : close}; 
-    }
-  
-    cj.fn.crmAPI(entity,action,params,options);
-}
+    options = $().extend({}, {
+        field :'name',
+        skip : ['id','contact_id','contact_type','contact_is_deleted',"email_id",'address_id', 'country_id'],
+        result: function(data){
+        return false;
+      },
+      formatItem: function(data,i,max,value,term){
+        var tmp = [];
+        for (attr in data) {
+          if ($.inArray (attr, options.skip) == -1 && data[attr]) {
+            tmp.push(data[attr]);
+          }
+        }
+        return  tmp.join(' :: ');
+      },
+      parse: function (data){
+             var acd = new Array();
+             for(cid in data.values){
+               delete data.values[cid]["data"];// to be removed once quicksearch doesn't return data
+               acd.push({ data:data.values[cid], value:data.values[cid].sort_name, result:data.values[cid].sort_name });
+             }
+             return acd;
+      },
+      delay:100,
+        width:250,
+      minChars:1
+      }, options
+    );
+    var contactUrl = CRM.url('civicrm/ajax/rest', params);
+
+    return this.each(function() {
+      var selector = this;
+      if (typeof $.fn.autocomplete != 'function')
+        $.fn.autocomplete = cj.fn.autocomplete;//to work around the fubar cj
+        var extraP = {};
+        extraP [options.field] = function () {return $(selector).val();};
+        $(this).autocomplete( contactUrl, {
+          extraParams:extraP,
+          formatItem: function(data,i,max,value,term){
+            return options.formatItem(data,i,max,value,term);
+          },
+          parse: function(data){ return options.parse(data);},
+          width: options.width,
+          delay:options.delay,
+          max:25,
+          dataType:'json',
+          minChars:options.minChars,
+          selectFirst: true
+       }).result(function(event, data, formatted) {
+            options.result(data);
+        });
+     });
+   }
+
+})(jQuery, CRM);

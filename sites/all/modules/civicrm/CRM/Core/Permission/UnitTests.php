@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,62 +36,28 @@
 /**
  *
  */
-class CRM_Core_Permission_UnitTests {
+class CRM_Core_Permission_UnitTests extends CRM_Core_Permission_Base {
 
-    public static function getPermission( ) {
-        return CRM_Core_Permission::EDIT;
-    }
+  // permission mapping to stub check() calls
+  public $permissions = NULL;
 
-    public static function whereClause( $type, &$tables, &$whereTables ) {
-        return '( 1 )';
-    }
+  function check($str) {
+    // return the stubbed permission (defaulting to true if the array is missing)
+    return is_array($this->permissions) ? in_array($str, $this->permissions) : TRUE;
+  }
 
-    public static function &group( $groupType = null, $excludeHidden = true ) {
-        return CRM_Core_PseudoConstant::allGroup( $groupType, $excludeHidden );
-    }
-
-    // permission mapping to stub check() calls
-    public static $permissions = null;
-
-    static function check($str)
-    {
-        // return the stubbed permission (defaulting to true if the array is missing)
-        return is_array(self::$permissions) ? in_array($str, self::$permissions) : true;
-    }
-
-    /**
-     * Given a roles array, check for access requirements
-     *
-     * @param array $array the roles to check
-     *
-     * @return boolean true if yes, else false
-     * @static
-     * @access public
-     */
-    static function checkGroupRole( $array) {
-        return false;
-    }
-
-    /**
-     * Get all the contact emails for users that have a specific permission
-     *
-     * @param string $permissionName name of the permission we are interested in
-     *
-     * @return string a comma separated list of email addresses
-     */
-    public static function permissionEmails( $permissionName ) {
-        return '';
-    }
-
-    /**
-     * Get all the contact emails for users that have a specific role
-     *
-     * @param string $roleName name of the role we are interested in
-     *
-     * @return string a comma separated list of email addresses
-     */
-    public static function roleEmails( $roleName ) {
-        return '';
-    }
-    
+  /**
+   * Get the permissioned where clause for the user
+   *
+   * @param int $type the type of permission needed
+   * @param  array $tables (reference ) add the tables that are needed for the select clause
+   * @param  array $whereTables (reference ) add the tables that are needed for the where clause
+   *
+   * @return string the group where clause for this user
+   * @access public
+   */
+  public function whereClause($type, &$tables, &$whereTables) {
+    return '( 1 )';
+  }
 }
+

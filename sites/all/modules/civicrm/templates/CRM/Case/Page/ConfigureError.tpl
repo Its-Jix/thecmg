@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,9 +25,9 @@
 *}
 {* CiviCase Configuration Help - displayed when component is enabled but not yet configured. *}
 
-{capture assign=docLink}{docURL page="CiviCase Admin" text="CiviCase Administration Documentation"}{/capture}
+{capture assign=docLink}{docURL page="user/case-management/setup" text="CiviCase Setup documentation"}{/capture}
 
-<div class="messages status">
+<div class="messages status no-popup">
       <div class="icon inform-icon"></div>&nbsp;    
       <strong>{ts}You need to setup and load Case and Activity configuration files before you can begin using the CiviCase component.{/ts}</strong>
       {ts 1=$docLink}Refer to the %1 to learn about this process.{/ts}

@@ -517,7 +517,7 @@ class DB
      *
      * @uses DB::parseDSN(), DB_common::setOption(), PEAR::isError()
      */
-    function &connect($dsn, $options = array())
+    static function &connect($dsn, $options = array())
     {
         $dsninfo = DB::parseDSN($dsn);
         $type = $dsninfo['phptype'];
@@ -534,12 +534,13 @@ class DB
             // expose php errors with sufficient debug level
             include_once "DB/${type}.php";
         } else {
-            @include_once "DB/${type}.php";
+            include_once "DB/${type}.php";
         }
 
         $classname = "DB_${type}";
         if (!class_exists($classname)) {
-            $tmp = PEAR::raiseError(null, DB_ERROR_NOT_FOUND, null, null,
+            $obj = new PEAR;
+            $tmp = $obj->raiseError(null, DB_ERROR_NOT_FOUND, null, null,
                                     "Unable to include the DB/{$type}.php"
                                     . " file for '$dsn'",
                                     'DB_Error', true);
@@ -591,7 +592,7 @@ class DB
      *
      * @return bool  whether $value is DB_Error object
      */
-    function isError($value)
+    static function isError($value)
     {
         return is_a($value, 'DB_Error');
     }
@@ -627,7 +628,7 @@ class DB
      *
      * @return boolean  whether $query is a data manipulation query
      */
-    function isManip($query)
+    static function isManip($query)
     {
         $manips = 'INSERT|UPDATE|DELETE|REPLACE|'
                 . 'CREATE|DROP|'
@@ -651,7 +652,7 @@ class DB
      * @return string  the error message or false if the error code was
      *                  not recognized
      */
-    function errorMessage($value)
+    static function errorMessage($value)
     {
         static $errorMessages;
         if (!isset($errorMessages)) {
@@ -732,7 +733,7 @@ class DB
      *  + username: User name for login
      *  + password: Password for login
      */
-    function parseDSN($dsn)
+	 static function parseDSN($dsn)
     {
         $parsed = array(
             'phptype'  => false,
@@ -866,7 +867,7 @@ class DB
          * defined, and means that we deal with strings and array in the same
          * manner. */
         $dsnArray = DB::parseDSN($dsn);
-        
+
         if ($hidePassword) {
             $dsnArray['password'] = 'PASSWORD';
         }
@@ -876,7 +877,7 @@ class DB
         if (is_string($dsn) && strpos($dsn, 'tcp') === false && $dsnArray['protocol'] == 'tcp') {
             $dsnArray['protocol'] = false;
         }
-        
+
         // Now we just have to construct the actual string. This is ugly.
         $dsnString = $dsnArray['phptype'];
         if ($dsnArray['dbsyntax']) {
@@ -899,7 +900,7 @@ class DB
             $dsnString .= ':'.$dsnArray['port'];
         }
         $dsnString .= '/'.$dsnArray['database'];
-        
+
         /* Option handling. Unfortunately, parseDSN simply places options into
          * the top-level array, so we'll first get rid of the fields defined by
          * DB and see what's left. */
@@ -926,7 +927,7 @@ class DB
 
         return $dsnString;
     }
-    
+
     // }}}
 }
 

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,14 +24,19 @@
  +--------------------------------------------------------------------+
 *}
 {if !empty($form.address.$blockId.geo_code_1) && !empty($form.address.$blockId.geo_code_2)}
-    {capture assign=docLink}{docURL page="Mapping and Geocoding"}{/capture}
    <tr>
       <td colspan="2">
-          {$form.address.$blockId.geo_code_1.label},&nbsp;{$form.address.$blockId.geo_code_2.label}<br />
+          {$form.address.$blockId.geo_code_1.label},&nbsp;{$form.address.$blockId.geo_code_2.label} {help id="id-geo-code" file="CRM/Contact/Form/Contact.hlp"}<br />
           {$form.address.$blockId.geo_code_1.html},&nbsp;{$form.address.$blockId.geo_code_2.html}<br />
-          <span class="description font-italic">
-            {ts}Latitude and longitude may be automatically populated by enabling a Mapping Provider.{/ts} {$docLink}
-          </span>
       </td>
+    </tr>
+    {if !empty($form.address.$blockId.manual_geo_code)}
+     <tr>
+        <td colspan="2">
+          {$form.address.$blockId.manual_geo_code.html}
+          {$form.address.$blockId.manual_geo_code.label} {help id="id-geo-code-override" file="CRM/Contact/Form/Contact.hlp"}
+        </td>
+      </tr>
+    {/if}
    </tr>
 {/if}

@@ -1,10 +1,9 @@
 <?php
-
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.1                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2011                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,93 +28,113 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2011
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
-require_once 'CRM/Core/Form.php';
-
 /**
  * This class generates form components generic to Mobile provider
- * 
+ *
  */
-class CRM_Contribute_Form extends CRM_Core_Form
-{
-    /**
-     * The id of the object being edited / created
-     *
-     * @var int
-     */
-    protected $_id;
+class CRM_Contribute_Form extends CRM_Core_Form {
 
-    /**
-     * The name of the BAO object for this form
-     *
-     * @var string
-     */
-    protected $_BAOName;
+  /**
+   * The id of the object being edited / created
+   *
+   * @var int
+   */
+  protected $_id;
 
-    function preProcess( ) {
-        $this->_id      = $this->get( 'id'      );
-        $this->_BAOName = $this->get( 'BAOName' );
+  /**
+   * The name of the BAO object for this form
+   *
+   * @var string
+   */
+  protected $_BAOName;
+
+  function preProcess() {
+    $this->_id = $this->get('id');
+    $this->_BAOName = $this->get('BAOName');
+  }
+
+  /**
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
+   * the default values are retrieved from the database
+   *
+   * @access public
+   *
+   * @return None
+   */
+  function setDefaultValues() {
+    $defaults = array();
+    $params = array();
+
+    if (isset($this->_id)) {
+      $params = array('id' => $this->_id);
+      if (!empty( $this->_BAOName)) {
+        $baoName = $this->_BAOName;
+        $baoName::retrieve($params, $defaults);
+      }
     }
-
-    /**
-     * This function sets the default values for the form. MobileProvider that in edit/view mode
-     * the default values are retrieved from the database
-     * 
-     * @access public
-     * @return None
-     */
-    function setDefaultValues( ) {
-        $defaults = array( );
-        $params   = array( );
-
-        if ( isset( $this->_id ) ) {
-            $params = array( 'id' => $this->_id );
-            require_once(str_replace('_', DIRECTORY_SEPARATOR, $this->_BAOName) . ".php");
-            eval( $this->_BAOName . '::retrieve( $params, $defaults );' );
-        }
-
-        if ($this->_action == CRM_Core_Action::DELETE) {
-            $this->assign( 'delName', $defaults['name'] );
-        } elseif ($this->_action == CRM_Core_Action::ADD) {
-            $defaults['is_active'] = 1;
-        }
-        
-        return $defaults;
+    if ($this->_action == CRM_Core_Action::DELETE && CRM_Utils_Array::value('name', $defaults)) {
+      $this->assign('delName', $defaults['name']);
     }
+    elseif ($this->_action == CRM_Core_Action::ADD) {
+      $condition = " AND is_default = 1";
+      $values = CRM_Core_OptionGroup::values('financial_account_type', false, false, false, $condition);
+      $defaults['financial_account_type_id'] = array_keys($values);
+      $defaults['is_active'] = 1;
 
-    /**
-     * Function to actually build the form
-     *
-     * @return None
-     * @access public
-     */
-    public function buildQuickForm( ) {
-        $this->addButtons( array(
-                                 array ( 'type'      => 'next',
-                                         'name'      => ts('Save'),
-                                         'isDefault' => true   ),
-                                 array ( 'type'      => 'cancel',
-                                         'name'      => ts('Cancel') ),
-                                 )
-                           );
-     
-        if($this->_action & CRM_Core_Action::DELETE) {
-            $this->addButtons(array(
-                                    array ('type'      => 'next',
-                                           'name'      => ts('Delete'),
-                                           'isDefault' => true),
-                                    array ('type'      => 'cancel',
-                                           'name'      => ts('Cancel')),
-                                    )
-                              );
-        }
-   
     }
+    elseif ($this->_action & CRM_Core_Action::UPDATE) {
+      if (CRM_Utils_Array::value('contact_id', $defaults) || CRM_Utils_Array::value('created_id', $defaults)) {
+        $contactID = CRM_Utils_Array::value('created_id', $defaults) ? $defaults['created_id'] : $defaults['contact_id'];
+        $this->assign('created_id', $contactID);
+        $this->assign('organisationId', $contactID);
+      }
 
+      if ($parentId = CRM_Utils_Array::value('parent_id', $defaults)) {
+        $this->assign('parentId', $parentId);
+      }
+    }
+    return $defaults;
+  }
+
+  /**
+   * Function to actually build the form
+   *
+   * @return None
+   * @access public
+   */
+  public function buildQuickForm() {
+    $this->addButtons(array(
+        array(
+          'type' => 'next',
+          'name' => ts('Save'),
+          'isDefault' => TRUE,
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'),
+        ),
+      )
+    );
+
+    if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->addButtons(array(
+          array(
+            'type' => 'next',
+            'name' => ts('Delete'),
+            'isDefault' => TRUE,
+          ),
+          array(
+            'type' => 'cancel',
+            'name' => ts('Cancel'),
+          ),
+        )
+      );
+    }
+  }
 }
-
 

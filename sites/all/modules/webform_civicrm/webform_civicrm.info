@@ -1,13 +1,15 @@
 name = Webform CiviCRM Integration
-description = Links Webform submissions with CiviCRM contacts and data.
+description = Links Webform submissions with your CiviCRM database.
 core = 7.x
 package = CiviCRM
-dependencies[] = civicrm
-dependencies[] = webform
+dependencies[] = civicrm (>=4.4)
+dependencies[] = webform (>=4.0-beta1)
+dependencies[] = libraries
+dependencies[] = options_element
 
-; Information added by drupal.org packaging script on 2012-05-30
-version = "7.x-2.6"
+; Information added by Drupal.org packaging script on 2014-06-19
+version = "7.x-4.7"
 core = "7.x"
 project = "webform_civicrm"
-datestamp = "1338348701"
+datestamp = "1403210079"
 
