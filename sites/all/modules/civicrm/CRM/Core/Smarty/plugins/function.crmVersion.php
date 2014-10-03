@@ -3,7 +3,7 @@
  +--------------------------------------------------------------------+
  | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,65 +28,33 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright TTTP
  * $Id$
  *
  */
 
 /**
- * This class provides the functionality to delete a group of
- * Activites. This class provides functionality for the actual
- * deletion.
+ * Display the CiviCRM version
+ *
+ * @code
+ * The version is {crmVersion}.
+ *
+ * {crmVersion redact=auto assign=ver}The version is {$ver}.
+ * @endcode
  */
-class CRM_Activity_Form_Task_Delete extends CRM_Activity_Form_Task {
+function smarty_function_crmVersion($params, &$smarty) {
+  $version = CRM_Utils_System::version();
 
-  /**
-   * Are we operating in "single mode", i.e. deleting one
-   * specific Activity?
-   *
-   * @var boolean
-   */
-  protected $_single = FALSE;
-
-  /**
-   * build all the data structures needed to build the form
-   *
-   * @return void
-   * @access public
-   */
-  function preProcess() {
-    parent::preProcess();
+  $redact = !CRM_Core_Permission::check('access CiviCRM');
+  if ($redact) {
+    $parts = explode('.', $version);
+    $version = $parts[0] . '.' . $parts[1] . '.x';
   }
 
-  /**
-   * Build the form
-   *
-   * @access public
-   *
-   * @return void
-   */
-  function buildQuickForm() {
-    $this->addDefaultButtons(ts('Delete Activities'), 'done');
+  if (isset($params['assign'])) {
+    $smarty->assign($params['assign'], $version);
   }
-
-  /**
-   * process the form after the input has been submitted and validated
-   *
-   * @access public
-   *
-   * @return None
-   */
-  public function postProcess() {
-    $deletedActivities = 0;
-    foreach ($this->_activityHolderIds as $activityId['id']) {
-      $moveToTrash = CRM_Case_BAO_Case::isCaseActivity($activityId['id']);
-      if (CRM_Activity_BAO_Activity::deleteActivity($activityId, $moveToTrash)) {
-        $deletedActivities++;
-      }
-    }
-
-    CRM_Core_Session::setStatus($deletedActivities, ts('Deleted Activities'), "success");
-    CRM_Core_Session::setStatus("", ts('Total Selected Activities: %1', array(1 => count($this->_activityHolderIds))), "info");
+  else {
+    return $version;
   }
 }
-
