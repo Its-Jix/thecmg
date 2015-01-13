@@ -314,16 +314,17 @@ function civicrm_initialize() {
  * may need to cover different drupal versions
  */
 function _civicrm_registerClassLoader() {
-  $path = variable_get('civicrm_class_loader');
-  if (empty($path) || !file_exists($path)) {
+  $home = dirname(__FILE__);
+  $path = variable_get('civicrm_class_loader', NULL);
+  if (empty($path) || !file_exists($home . $path)) {
     $candidates = array(
-        dirname(__FILE__) . '/../CRM/Core/ClassLoader.php',
-        dirname(__FILE__) . '/../civicrm-core/CRM/Core/ClassLoader.php',
-        dirname(__FILE__) . '/../core/CRM/Core/ClassLoader.php',
+        '/../CRM/Core/ClassLoader.php',
+        '/../civicrm-core/CRM/Core/ClassLoader.php',
+        '/../core/CRM/Core/ClassLoader.php',
         // ... ad nauseum ...
     );
     foreach ($candidates as $candidate) {
-      if (file_exists($candidate)) {
+      if (file_exists($home . $candidate)) {
         $path = $candidate;
         variable_set('civicrm_class_loader', $candidate);
         break;
@@ -331,7 +332,7 @@ function _civicrm_registerClassLoader() {
     }
   }
 
-  require_once $path;
+  require_once $home . $path;
   CRM_Core_ClassLoader::singleton()->register();
 }
 /**
@@ -681,8 +682,10 @@ function civicrm_enable() {
   // also invoke civicrm menu rebuild
   CRM_Core_Menu::store();
 
-  //Update the 'blocks' DB table with the blocks
-  _block_rehash();
+  // Update the 'blocks' DB table with the blocks.
+  if (module_exists('block')) {
+    _block_rehash();
+  }
 }
 
 /**
@@ -1228,7 +1231,7 @@ function civicrm_modules_uninstalled($modules) {
  * @param array $cid_parts
  */
 function civicrm_metatag_page_cache_cid_parts_alter(&$cid_parts) {
-  if (substr($cid_parts['path'], 0, 7) =='civicrm') {
+  if (!empty($cid_parts['path']) && substr($cid_parts['path'], 0, 7) =='civicrm') {
     $cid_parts['path'] .=  '/' . md5(implode('_',$_GET));
   }
 }
