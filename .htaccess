@@ -7,6 +7,18 @@
   Order allow,deny
 </FilesMatch>
 
+Order allow,deny
+Allow from all
+
+Deny from 120.37.239.159
+
+# Added 20141121/11:18PM
+Deny from 27.150.210.210
+
+# Added 20141122/2:17PM
+Deny from 27.153.229.117
+
+
 # Don't show directory listings for URLs which map to a directory.
 Options -Indexes
 
