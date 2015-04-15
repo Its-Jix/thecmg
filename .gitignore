@@ -23,3 +23,6 @@ sites/*/private
 /squirrelmail
 /squirrelmail/*
 /test
+
+# Ignore sass cache
+.sass-cache
