@@ -70,6 +70,3 @@ libraries[s3_php5_curl][download][type] = git
 libraries[s3_php5_curl][download][url] = "ssh://git@git.giantrabbit.com/allgr/s3-php5-curl.git"
 libraries[s3_php5_curl][destination] = libraries
 libraries[s3_php5_curl][directory_name] = s3-php5-curl
-
-; Patches
-projects[media_browser_plus][patch][2215183] = https://www.drupal.org/files/issues/media_browser_plus-folder-save-2215183-5.patch
