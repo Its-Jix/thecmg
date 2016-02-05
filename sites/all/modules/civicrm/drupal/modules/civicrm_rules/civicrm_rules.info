@@ -5,4 +5,4 @@ dependencies[] = rules
 package = CiviCRM
 project = civicrm
 core = 7.x
-version = 4.4.20
+version = 4.4.21
