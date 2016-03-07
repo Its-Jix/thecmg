@@ -59,7 +59,11 @@ projects[xautoload][subdir] = contrib
 projects[xmlsitemap][subdir] = contrib
 
 ; Themes
-projects[zen][version] = 6.x-dev
+projects[zen][type] = theme
+projects[zen][subdir] = contrib
+projects[zen][download][branch] = gr-7.x-6.x
+projects[zen][download][type] = git
+projects[zen][download][url] = "ssh://git@git.giantrabbit.com/allgr/zen.git"
 
 ; Libraries
 libraries[ckeditor][download][type] = get
