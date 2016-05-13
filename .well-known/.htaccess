@@ -1,0 +1,3 @@
+RewriteRule "^.well-known/" - [L]
+Allow from all
+Satisfy any
