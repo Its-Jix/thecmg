@@ -2,6 +2,16 @@
 
 require('settings.bootstrap.php');
 
+$dsn = "mysql://{$database_settings['username']}";
+if ($database_settings['password'] !== NULL && $database_settings['password'] !== '') {
+  $dsn .= ":{$database_settings['password']}";
+}
+$dsn .= "@{$database_settings['host']}";
+if ($database_settings['port'] !== NULL && $database_settings['port'] !== '') {
+  $dsn .= ":{$database_settings['port']}";
+}
+$dsn .= "/{$database_settings['database']}?new_link=true";
+
 /*
  +--------------------------------------------------------------------+
  | CiviCRM version 4.3                                                |
@@ -62,7 +72,7 @@ define( 'CIVICRM_UF'               , 'Drupal'        );
  * Datasource (DSN) format:
  *      define( 'CIVICRM_UF_DSN', 'mysql://cms_db_username:cms_db_password@db_server/cms_database?new_link=true');
  */
-define( 'CIVICRM_UF_DSN'           , "mysql://{$database_settings['username']}:{$database_settings['password']}@{$database_settings['host']}:{$database_settings['port']}/{$database_settings['database']}?new_link=true" );
+define( 'CIVICRM_UF_DSN'           , $dsn);
 
 /**
  * CiviCRM Database Settings
@@ -83,7 +93,7 @@ define( 'CIVICRM_UF_DSN'           , "mysql://{$database_settings['username']}:{
  *      define( 'CIVICRM_DSN'         , 'mysql://civicrm:YOUR_PASSWORD@localhost/civicrm?new_link=true' );
  *
  */
-define( 'CIVICRM_DSN'          , "mysql://{$database_settings['username']}:{$database_settings['password']}@{$database_settings['host']}:{$database_settings['port']}/{$database_settings['database']}?new_link=true" );
+define( 'CIVICRM_DSN'          , $dsn);
 
 /**
  * CiviCRM Logging Database
