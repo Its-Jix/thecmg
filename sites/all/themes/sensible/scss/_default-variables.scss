@@ -1,0 +1,64 @@
+/**
+ * Default Variables.
+ *
+ * Modify this file to provide default Bootstrap Framework variables. The
+ * Bootstrap Framework will not override any variables defined here because it
+ * uses the `!default` flag which will only set their default if not already
+ * defined here.
+ *
+ * You can copy existing variables directly from the following file:
+ * ./THEMENAME/bootstrap/assets/stylesheets/_variables.scss
+ */
+
+// Set the proper directory for the Bootstrap Glyphicon font.
+$icon-font-path: '../bootstrap/assets/fonts/bootstrap/';
+
+//== Fonts
+//
+// ## Sensible Font
+@font-face {
+  font-family: "Aileron-Regular";
+  src: url("../fonts/AileronRegular.eot?#iefix");
+  src: url("../fonts/AileronRegular.eot?#iefix") format("eot"),
+       url("../fonts/AileronRegular.woff") format("woff"),
+       url("../fonts/AileronRegular.ttf") format("truetype"),
+       url("../fonts/AileronRegular.svg") format("svg");
+  font-weight: normal;
+}
+@font-face {
+  font-family: "Aileron-Regular";
+  src: url("../fonts/Aileron-Bold.eot?#iefix");
+  src: url("../fonts/Aileron-Bold.eot?#iefix") format("eot"),
+       url("../fonts/Aileron-Bold.woff") format("woff"),
+       url("../fonts/Aileron-Bold.ttf") format("truetype"),
+       url("../fonts/Aileron-Bold.svg") format("svg");
+  font-weight: 500;
+}
+$font-family-sans-serif:  "Aileron-Regular", Helvetica, Arial, sans-serif !default;
+$font-family-serif:       Georgia, "Times New Roman", Times, serif !default;
+$font-size-base:          16px !default;
+//== Colors
+//
+//## Gray and brand colors for use across Sensible.
+
+$gray-base:              #000 !default;
+$gray-darker:            lighten($gray-base, 13.5%) !default; // #222
+$gray-dark:              lighten($gray-base, 20%) !default;   // #333
+$gray:                   lighten($gray-base, 33.5%) !default; // #555
+$gray-light:             lighten($gray-base, 46.7%) !default; // #777
+$gray-lighter:           lighten($gray-base, 93.5%) !default; // #eee
+
+$brand-primary:         #2b4e72 !default;
+$brand-success:         #94ba65 !default;
+$brand-info:            #2790b0 !default;
+$brand-warning:         #ebbb54 !default;
+$brand-danger:          #cf4444 !default;
+
+$white:                 #fff !default;
+//== Components
+//
+//## Border Radius
+
+$border-radius-base:        0px !default;
+$border-radius-large:       0px !default;
+$border-radius-small:       0px !default;

@@ -1,0 +1,54 @@
+/**
+ * Changes specific to Sensible Theme
+ *
+**/
+
+.container-fluid {
+  max-width: 1200px;
+}
+.well {
+  box-shadow: none;
+  padding: 15px;
+  background: none;
+}
+
+.breadcrumb {
+  border: 1px solid $gray-lighter;
+  background-color: $white;
+}
+
+.navbar-default {
+  background: $white;
+}
+
+.sensible-node.node-article {
+  .submitted {
+    .user-picture {
+      float: left;
+      margin-right: 5px;
+      margin-bottom: 10px;
+      img {
+        width: 25px;
+        border-radius: 25px;
+      }
+    }
+  }
+  footer .field-name-field-tags {
+    margin-top: 15px;
+    @include clearfix;
+    .field-label {
+      display: inline-block;
+    }
+    .field-items {
+      display: inline-block;
+      .field-item {
+        font-size: 0.9em;
+        background-color: $gray-lighter;
+        padding: 0 5px;
+        border-radius: 2px;
+        display: inline-block;
+        margin: 0 3px;
+      }
+    }
+  }
+}
