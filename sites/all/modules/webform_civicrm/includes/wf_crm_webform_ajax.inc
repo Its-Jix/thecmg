@@ -53,6 +53,7 @@ class wf_crm_webform_ajax extends wf_crm_webform_base {
     }
     list($nid, $fid) = explode('-', $key, 2);
     $this->node = node_load($nid);
+    $this->settings = $this->node->webform_civicrm;
     if (!$this->autocompleteAccess($fid)) {
       drupal_access_denied();
     }
@@ -95,7 +96,9 @@ class wf_crm_webform_ajax extends wf_crm_webform_base {
           }
           $this->ent['contact'][$c]['id'] = (int) $_GET['cid'];
         }
-        $contact = $this->loadContact($c, $component['extra']['hide_fields']);
+        // Redact fields if they are to be hidden unconditionally, otherwise they are needed on the client side
+        $to_hide = (wf_crm_aval($component['extra'], 'hide_method', 'hide') == 'hide' && !wf_crm_aval($component['extra'], 'no_hide_blank')) ? $component['extra']['hide_fields'] : array();
+        $contact = $this->loadContact($c, $to_hide);
         $states = $countries = array();
         // Format as json array
         foreach ($this->enabled as $fid => $f) {
@@ -103,7 +106,7 @@ class wf_crm_webform_ajax extends wf_crm_webform_base {
           if ($i == $c && $ent == 'contact' && isset($contact[$table][$n][$field])) {
             $type = ($table == 'contact' && strpos($field, 'name')) ? 'name' : $table;
             // Exclude blank and hidden fields
-            if ($contact[$table][$n][$field] !== '' && $contact[$table][$n][$field] !== array() && !in_array($type, $component['extra']['hide_fields'])) {
+            if ($contact[$table][$n][$field] !== '' && $contact[$table][$n][$field] !== array() && !in_array($type, $to_hide)) {
               $dataType = wf_crm_aval(wf_crm_get_field("{$table}_$field"), 'data_type');
               $val = array('val' => $contact[$table][$n][$field]);
               // Retrieve file info
@@ -126,6 +129,25 @@ class wf_crm_webform_ajax extends wf_crm_webform_base {
               }
               else {
                 $data[] = $val;
+              }
+            }
+          }
+          // Populate related contacts
+          elseif ($c == 1 && $i > $c && $field == 'existing') {
+            $related_component = $this->getComponent($fid);
+            if (wf_crm_aval($related_component['extra'], 'default') == 'relationship') {
+              $old_related_cid = wf_crm_aval($this->ent, "contact:$i:id");
+              // Don't be fooled by old data
+              $related_component['extra']['allow_url_autofill'] = FALSE;
+              unset($this->ent['contact'][$i]);
+              $this->findContact($related_component);
+              $related_cid = wf_crm_aval($this->ent, "contact:$i:id");
+              if ($related_cid && $related_cid != $old_related_cid) {
+                $data[] = array(
+                  'fid' => $fid,
+                  'val' => $related_cid,
+                  'display' => wf_crm_contact_access($related_component,  wf_crm_search_filters($this->node, $related_component), $related_cid),
+                );
               }
             }
           }

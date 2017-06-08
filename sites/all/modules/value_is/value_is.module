@@ -9,12 +9,19 @@
  * Implements hook_element_info_alter().
  */
 function value_is_element_info_alter(&$info) {
+  // Required file.
   if (isset($info['file'])) {
     if (!isset($info['file']['#validate'])) {
       $info['file']['#validate'] = array();
     }
     array_unshift($info['file']['#validate'], '_value_is_file_element_validate');
     $info['file']['#process'][] = '_value_is_file_element_process';
+  }
+
+  // Disabled checkboxes.
+  if (isset($info['checkboxes'])) {
+    $info['checkboxes']['#process'][] = '_value_is_disabled_options_process';
+    $info['checkboxes']['#value_callback'] = '_value_is_disabled_options_value_callback';
   }
 }
 
@@ -79,6 +86,75 @@ function _value_is_get_file($element) {
 }
 
 /**
+ * Process callback for checkboxes elements.
+ */
+function _value_is_disabled_options_process($element, &$form_state, &$full_form) {
+  $state = _value_is_disabled_options_state($element);
+  return $element;
+}
+
+/**
+ * Helper to determine if there's nothing to do in this element. Depends on:
+ * - #value_callback must be mine
+ * - element must NOT already be (fully) #disabled
+ * - some #disabled_options or #hidden_options must exist
+ */
+function _value_is_disabled_options_passthrough($element) {
+  $good_value_callback = $element['#value_callback'] == '_value_is_disabled_options_value_callback';
+  $disabled = !empty($element['#disabled']);
+  $no_config = empty($element['#disabled_options']) && empty($element['#hidden_options']);
+  return !($good_value_callback && !$disabled && !$no_config);
+}
+
+/**
+ * Helper to save unchangeable checkboxes state and alter $element.
+ */
+function _value_is_disabled_options_state(&$element) {
+  $passthrough = _value_is_disabled_options_passthrough($element);
+  if ($passthrough) {
+    return array();
+  }
+
+  $state = array();
+  foreach ($element['#options'] as $key => $label) {
+    if (isset($element['#disabled_options']) && in_array($key, $element['#disabled_options'])) {
+      $element[$key]['#disabled'] = TRUE;
+      $value = in_array($key, $element['#default_value']) ? $key : 0;
+      $state[$key] = $value;
+    }
+    if (isset($element['#hidden_options']) && in_array($key, $element['#hidden_options'])) {
+      $element[$key]['#access'] = FALSE;
+      $value = in_array($key, $element['#default_value']) ? $key : 0;
+      $state[$key] = $value;
+    }
+  }
+
+  return $state;
+}
+
+/**
+ * Value callback for checkboxes elements.
+ */
+function _value_is_disabled_options_value_callback($element, $input = FALSE, $form_state = array()) {
+  $passthrough = _value_is_disabled_options_passthrough($element);
+  $default = isset($element['#value']) ? $element['#value'] : (isset($element['#default_value']) ? $element['#default_value'] : array());
+  if ($passthrough && !empty($element['#disabled'])) {
+    return drupal_map_assoc($default);
+  }
+
+  $state = _value_is_disabled_options_state($element);
+  $access = !isset($element['#access']) || $element['#access'];
+  $submitted = $access && $input !== FALSE;
+
+  if ($submitted) {
+    $input_data = is_array($input) ? $input : array();
+    return drupal_map_assoc(array_filter($state + $input_data));
+  }
+
+  return drupal_map_assoc($default);
+}
+
+/**
  * Helper to flip a 2D array.
  */
 function _value_is_flip_array_2d($array) {
@@ -125,14 +201,25 @@ function value_is_username($element, &$form_state, $form) {
 }
 
 /**
+ * Checks for e-mail address(es) or token(s).
+ */
+function value_is_email_or_token($element, &$form_state, $form) {
+  $element['#allow_tokens'] = TRUE;
+  return value_is_email($element, $form_state, $form);
+}
+
+/**
  * Checks for e-mail address(es).
  */
 function value_is_email($element, &$form_state, $form) {
   $value = $element['#value'];
 
   if ('' != $value) {
+    $allow_tokens = !empty($element['#allow_tokens']);
+
     // Default is just 1 address.
     $max = isset($element['#max']) ? (int) $element['#max'] : 1;
+
     // The input will be validated as if it were an array.
     $addresses = explode(',', $value);
 
@@ -145,7 +232,7 @@ function value_is_email($element, &$form_state, $form) {
 
     // Validate per address.
     foreach ($addresses as $address) {
-      if (!valid_email_address(trim($address))) {
+      if (!valid_email_address(trim($address)) && (!$allow_tokens || !preg_match('#:e?mail\]#', $address))) {
         $params = array('%title' => $element['#title']);
         $message = 1 < $max ?
           t('%title must be a comma separated list of valid e-mail addresses.', $params) :
