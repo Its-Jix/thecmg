@@ -61,11 +61,10 @@ function rb_block_block_list() {
   $path = drupal_get_path('module', 'block') . '/block.admin.inc';
   include_once $path;
   $blocks = block_admin_display_prepare_blocks($theme);
-
   // Format the list as a nice select array, with module and delta as keys.
   $select_list = array();
   foreach ($blocks as $block) {
-    $select_list[$block['module'] . '-' . $block['delta']] = $block['info'];
+    $select_list[$block['module'] . '||' . $block['delta']] = $block['info'];
   }
 
   return $select_list;
@@ -110,7 +109,7 @@ function rb_block_action_place_block($block, $region, $weight) {
   }
 
   // Get block data.
-  $block_info = explode('-', $block);
+  $block_info = explode('||', $block);
   $new_block = block_load($block_info[0], $block_info[1]);
 
   // Set the modified values for the block. Also assure that the block is set as
@@ -131,7 +130,7 @@ function rb_block_action_place_block($block, $region, $weight) {
  */
 function rb_block_action_disable_block($block) {
   // Get block information.
-  $block_info = explode('-', $block);
+  $block_info = explode('||', $block);
   $disabled_block = block_load($block_info[0], $block_info[1]);
 
   // Add the disabled block to a list in Drupal static, to allow it to be found
