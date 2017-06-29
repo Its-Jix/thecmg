@@ -10,13 +10,13 @@ var wfCivi = (function ($, D) {
    */
   var pub = {};
 
-  pub.existingSelect = function (num, nid, path, toHide, cid, fetch) {
+  pub.existingSelect = function (num, nid, path, toHide, hideOrDisable, showEmpty, cid, fetch) {
     if (cid.charAt(0) === '-') {
-      resetFields(num, nid, true, 'show', toHide, 500);
+      resetFields(num, nid, true, 'show', toHide, hideOrDisable, showEmpty, 500);
       // Fill name fields with name typed
       if (cid.length > 1) {
         var names = {first: '', last: ''};
-        var s = cid.substr(1).split(' ');
+        var s = cid.substr(1).replace(/%/g, ' ').split(' ');
         for (var i in s) {
           var str = s[i].substr(0,1).toUpperCase() + s[i].substr(1).toLowerCase();
           if (i < 1) {
@@ -33,7 +33,7 @@ var wfCivi = (function ($, D) {
       }
       return;
     }
-    resetFields(num, nid, true, 'hide', toHide, 500);
+    resetFields(num, nid, true, 'hide', toHide, hideOrDisable, showEmpty, 500);
     if (cid && fetch) {
       $('.webform-client-form-'+nid).addClass('contact-loading');
       var params = getCids(nid);
@@ -41,23 +41,29 @@ var wfCivi = (function ($, D) {
       params.cid = cid;
       $.getJSON(path, params, function(data) {
         fillValues(data, nid);
+        resetFields(num, nid, false, 'hide', toHide, hideOrDisable, showEmpty);
         $('.webform-client-form-'+nid).removeClass('contact-loading');
       });
     }
   };
 
-  pub.existingInit = function (field, num, nid, path, toHide) {
-    var cid, ret = null;
-    if (field.length) {
-      cid = field.val();
+  pub.existingInit = function ($field, num, nid, path, toHide) {
+    var cid = $field.val(),
+      ret = null,
+      hideOrDisable = $field.attr('data-hide-method'),
+      showEmpty = $field.attr('data-no-hide-blank') == '1';
+    if ($field.length) {
+      if ($field.is('[type=hidden]') && !cid) {
+        return;
+      }
       if (!cid || cid.charAt(0) !== '-') {
-        resetFields(num, nid, false, 'hide', toHide);
+        resetFields(num, nid, false, 'hide', toHide, hideOrDisable, showEmpty);
       }
       if (cid) {
-        if (cid == field.attr('data-civicrm-id')) {
-          ret = [{id: cid, name: field.attr('data-civicrm-name')}];
+        if (cid == $field.attr('data-civicrm-id')) {
+          ret = [{id: cid, name: $field.attr('data-civicrm-name')}];
         }
-        else if (field.is(':text')) {
+        else if ($field.is(':text')) {
           // If for some reason the data is not embedded, fetch it from the server
           $.ajax({
             url: path,
@@ -109,7 +115,7 @@ var wfCivi = (function ($, D) {
 
   var stateProvinceCache = {};
 
-  function resetFields(num, nid, clear, op, toHide, speed) {
+  function resetFields(num, nid, clear, op, toHide, hideOrDisable, showEmpty, speed) {
     $('div.form-item.webform-component[class*="--civicrm-'+num+'-contact-"]', '.webform-client-form-'+nid).each(function() {
       var $el = $(this);
       var name = getFieldNameFromClass($el);
@@ -137,11 +143,28 @@ var wfCivi = (function ($, D) {
         }
         var type = (n[6] === 'name') ? 'name' : n[4];
         if ($.inArray(type, toHide) >= 0) {
-          $(':input', $el).webformProp('disabled', op === 'hide');
-          $el[op](speed, function() {$el[op];});
+          var fn = (op === 'hide' && (!showEmpty || !isFormItemBlank($el))) ? 'hide' : 'show';
+          $(':input', $el).webformProp('disabled', fn === 'hide');
+          $(':input', $el).webformProp('readonly', fn === 'hide');
+          if (hideOrDisable === 'hide') {
+            $el[fn](speed, function() {$el[fn];});
+          }
         }
       }
     });
+  }
+
+  function isFormItemBlank($el) {
+    var isBlank = true;
+    if ($(':input:checked', $el).length) {
+      return false;
+    }
+    $(':input', $el).not(':radio, :checkbox, :button, :submit').each(function() {
+      if ($(this).val()) {
+        isBlank = false;
+      }
+    });
+    return isBlank;
   }
 
   function getFieldNameFromClass($el) {
@@ -171,10 +194,15 @@ var wfCivi = (function ($, D) {
       if ($el.length) {
         // For chain-select fields, store value for later if it's not available
         if ((fid.substr(fid.length - 9) === 'county_id' || fid.substr(fid.length - 11) === 'province_id') && !$('option[value='+val+']', $el).length) {
-          console.log($el);
           $el.attr('data-val', val);
         }
         else if ($el.val() !== val) {
+          if ($el.data('tokenInputObject')) {
+            $el.tokenInput('clear').tokenInput('add', {id: val, name: this.display});
+          }
+          else if ($el.is('[type=hidden]')) {
+            $el.siblings('.token-input-list').find('p').text(this.display);
+          }
           $el.val(val).trigger('change', 'webform_civicrm:autofill');
         }
       }
@@ -254,12 +282,7 @@ var wfCivi = (function ($, D) {
     if (!$.isEmptyObject(data || [])) {
       if (!data['']) {
         var text = $el.hasClass('required') ? Drupal.t('- Select -') : Drupal.t('- None -');
-        if ($el.hasClass('has-default')) {
-          $el.removeClass('has-default');
-        }
-        else {
-          $el.append('<option value="">'+text+'</option>');
-        }
+        $el.append('<option value="">'+text+'</option>');
       }
       $.each(data, function(key, val) {
         $el.append('<option value="'+key+'">'+val+'</option>');
@@ -267,7 +290,6 @@ var wfCivi = (function ($, D) {
       $el.val(value);
     }
     else {
-      $el.removeClass('has-default');
       $el.append('<option value="-">'+Drupal.t('- N/A -')+'</option>');
     }
     $el.removeAttr('disabled').trigger('change', 'webform_civicrm:chainselect');
@@ -312,9 +334,6 @@ var wfCivi = (function ($, D) {
       classes = $el.attr('class').replace('text', 'select'),
       id = $el.attr('id'),
       $form = $el.closest('form');
-    if (value !== '') {
-      classes = classes + ' has-default';
-    }
     $el.replaceWith('<select id="'+$el.attr('id')+'" name="'+$el.attr('name')+'"' + ' class="' + classes + ' civicrm-processed" data-val="' + value + '"></select>');
     return $('#' + id, $form).change(function() {
       $(this).attr('data-val', '');

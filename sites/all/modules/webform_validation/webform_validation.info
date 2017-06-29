@@ -1,17 +1,13 @@
 name = Webform Validation
-description = "Add validation rules to webforms"
+description = Add validation rules to Webforms.
 core = 7.x
-dependencies[] = webform
 package = Webform
-files[] = webform_validation.admin.inc
-files[] = webform_validation.install
-files[] = webform_validation.module
-files[] = webform_validation.rules.inc
-files[] = webform_validation.validators.inc
+dependencies[] = webform
+php = 5.3
 
-; Information added by Drupal.org packaging script on 2014-02-11
-version = "7.x-1.4"
+; Information added by Drupal.org packaging script on 2017-01-04
+version = "7.x-1.13"
 core = "7.x"
 project = "webform_validation"
-datestamp = "1392157410"
+datestamp = "1483565351"
 

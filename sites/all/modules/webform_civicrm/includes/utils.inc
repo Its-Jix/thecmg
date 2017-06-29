@@ -78,6 +78,10 @@ function wf_crm_field_options($field, $context, $data) {
     // Aside from the above special cases, most lists can be fetched from api.getoptions
     else {
       $params = array('field' => $name, 'context' => 'create');
+      // Special case for contribution_recur fields
+      if ($table == 'contribution' && strpos($name, 'frequency_') === 0) {
+        $table = 'contribution_recur';
+      }
       // Custom fields - use main entity
       if (substr($table, 0, 2) == 'cg') {
         $table = $ent;
@@ -184,11 +188,17 @@ function wf_crm_get_events($reg_options, $context) {
   $ret = array();
   $format = wf_crm_aval($reg_options, 'title_display', 'title');
   $sql = "SELECT id, title, start_date, end_date, event_type_id FROM civicrm_event WHERE is_template = 0 AND is_active = 1";
-  // 0 means only current events, 1 means show all past events, other values are relative date strings
-  $date = wf_crm_aval($reg_options, 'show_past_events', 'now');
-  if ($date != '1') {
-    $date = date('Y-m-d H:i:s', strtotime($date));
-    $sql .= " AND (end_date >= '$date' OR end_date IS NULL)";
+  // 'now' means only current events, 1 means show all past events, other values are relative date strings
+  $date_past = wf_crm_aval($reg_options, 'show_past_events', 'now');
+  if ($date_past != '1') {
+    $date_past = date('Y-m-d H:i:s', strtotime($date_past));
+    $sql .= " AND (end_date >= '$date_past' OR end_date IS NULL)";
+  }
+  // 'now' means only past events, 1 means show all future events, other values are relative date strings
+  $date_future = wf_crm_aval($reg_options, 'show_future_events', '1');
+  if ($date_future != '1') {
+    $date_future = date('Y-m-d H:i:s', strtotime($date_future));
+    $sql .= " AND (end_date <= '$date_future' OR end_date IS NULL)";
   }
   if (is_numeric($reg_options['event_type'])) {
     $sql .= ' AND event_type_id = ' . $reg_options['event_type'];
@@ -489,7 +499,7 @@ function wf_crm_get_fields($var = 'fields') {
       'relationship' => array('entity_type' => 'contact', 'label' => t('Relationship'), 'help_text' => TRUE),
     );
     $conditional_sets = array(
-      'CiviCase' => array('entity_type' => 'case', 'label' => t('Case Settings'), 'max_instances' => 30),
+      'CiviCase' => array('entity_type' => 'case', 'label' => t('Case'), 'max_instances' => 30),
       'CiviEvent' => array('entity_type' => 'participant', 'label' => t('Participant'), 'max_instances' => 9),
       'CiviContribute' => array('entity_type' => 'contribution', 'label' => t('Contribution')),
       'CiviMember' => array('entity_type' => 'membership', 'label' => t('Membership')),
@@ -544,7 +554,7 @@ function wf_crm_get_fields($var = 'fields') {
       'contact_type' => 'organization',
     );
     // Individual names
-    if (empty($config->civiVersion) || substr($config->civiVersion, 0, 3) == '4.4') {
+    if (version_compare(CRM_Utils_System::version(), '4.5', '<')) {
       // This setting doesn't exist prior to 4.5 so hard-code it.
       $enabled_names = array('Prefix', 'Suffix', 'First Name', 'Middle Name', 'Last Name');
     }
@@ -874,6 +884,20 @@ function wf_crm_get_fields($var = 'fields') {
         'set' => 'caseRoles',
         'exposed_empty_option' => '- ' . t('Automatic') . ' -',
       );
+      $fields['case_start_date'] = array(
+        'name' => t('Case # Start Date'),
+        'type' => 'date',
+        'value' => 'now',
+      );
+      $fields['case_end_date'] = array(
+        'name' => t('Case # End Date'),
+        'type' => 'date',
+        'value' => 'now',
+      );
+      $fields['case_details'] = array(
+        'name' => t('Case # Details'),
+        'type' => 'textarea',
+      );
       // Fetch case roles
       $sets['caseRoles'] = array('entity_type' => 'case', 'label' => t('Case Roles'));
       // Use the vanilla civicrm_api for this because it will throw an error in CiviCRM 4.4 (api doesn't exist)
@@ -1000,7 +1024,36 @@ function wf_crm_get_fields($var = 'fields') {
         'name' => t('Contribution Source'),
         'type' => 'textfield',
       );
-    }
+      $sets['contributionRecur'] = array('entity_type' => 'contribution', 'label' => t('Recurring Contribution'));
+      $fields['contribution_frequency_unit'] = array(
+        'name' => t('Frequency of Installments'),
+        'type' => 'select',
+        'expose_list' => TRUE,
+        'value' => 0,
+        'exposed_empty_option' => '- ' . t('No Installments') . ' -',
+        'set' => 'contributionRecur',
+      );
+      $fields['contribution_installments'] = array(
+        'name' => t('Number of Installments'),
+        'type' => 'number',
+        'value' => '1',
+        'extra' => array(
+          'integer' => 1,
+          'min' => 0,
+        ),
+        'set' => 'contributionRecur',
+      );
+      $fields['contribution_frequency_interval'] = array(
+        'name' => t('Interval of Installments'),
+        'type' => 'number',
+        'value' => '1',
+        'extra' => array(
+          'integer' => 1,
+          'min' => 1,
+        ),
+        'set' => 'contributionRecur',
+      );
+     }
     if (isset($sets['participant'])) {
       $fields['participant_event_id'] = array(
         'name' => t('Event(s)'),
@@ -1258,11 +1311,11 @@ function wf_crm_get_fields($var = 'fields') {
         }
         $fields[$id]['name'] = $dao->label;
         $fields[$id]['required'] = $dao->is_required;
-        $fields[$id]['extra']['description'] = $dao->help_pre;
         $fields[$id]['value'] = implode(',', wf_crm_explode_multivalue_str($dao->default_value));
         $fields[$id]['data_type'] = $dao->data_type;
         if (!empty($dao->help_pre) || !empty($dao->help_post)) {
           $fields[$id]['extra']['description'] = $dao->help_pre ? $dao->help_pre : $dao->help_post;
+          $fields[$id]['extra']['description_above'] = (int) !$dao->help_pre;
           $fields[$id]['has_help'] = TRUE;
         }
         // Conditional rule - todo: support additional entities
@@ -1489,6 +1542,9 @@ function wf_civicrm_api($entity, $operation, $params) {
     $bt = debug_backtrace();
     $n = $bt[0]['function'] == 'wf_civicrm_api' ? 1 : 0;
     $file = explode('/', $bt[$n]['file']);
+    if (isset($params['credit_card_number'])) {
+      $params['credit_card_number'] = "xxxxxxxxxxxx".substr($params['credit_card_number'], -4);
+    }
     watchdog('webform_civicrm',
       'The CiviCRM "%function" API returned the error: "%msg" when called by function "!fn" on line !line of !file with parameters: "!params"',
       array(
@@ -1582,6 +1638,21 @@ function wf_crm_required_contact_fields($contact_type) {
  */
 function wf_crm_location_fields() {
   return array('address', 'email', 'phone', 'website', 'im');
+}
+
+/**
+ * These are the address fields this module supports
+ *
+ * @return array
+ */
+function wf_crm_address_fields() {
+  return array(
+    'street_address',
+    'city',
+    'state_province_id',
+    'country_id',
+    'postal_code'
+  );
 }
 
 /**

@@ -8,7 +8,7 @@
 /**
  * Implement hook_preprocess_html().
  */
-function rb_misc_preprocess_html(&$vars) {
+function rb_theme_preprocess_html(&$vars) {
   // Check if the rule has set the static variable
   if(rb_theme_static('head_title')) {
     $vars['head_title'] = rb_theme_static('head_title');
