@@ -109,8 +109,8 @@ DirectoryIndex index.php index.html index.htm
   # (http://www.example.com/... will be redirected to http://example.com/...)
   # uncomment the following:
   RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
-  RewriteRule ^ http%{ENV:protossl}://%1%{REQUEST_URI} [L,R=301]
-
+  RewriteRule ^ http%{ENV:protossl}://%1%{REQUEST_URI} [R=301,L]
+  
   # Modify the RewriteBase if you are using Drupal in a subdirectory or in a
   # VirtualDocumentRoot and the rewrite rules are not working properly.
   # For example if your site is at http://example.com/drupal uncomment and
