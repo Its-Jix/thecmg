@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,12 +23,12 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
-*/
+ */
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -43,15 +43,34 @@ class CRM_Contact_Form_Search_Custom_Base {
   /**
    * @param $formValues
    */
-  function __construct(&$formValues) {
+  public function __construct(&$formValues) {
     $this->_formValues = &$formValues;
   }
 
-  function count() {
+  /**
+   * Builds the list of tasks or actions that a searcher can perform on a result set.
+   *
+   * The returned array completely replaces the task list, so a child class that
+   * wants to modify the existing list should manipulate the result of this method.
+   *
+   * @param CRM_Core_Form_Search $form
+   * @return array
+   */
+  public function buildTaskList(CRM_Core_Form_Search $form) {
+    return $form->getVar('_taskList');
+  }
+
+  /**
+   * @return null|string
+   */
+  public function count() {
     return CRM_Core_DAO::singleValueQuery($this->sql('count(distinct contact_a.id) as total'));
   }
 
-  function summary() {
+  /**
+   * @return null
+   */
+  public function summary() {
     return NULL;
   }
 
@@ -63,7 +82,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    *
    * @return string
    */
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     $sql = $this->sql(
       'contact_a.id as contact_id',
       $offset,
@@ -89,7 +108,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    *
    * @return string
    */
-  function sql(
+  public function sql(
     $selectClause,
     $offset = 0,
     $rowcount = 0,
@@ -118,11 +137,14 @@ class CRM_Contact_Form_Search_Custom_Base {
     return $sql;
   }
 
-  function templateFile() {
+  /**
+   * @return null
+   */
+  public function templateFile() {
     return NULL;
   }
 
-  function &columns() {
+  public function &columns() {
     return $this->_columns;
   }
 
@@ -130,7 +152,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $sql
    * @param $formValues
    */
-  static function includeContactIDs(&$sql, &$formValues) {
+  public static function includeContactIDs(&$sql, &$formValues) {
     $contactIDs = array();
     foreach ($formValues as $id => $value) {
       if ($value &&
@@ -152,7 +174,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * @param $rowcount
    * @param $sort
    */
-  function addSortOffset(&$sql, $offset, $rowcount, $sort) {
+  public function addSortOffset(&$sql, $offset, $rowcount, $sort) {
     if (!empty($sort)) {
       if (is_string($sort)) {
         $sort = CRM_Utils_Type::escape($sort, 'String');
@@ -177,7 +199,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    *
    * @throws Exception
    */
-  function validateUserSQL(&$sql, $onlyWhere = FALSE) {
+  public function validateUserSQL(&$sql, $onlyWhere = FALSE) {
     $includeStrings = array('contact_a');
     $excludeStrings = array('insert', 'delete', 'update');
 
@@ -202,7 +224,13 @@ class CRM_Contact_Form_Search_Custom_Base {
     }
   }
 
-  function whereClause(&$where, &$params) {
+  /**
+   * @param $where
+   * @param array $params
+   *
+   * @return string
+   */
+  public function whereClause(&$where, &$params) {
     return CRM_Core_DAO::composeQuery($where, $params, TRUE);
   }
 
@@ -211,7 +239,7 @@ class CRM_Contact_Form_Search_Custom_Base {
    * used for creating $sql
    * @return null
    */
-  function getQueryObj() {
+  public function getQueryObj() {
     return NULL;
   }
 
