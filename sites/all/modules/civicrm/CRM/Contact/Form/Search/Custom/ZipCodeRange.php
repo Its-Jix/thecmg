@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,36 +23,30 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
-  /**
-   * @param $formValues
-   */
-  public function __construct(&$formValues) {
+  function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_columns = array(
-      ts('Contact ID') => 'contact_id',
+      ts('Contact Id') => 'contact_id',
       ts('Name') => 'sort_name',
       ts('Email') => 'email',
       ts('Zip') => 'postal_code',
     );
   }
 
-  /**
-   * @param CRM_Core_Form $form
-   */
-  public function buildForm(&$form) {
+  function buildForm(&$form) {
     $form->add('text',
       'postal_code_low',
       ts('Postal Code Start'),
@@ -77,42 +71,16 @@ class CRM_Contact_Form_Search_Custom_ZipCodeRange extends CRM_Contact_Form_Searc
     $form->assign('elements', array('postal_code_low', 'postal_code_high'));
   }
 
-  /**
-   * @return array
-   */
-  public function summary() {
+  function summary() {
     $summary = array();
     return $summary;
   }
 
-  /**
-   * @param int $offset
-   * @param int $rowcount
-   * @param null $sort
-   * @param bool $returnSQL
-   *
-   * @return string
-   */
-  public function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
-    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
-  }
-
-  /**
-   * @param int $offset
-   * @param int $rowcount
-   * @param null $sort
-   * @param bool $includeContactIDs
-   * @param bool $justIDs
-   *
-   * @return string
-   */
-  public function all(
-    $offset = 0, $rowcount = 0, $sort = NULL,
+  function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
     if ($justIDs) {
       $selectClause = "contact_a.id as contact_id";
-      $sort = "contact_a.id";
     }
     else {
       $selectClause = "
@@ -128,10 +96,7 @@ address.postal_code    as postal_code
     );
   }
 
-  /**
-   * @return string
-   */
-  public function from() {
+  function from() {
     $this->buildACLClause('contact_a');
     $from = "
 FROM      civicrm_contact contact_a
@@ -143,12 +108,7 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     return $from;
   }
 
-  /**
-   * @param bool $includeContactIDs
-   *
-   * @return string
-   */
-  public function where($includeContactIDs = FALSE) {
+  function where($includeContactIDs = FALSE) {
     $params = array();
 
     $low = CRM_Utils_Array::value('postal_code_low',
@@ -167,8 +127,7 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     }
 
     $where = "ROUND(address.postal_code) >= %1 AND ROUND(address.postal_code) <= %2";
-    $params = array(
-      1 => array(trim($low), 'Integer'),
+    $params = array(1 => array(trim($low), 'Integer'),
       2 => array(trim($high), 'Integer'),
     );
 
@@ -178,17 +137,15 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
     return $this->whereClause($where, $params);
   }
 
-  /**
-   * @return string
-   */
-  public function templateFile() {
+  function setDefaultValues() {
+    return array();
+  }
+
+  function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
-  /**
-   * @param $title
-   */
-  public function setTitle($title) {
+  function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
     }
@@ -200,7 +157,7 @@ LEFT JOIN civicrm_email   email   ON ( email.contact_id = contact_a.id AND
   /**
    * @param string $tableAlias
    */
-  public function buildACLClause($tableAlias = 'contact') {
+  public function buildAclClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }
 

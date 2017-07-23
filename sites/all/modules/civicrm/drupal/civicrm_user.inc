@@ -1,7 +1,6 @@
 <?php
 
 /**
- * @file
  * Project:     CiviCRM: Constituent Relationship Management for NP's
  * File:        civicrm_user.inc
  *
@@ -18,10 +17,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+ *
  */
 
 /**
  * Drupal module include file.
+ *
+ * @package CRM
+ * @copyright CiviCRM LLC (c) 2004-2013
+ * $Id$
+ *
  */
 
 /**
@@ -41,10 +46,7 @@
  */
 
 /**
- * Implements hook_user_login().
- *
- * @param $edit
- * @param $user
+ * Implementation of hook_user_login (D7)
  */
 function civicrm_user_login(&$edit, $user) {
   if (!civicrm_initialize()) {
@@ -56,11 +58,7 @@ function civicrm_user_login(&$edit, $user) {
 }
 
 /**
- * Implements hook_user_insert().
- *
- * @param $edit
- * @param $user
- * @param null $category
+ * Implementation of hook_user_insert
  */
 function civicrm_user_insert(&$edit, &$user, $category = NULL) {
   if (!civicrm_initialize()) {
@@ -72,7 +70,7 @@ function civicrm_user_insert(&$edit, &$user, $category = NULL) {
     return;
   }
 
-  // Did civicrm generate this page, or is it via a user hook?
+  // did civicrm generate this page, or is it via a user hook?
   if (civicrm_on_user_page()) {
     civicrm_register_data($edit, $user, $category, FALSE);
   }
@@ -81,20 +79,18 @@ function civicrm_user_insert(&$edit, &$user, $category = NULL) {
       civicrm_get_ctype('Individual')
     );
   }
+  return;
 }
 
 /**
- * Implements hook_user_update().
- * @param $edit
- * @param $user
- * @param $category
+ * Implementation of hook_user_update
  */
 function civicrm_user_update(&$edit, &$user, $category) {
   if (!civicrm_initialize()) {
     return;
   }
-  // This always comes in via user hook.
-  // in D7 we don't know if the email has changed, so we go ahead and update
+  // this always comes in via user hook
+  // in D7 we dont know if the email has changed, so we go ahead and update
   if (isset($edit['mail']) && !empty($edit['mail'])) {
     $contactID = CRM_Core_BAO_UFMatch::getContactId($user->uid);
     // cant find the contactID, so lets skip
@@ -119,8 +115,7 @@ function civicrm_user_update(&$edit, &$user, $category) {
 }
 
 /**
- * Implements hook_user_delete().
- * @param $account
+ * Implementation of hook_user_delete
  */
 function civicrm_user_delete($account) {
   if (!civicrm_initialize()) {
@@ -130,7 +125,7 @@ function civicrm_user_delete($account) {
 }
 
 /**
- * Implements hook_user_categories().
+ * Implementation of hook_user_categories
  */
 function civicrm_user_categories() {
   if (!civicrm_initialize()) {
@@ -138,12 +133,7 @@ function civicrm_user_categories() {
   }
   $urlParts = explode('/', CRM_Utils_Array::value('q', $_GET, array()));
 
-  $allUFGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup('User Account', 0, TRUE, CRM_Core_Permission::VIEW, array(
-    'id',
-    'name',
-    'title',
-    'is_active',
-  ));
+  $allUFGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup('User Account', 0, TRUE, CRM_Core_Permission::VIEW, array('id', 'name', 'title', 'is_active'));
   $ufGroups = array();
 
   $weight = 100;
@@ -160,7 +150,7 @@ function civicrm_user_categories() {
         }
       }
 
-      $ufGroups[] = array(
+      $ufGroups[] = array('name' => $name,
         'id' => $key,
         'name' => $name,
         'title' => $value['title'],
@@ -176,12 +166,10 @@ function civicrm_user_categories() {
 }
 
 /**
- * Implements hook_user_view().
+ * Implementation of hook_user_view
  *
  * @todo I suspect that some of the stuff done in the old form_alter handler
  *       should live here instead under D7
- * @param $user
- * @param $view_mode
  */
 function civicrm_user_view($user, $view_mode) {
   if (!civicrm_initialize()) {
@@ -189,41 +177,35 @@ function civicrm_user_view($user, $view_mode) {
   }
   $userID = CRM_Core_BAO_UFMatch::getContactId($user->uid);
   if ($userID) {
-    // Make sure user has permission to view the record.
+    // make sure user has permission to view the record
     $contactURL = NULL;
     $civiPerm = CRM_Contact_BAO_Contact_Permission::allow($userID);
-
     if (CRM_Core_Permission::check('access CiviCRM') && $civiPerm) {
-      $contactURL
-        = '<span class="user-page-link" id="user-page-contact" ><span class="user-page-bullet">&raquo;</span> '
-        . l(ts("View contact record"),
-        'civicrm/contact/view',
-          array('query' => array('reset' => 1, 'cid' => $userID))
-        ) .
-        '</span>';
+      $contactURL =
+  '<span class="user-page-link" id="user-page-contact" ><span class="user-page-bullet">&raquo;</span> ' .
+  l(ts("View Contact Record"),
+    'civicrm/contact/view',
+    array('query' => array('reset' => 1, 'cid' => $userID ))
+    ) .
+  '</span>';
     }
 
-    if (CRM_Core_Permission::check('access Contact Dashboard')) {
+    if (CRM_Core_Permission::check('access Contact Dashboard') && $civiPerm) {
       if (!empty($contactURL)) {
         $contactURL .= '<br/>';
       }
       $contactURL .=
-        '<span class="user-page-link" id="user-page-dashboard" ><span class="user-page-bullet">&raquo;</span> '
-        . l(ts("View Contact Dashboard"),
-          'civicrm/user',
-          array('query' => array('reset' => 1, 'id' => $userID))
-        ) .
-        '</span>';
+  '<span class="user-page-link" id="user-page-dashboard" ><span class="user-page-bullet">&raquo;</span> ' .
+  l(ts("View Contact Dashboard"),
+    'civicrm/user',
+    array('query' => array('reset' => 1, 'id' => $userID ))
+    ) .
+  '</span>';
     }
 
     $ctype = CRM_Core_DAO::getFieldValue('CRM_Contact_DAO_Contact', $userID, 'contact_type');
 
-    $ufGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup('User Account', 0, TRUE, CRM_Core_Permission::VIEW, array(
-      'id',
-      'name',
-      'title',
-      'is_active',
-    ));
+    $ufGroups = CRM_Core_BAO_UFGroup::getModuleUFGroup('User Account', 0, TRUE, CRM_Core_Permission::VIEW, array('id', 'name', 'title', 'is_active'));
     $weight = 100;
     foreach ($ufGroups as $id => $ufGroup) {
 
@@ -268,11 +250,12 @@ function civicrm_user_view($user, $view_mode) {
       );
     }
   }
+  return;
 }
 
 /**
- * Implements hook_user_logout().
- * @param $account
+ * Implementation of hook_user_logout
+ *
  */
 function civicrm_user_logout($account) {
   if (!civicrm_initialize()) {
@@ -283,9 +266,7 @@ function civicrm_user_logout($account) {
 }
 
 /**
- * Validation functions so CiviCRM can get at these items.
- * @param $form
- * @param $form_state
+ * Validation functions so CiviCRM can get at these items
  */
 function civicrm_validate_user_forms($form, &$form_state) {
   if (!civicrm_initialize()) {
@@ -298,3 +279,4 @@ function civicrm_validate_user_forms($form, &$form_state) {
   global $user;
   civicrm_validate_data($edit, $user, $category);
 }
+

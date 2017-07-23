@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,7 +39,7 @@
   {* Show link to Tell a Friend (CRM-2153) *}
   {if $friendText}
     <div id="tell-a-friend" class="crm-section friend_link-section">
-      <a href="{$friendURL}" title="{$friendText}" class="button"><span>&raquo; {$friendText}</span></a>
+    <a href="{$friendURL}" title="{$friendText}" class="button"><span>&raquo; {$friendText}</span></a>
     </div>{if !$linkText}<br /><br />{/if}
   {/if}
   {* Add button for donor to create their own Personal Campaign page *}
@@ -64,17 +64,17 @@
       {/if}
     {elseif $contributeMode EQ 'notify' OR ($contributeMode EQ 'direct' && $is_recur) }
       <div>{ts 1=$paymentProcessor.name}Your contribution has been submitted to %1 for processing. Please print this page for your records.{/ts}</div>
-        {if $is_email_receipt}
-      <div>
-        {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
-          {ts 1=$email 2=$onBehalfEmail}An email receipt will be sent to %1 and to %2 once the transaction is processed successfully.{/ts}
-        {else}
-          {ts 1=$email}An email receipt will be sent to %1 once the transaction is processed successfully.{/ts}
-        {/if}
-      </div>
-    {/if}
-  {else}
-    <div>{ts}Your transaction has been processed successfully. Please print this page for your records.{/ts}</div>
+      {if $is_email_receipt}
+        <div>
+          {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
+            {ts 1=$email 2=$onBehalfEmail}An email receipt will be sent to %1 and to %2 once the transaction is processed successfully.{/ts}
+          {else}
+            {ts 1=$email}An email receipt will be sent to %1 once the transaction is processed successfully.{/ts}
+          {/if}
+        </div>
+      {/if}
+    {else}
+      <div>{ts}Your transaction has been processed successfully. Please print this page for your records.{/ts}</div>
       {if $is_email_receipt}
         <div>
           {if $onBehalfEmail AND ($onBehalfEmail neq $email)}
@@ -84,13 +84,13 @@
           {/if}
         </div>
       {/if}
-  {/if}
+    {/if}
   </div>
   <div class="spacer"></div>
 
   {include file="CRM/Contribute/Form/Contribution/MembershipBlock.tpl" context="thankContribution"}
 
-  {if $amount GTE 0 OR $minimum_fee GTE 0 OR ( $priceSetID and $lineItem ) }
+  {if $amount GT 0 OR $minimum_fee GT 0 OR ( $priceSetID and $lineItem ) }
     <div class="crm-group amount_display-group">
       {if !$useForMember}
         <div class="header-dark">
@@ -115,9 +115,6 @@
             <strong> -------------------------------------------</strong><br />
             {ts}Total{/ts}: <strong>{$amount+$membership_amount|crmMoney}</strong><br />
           {else}
-            {if $totalTaxAmount}
-              {ts}Tax Amount{/ts}: <strong>{$totalTaxAmount|crmMoney}</strong><br />
-            {/if}
             {ts}Amount{/ts}: <strong>{$amount|crmMoney} {if $amount_level} - {$amount_level} {/if}</strong><br />
           {/if}
         {/if}
@@ -133,36 +130,36 @@
 
         {* Recurring contribution / pledge information *}
         {if $is_recur}
-          {if !empty($auto_renew)} {* Auto-renew membership confirmation *}
+          {if $membershipBlock} {* Auto-renew membership confirmation *}
             {crmRegion name="contribution-thankyou-recur-membership"}
               <br />
-              {if $frequency_interval > 1}
-                <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
-              {else}
-                <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
-              {/if}
+            {if $frequency_interval > 1}
+              <strong>{ts 1=$frequency_interval 2=$frequency_unit}This membership will be renewed automatically every %1 %2(s).{/ts}</strong>
+            {else}
+              <strong>{ts 1=$frequency_unit}This membership will be renewed automatically every %1.{/ts}</strong>
+            {/if}
               <div class="description crm-auto-renew-cancel-info">({ts}You will receive an email receipt which includes information about how to cancel the auto-renewal option.{/ts})</div>
             {/crmRegion}
           {else}
             {crmRegion name="contribution-thankyou-recur"}
-              {if $installments > 1}
-                {if $frequency_interval > 1}
-                  <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 %2s for a total %3 installments (including this initial contribution).{/ts}</strong></p>
-                {else}
-                    <p><strong>{ts 1=$frequency_unit 2=$installments}This recurring contribution will be automatically processed every %1 for a total %2 installments (including this initial contribution).{/ts}</strong></p>
-                  {/if}
-                {else}
-                  {if $frequency_interval > 1}
-                    <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}This recurring contribution will be automatically processed every %1 %2s.{/ts}</strong></p>
-                  {else}
-                    <p><strong>{ts 1=$frequency_unit}This recurring contribution will be automatically processed every %1.{/ts}</strong></p>
-                  {/if}
+            {if $installments > 1}
+              {if $frequency_interval > 1}
+                <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}This recurring contribution will be automatically processed every %1 %2s for a total %3 installments (including this initial contribution).{/ts}</strong></p>
+              {else}
+                <p><strong>{ts 1=$frequency_unit 2=$installments}This recurring contribution will be automatically processed every %1 for a total %2 installments (including this initial contribution).{/ts}</strong></p>
+              {/if}
+            {else}
+              {if $frequency_interval > 1}
+                <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}This recurring contribution will be automatically processed every %1 %2s.{/ts}</strong></p>
+              {else}
+                <p><strong>{ts 1=$frequency_unit}This recurring contribution will be automatically processed every %1.{/ts}</strong></p>
+              {/if}
+            {/if}
+              <p>
+                {if $is_email_receipt}
+                  {ts}You will receive an email receipt which includes information about how to update or cancel this recurring contribution.{/ts}
                 {/if}
-                  <p>
-                  {if $is_email_receipt}
-                    {ts}You will receive an email receipt which includes information about how to update or cancel this recurring contribution.{/ts}
-                  {/if}
-                </p>
+              </p>
             {/crmRegion}
           {/if}
         {/if}
@@ -188,19 +185,7 @@
     </div>
   {/if}
 
-  {if $honor_block_is_active}
-    <div class="crm-group honor_block-group">
-      <div class="header-dark">
-        {$soft_credit_type}
-      </div>
-      <div class="display-block">
-       <div class="label-left crm-section honoree_profile-section">
-          <strong>{$honorName}</strong></br>
-          {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
-        </div>
-      </div>
-   </div>
-  {/if}
+    {include file="CRM/Contribute/Form/Contribution/Honor.tpl"}
 
   {if $customPre}
     <fieldset class="label-left crm-profile-view">
@@ -236,17 +221,17 @@
 
   {if $onbehalfProfile}
     <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+      {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile}
       <div class="crm-section organization_email-section">
         <div class="label">{ts}Organization Email{/ts}</div>
         <div class="content">{$onBehalfEmail}</div>
         <div class="clear"></div>
-       </div>
+      </div>
     </div>
   {/if}
 
-  {if ( $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
-    {if $contributeMode ne 'notify' and (!$is_pay_later or $isBillingAddressRequiredForPayLater) and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
+    {if ( $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) ) or $email }
+        {if $contributeMode ne 'notify' and ! $is_pay_later and $is_monetary and ( $amount GT 0 OR $minimum_fee GT 0 ) }
       {if $billingName or $address}
         <div class="crm-group billing_name_address-group">
           <div class="header-dark">
