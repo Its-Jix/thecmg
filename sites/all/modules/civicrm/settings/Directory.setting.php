@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -46,11 +46,11 @@ return array(
     'default' => null,
     'add' => '4.1',
     'prefetch' => 1,
-    'title' => 'Upload Directory',
+    'title' => null,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
-    'help_text' => '',
+    'help_text' => 'If set, new contacts that are created when signing a petition are assigned a tag of this name.',
   ),
   'imageUploadDir' => array(
     'group_name' => 'Directory Preferences',
@@ -61,7 +61,7 @@ return array(
     'default' => null,
     'add' => '4.1',
     'prefetch' => 1,
-    'title' => 'Image Directory',
+    'title' => null,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -76,7 +76,7 @@ return array(
     'default' => null,
     'add' => '4.1',
     'prefetch' => 1,
-    'title' => 'Custom Files Upload Directory',
+    'title' => null,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -91,7 +91,7 @@ return array(
     'default' => null,
     'add' => '4.1',
     'prefetch' => 1,
-    'title' => 'Custom Template Directory',
+    'title' => null,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -106,7 +106,7 @@ return array(
     'default' => null,
     'add' => '4.1',
     'prefetch' => 1,
-    'title' => 'Custom PHP Path',
+    'title' => null,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,
@@ -121,7 +121,7 @@ return array(
     'default' => null,
     'add' => '4.1',
     'prefetch' => 1,
-    'title' => 'Extensions Directory',
+    'title' => null,
     'is_domain' => 1,
     'is_contact' => 0,
     'description' => null,

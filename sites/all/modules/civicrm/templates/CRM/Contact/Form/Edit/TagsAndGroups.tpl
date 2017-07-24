@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,9 +30,18 @@
 {/if}
     <table class="form-layout-compressed{if $context EQ 'profile'} crm-profile-tagsandgroups{/if}">
       <tr>
-       {if $groupElementType eq 'select'}
+       {if $groupElementType eq 'crmasmSelect'}
           <td><span class="label">{if $title}{$form.group.label}{/if}</span>
             {$form.group.html}
+            {literal}
+            <script type="text/javascript">
+             cj(function(){
+               cj("select#group").crmasmSelect({
+                 respectParents: true
+               });
+             });
+             </script>
+             {/literal}
           </td>
       {/if}
       {foreach key=key item=item from=$tagGroup}
@@ -62,7 +71,7 @@
       {/foreach}
     </tr>
     {if !$type || $type eq 'tag'}
-      <tr><td>{include file="CRM/common/Tagset.tpl"}</td></tr>
+      <tr><td>{include file="CRM/common/Tag.tpl"}</td></tr>
     {/if}
   </table>
 {if $title}

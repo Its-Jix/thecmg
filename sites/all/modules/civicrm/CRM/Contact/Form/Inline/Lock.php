@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -43,9 +43,7 @@ class CRM_Contact_Form_Inline_Lock {
    * This function provides the HTML form elements
    *
    * @param object $form form object
-   * @param $contactID
-   *
-   * @internal param int $inlineEditMode ( 1 for contact summary
+   * @param int $inlineEditMode ( 1 for contact summary
    * top bar form and 2 for display name edit )
    *
    * @access public
@@ -68,11 +66,9 @@ class CRM_Contact_Form_Inline_Lock {
   /**
    * Ensure that oplock_ts hasn't changed in the underlying DB
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
-   * @param null $contactID
-   *
-   * @internal param array $options additional user data
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -94,8 +90,6 @@ class CRM_Contact_Form_Inline_Lock {
 
   /**
    * Return any post-save data
-   *
-   * @param $contactID
    *
    * @return array extra options to return in JSON
    */

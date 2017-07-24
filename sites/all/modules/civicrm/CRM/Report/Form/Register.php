@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -55,18 +55,6 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
     $instanceInfo = array();
   }
 
-  /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
-   *
-   * @return array reference to the array of default values
-   *
-   */
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     $defaults = array();
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -138,13 +126,6 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
     $this->addFormRule(array('CRM_Report_Form_Register', 'formRule'), $this);
   }
 
-  /**
-   * @param $fields
-   * @param $files
-   * @param $self
-   *
-   * @return array
-   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     $dupeClass = FALSE;
@@ -179,7 +160,7 @@ class CRM_Report_Form_Register extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {

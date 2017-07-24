@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -72,12 +72,14 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Mailing_BAO_Component' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable Mailing Component'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Mailing_BAO_Component' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable Mailing Component'),
         ),
       );
@@ -106,19 +108,12 @@ class CRM_Mailing_Page_Component extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
-   * @param null $mode
-   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
     return CRM_Utils_System::currentPath();
   }
 
-  /**
-   * @param null $args
-   * @param null $pageArgs
-   * @param null $sort
-   */
   function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
     return parent::run($args, $pageArgs, "component_type, is_default desc, name");
   }

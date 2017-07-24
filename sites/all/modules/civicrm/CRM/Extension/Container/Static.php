@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  */
 
@@ -36,9 +36,6 @@
  * scanned for extensions.
  */
 class CRM_Extension_Container_Static implements CRM_Extension_Container_Interface {
-  /**
-   * @param $exts
-   */
   public function __construct($exts) {
     $this->exts = $exts;
   }
@@ -86,11 +83,6 @@ class CRM_Extension_Container_Static implements CRM_Extension_Container_Interfac
   public function refresh() {
   }
 
-  /**
-   * @param $key
-   *
-   * @throws CRM_Extension_Exception_MissingException
-   */
   protected function getExt($key) {
     if (isset($this->exts[$key])) {
       return $this->exts[$key];

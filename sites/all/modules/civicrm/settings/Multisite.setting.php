@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -41,7 +41,6 @@ return array(
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'is_enabled',
-    'title' => 'Multisite Is enabled',
     'type' => 'Integer',
     'default' => null,
     'add' => '4.1',
@@ -54,7 +53,6 @@ return array(
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'domain_group_id',
-    'title' => 'Multisite Domain Group',
     'type' => 'Integer',
     'default' => null,
     'add' => '4.1',
@@ -67,7 +65,6 @@ return array(
     'group_name' => 'Multi Site Preferences',
     'group' => 'multisite',
     'name' => 'event_price_set_domain_id',
-    'title' => 'Domain Event Price Set',
     'type' => 'Integer',
     'default' => null,
     'add' => '4.1',
@@ -81,7 +78,6 @@ return array(
     'group' => 'multisite',
     'name' => 'uniq_email_per_site',
     'type' => 'Integer',
-    'title' => 'Unique Email per Domain?',
     'default' => null,
     'add' => '4.1',
     'is_domain' => 1,

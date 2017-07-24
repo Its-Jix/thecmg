@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -88,8 +88,8 @@
 </tr>
 
 <script type="text/javascript">
-    var showRows   = [{$showBlocks}];
-    var hideBlocks = [{$hideBlocks}];
+    var showRows   = new Array({$showBlocks});
+    var hideBlocks = new Array({$hideBlocks});
     var rowcounter = 0;
     var surveyId   = {if $surveyId}{$surveyId}{else}''{/if};
 
@@ -151,7 +151,7 @@
                 }
 
                 if ( result[key].is_default == 1 ) {
-                    cj('#radio'+countRows+' input').prop('checked', true);
+                    cj('#radio'+countRows+' input').attr('checked', 'true');
                 }
 
                 if ( countRows > 1 ) {
@@ -163,7 +163,7 @@
       }, "json" );
   }
 
-    CRM.$(function($) {
+    cj(document).ready( function( ) {
         showOptionSelect( );
     });
 

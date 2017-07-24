@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -57,7 +57,7 @@ class CRM_Contact_Form_Edit_Demographics {
         array('id' => "civicrm_gender_{$var}_{$key}")
       );
     }
-    $form->addGroup($genderOptions, 'gender_id', ts('Gender'))->setAttribute('allowClear', TRUE);
+    $form->addGroup($genderOptions, 'gender_id', ts('Gender'));
 
     $form->addDate('birth_date', ts('Date of Birth'), FALSE, array('formatType' => 'birth'));
 
@@ -71,10 +71,7 @@ class CRM_Contact_Form_Edit_Demographics {
    *
    * @access public
    *
-   * @param $form
-   * @param $defaults
-   *
-   * @return void
+   * @return None
    */
   static function setDefaultValues(&$form, &$defaults) {}
 }

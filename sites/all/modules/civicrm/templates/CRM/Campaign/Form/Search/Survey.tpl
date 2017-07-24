@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,18 +40,17 @@
   <div id="survey-result-set-dialog" class="hiddenElement"></div>
 
   {* load survey selector *}
-  {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
+  {include file="CRM/common/enableDisable.tpl"}
 
   {literal}
   <script type="text/javascript">
-    CRM.$(function($) {
+    cj( function( ){
       loadSurveyList( );
     });
   </script>
   {/literal}
 
-  <table class="surveys">
+  <table id="surveys">
     <thead>
     <tr class="columnheader">
       <th class="hiddenElement">{ts}Survey ID{/ts}</th>
@@ -131,11 +130,15 @@
 {literal}
 <script type="text/javascript">
 
+ cj(function() {
+    cj().crmAccordions();
+ });
+
  {/literal}
  {* load selector when force *}
  {if $force and !$buildSelector}
  {literal}
- CRM.$(function($) {
+ cj( function( ) {
     searchSurveys( {/literal}'{$qfKey}'{literal} );
  });
 
@@ -150,12 +153,12 @@ function searchSurveys( qfKey )
       //lets carry qfKey to retain form session.
       if ( qfKey ) dataUrl = dataUrl + '&qfKey=' + qfKey;
 
-      CRM.$.get( dataUrl, null, function( surveyList ) {
-        CRM.$( '#surveyList' ).html( surveyList ).trigger('crmLoad');
+      cj.get( dataUrl, null, function( surveyList ) {
+        cj( '#surveyList' ).html( surveyList );
 
         //collapse the search form.
         var searchFormName = '#search_form_' + {/literal}'{$searchFor}'{literal};
-        CRM.$( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+        cj( searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
       }, 'html' );
 }
 
@@ -173,16 +176,17 @@ function loadSurveyList( )
      noRecordFoundMsg += '<div class="qill">';
 
      var count = 0;
-     var searchQill = [];
+     var searchQill = new Array( );
      for ( param in searchParams ) {
-       if ( val = CRM.$( '#' + param ).val( ) ) {
-         if ( param == 'activity_type_id' ) val = surveyTypes[val];
-         if ( param == 'survey_campaign_id' ) val = surveyCampaigns[val];
-         searchQill[count++] = searchParams[param] + ' : ' + val;
-       }
+        if ( val = cj( '#' + param ).val( ) ) {
+      if ( param == 'activity_type_id' ) val = surveyTypes[val];
+      if ( param == 'survey_campaign_id' ) val = surveyCampaigns[val];
+      searchQill[count++] = searchParams[param] + ' : ' + val;
+  }
      }
      noRecordFoundMsg += searchQill.join( '<span class="font-italic"> ...AND... </span></div><div class="qill">' );
-     CRM.$( 'table.surveys', '#surveyList').dataTable({
+
+     cj( '#surveys' ).dataTable({
              "bFilter"    : false,
              "bAutoWidth" : false,
              "bProcessing": false,
@@ -212,17 +216,17 @@ function loadSurveyList( )
              "asStripClasses" : [ "odd-row", "even-row" ],
              "oLanguage":{"sEmptyTable"  : noRecordFoundMsg,
                  "sZeroRecords" : noRecordFoundMsg },
-             "fnDrawCallback": function() { CRM.$().crmtooltip(); },
+             "fnDrawCallback": function() { cj().crmtooltip(); },
              "fnRowCallback": function( nRow, aData, iDisplayIndex ) {
          //insert the id for each row for enable/disable.
-         var rowId = 'survey-' + aData[0];
-         CRM.$(nRow).attr( 'id', rowId).addClass('crm-entity');
+         var rowId = 'survey_row_' + aData[0];
+         cj(nRow).attr( 'id', rowId );
          //handled disabled rows.
          var isActive = Boolean(Number(aData[10]));
-         if ( !isActive ) CRM.$(nRow).addClass( 'disabled' );
+         if ( !isActive ) cj(nRow).addClass( 'disabled' );
 
          //add id for yes/no column.
-         CRM.$(nRow).children().eq(11).attr( 'id', rowId + '_status' );
+         cj(nRow).children().eq(11).attr( 'id', rowId + '_status' );
 
          return nRow;
     },
@@ -231,7 +235,7 @@ function loadSurveyList( )
       var dataLength = aoData.length;
 
       var count = 1;
-      var searchCriteria = [];
+      var searchCriteria = new Array( );
 
       //get the search criteria.
                         var searchParams = {/literal}{$searchParams}{literal};
@@ -239,7 +243,7 @@ function loadSurveyList( )
           fldName = param;
           if ( param == 'survey_title' ) fldName = 'title';
           if ( param == 'survey_campaign_id' ) fldName = 'campaign_id';
-                            if ( val = CRM.$( '#' + param ).val( ) ) {
+                            if ( val = cj( '#' + param ).val( ) ) {
             aoData[dataLength++] = {name: fldName, value: val};
           }
           searchCriteria[count++] = fldName;
@@ -251,7 +255,7 @@ function loadSurveyList( )
       //lets transfer search criteria.
       aoData[dataLength++] = {name: 'searchCriteria', value:searchCriteria.join(',')};
 
-      CRM.$.ajax( {
+      cj.ajax( {
         "dataType": 'json',
         "type": "POST",
         "url": sSource,
@@ -270,7 +274,7 @@ function displayResultSet( surveyId, surveyTitle, OptionGroupId ) {
   var content  = '<tr><th>{/literal}{ts escape='js'}Label{/ts}{literal}</th><th>{/literal}{ts escape='js'}Value{/ts}{literal}</th><th>{/literal}{ts escape='js'}Recontact Interval{/ts}{literal}</th><th>{/literal}{ts escape='js'}Weight{/ts}{literal}</th></tr>';
   var setTitle = '{/literal}{ts escape='js'}Result Set for{/ts} {literal}' + surveyTitle;
 
-  CRM.$.post( dataUrl, data, function( opGroup ) {
+  cj.post( dataUrl, data, function( opGroup ) {
     if ( opGroup.status == 'success' ) {
       var result = opGroup.result;
       for( key in result ) {
@@ -281,7 +285,7 @@ function displayResultSet( surveyId, surveyTitle, OptionGroupId ) {
         content += '<tr><td>'+  result[key].label +'</td><td>'+ result[key].value +'</td><td>'+ interval +'</td><td>'+ result[key].weight +'</td></tr>';
       }
 
-      CRM.$("#survey-result-set-dialog").show( ).html('<table>'+content+'</table>').dialog({
+      cj("#survey-result-set-dialog").show( ).html('<table>'+content+'</table>').dialog({
         title: setTitle,
         modal: true,
         width: 480,
@@ -290,7 +294,7 @@ function displayResultSet( surveyId, surveyTitle, OptionGroupId ) {
           background: "black"
         },
         beforeclose: function(event, ui) {
-          CRM.$(this).dialog("destroy");
+          cj(this).dialog("destroy");
         }
       });
     }

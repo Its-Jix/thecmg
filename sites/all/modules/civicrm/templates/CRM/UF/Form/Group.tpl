@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,11 +28,8 @@
  <h3> {ts}Delete CiviCRM Profile{/ts} - {$profileTitle}</h3>
 {/if}
 <div class=" crm-block crm-form-block crm-uf_group-form-block">
-{* CRM-13693 Duplicate Delete button *}
-{if $action neq 8}
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="top"}</div>
-{/if}
-{if ($action eq 2 or $action eq 4) and $snippet neq 'json' } {* Update or View*}
+{if $action eq 2 or $action eq 4 } {* Update or View*}
     <div class="action-link">
   <a href="{crmURL p='civicrm/admin/uf/group/field' q="action=browse&reset=1&gid=$gid"}" class="button"><span>{ts}View or Edit Fields for this Profile{/ts}</a></span>
   <div class="clear"></div>
@@ -81,3 +78,7 @@
 <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl" location="bottom"}</div>
 </div>
 {include file="CRM/common/showHide.tpl"}
+
+{* include jscript to warn if unsaved form field changes *}
+{include file="CRM/common/formNavigate.tpl"}
+

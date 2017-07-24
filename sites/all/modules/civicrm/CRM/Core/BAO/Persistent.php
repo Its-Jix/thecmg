@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -85,12 +85,6 @@ class CRM_Core_BAO_Persistent extends CRM_Core_DAO_Persistent {
     return $persistentDAO;
   }
 
-  /**
-   * @param $context
-   * @param null $name
-   *
-   * @return mixed
-   */
   static function getContext($context, $name = NULL) {
     static $contextNameData = array();
 

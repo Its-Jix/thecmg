@@ -1,8 +1,4 @@
 <?php
-
-/**
- * Class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices
- */
 class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_Form_Cart {
   public $price_fields_for_event;
   public $_values = NULL;
@@ -50,11 +46,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     }
   }
 
-  /**
-   * @param $contact
-   *
-   * @return null
-   */
   static function primary_email_from_contact($contact) {
     foreach ($contact->email as $email) {
       if ($email['is_primary']) {
@@ -65,11 +56,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     return NULL;
   }
 
-  /**
-   * @param $event
-   *
-   * @return array
-   */
   function build_price_options($event) {
     $price_fields_for_event = array();
     $base_field_name = "event_{$event->id}_amount";
@@ -88,9 +74,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     return $price_fields_for_event;
   }
 
-  /**
-   * @return bool
-   */
   function validate() {
     parent::validate();
     if ($this->_errors) {
@@ -152,9 +135,6 @@ class CRM_Event_Cart_Form_Checkout_ParticipantsAndPrices extends CRM_Event_Cart_
     return empty($this->_errors);
   }
 
-  /**
-   * @return array
-   */
   public function setDefaultValues() {
     $this->loadCart();
 

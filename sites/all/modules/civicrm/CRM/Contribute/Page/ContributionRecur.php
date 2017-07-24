@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -55,7 +55,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
       $values = array();
       CRM_Core_DAO::storeValues($recur, $values);
       // if there is a payment processor ID, get the name of the payment processor
-      if (!empty($values['payment_processor_id'])) {
+      if (CRM_Utils_Array::value('payment_processor_id', $values)) {
         $values['payment_processor'] = CRM_Core_DAO::getFieldValue(
           'CRM_Financial_DAO_PaymentProcessor',
           $values['payment_processor_id'],
@@ -63,7 +63,7 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
         );
       }
       // get contribution status label
-      if (!empty($values['contribution_status_id'])) {
+      if (CRM_Utils_Array::value('contribution_status_id', $values)) {
         $values['contribution_status'] = CRM_Core_OptionGroup::getLabel('contribution_status', $values['contribution_status_id']);
       }
 
@@ -80,6 +80,9 @@ class CRM_Contribute_Page_ContributionRecur extends CRM_Core_Page {
 
     // check logged in url permission
     CRM_Contact_Page_View::checkUserPermission($this);
+
+    // set page title
+    CRM_Contact_Page_View::setTitle($this->_contactId);
 
     $this->assign('action', $this->_action);
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,8 +37,6 @@
  * Page for displaying list of Mail account settings
  */
 class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
-
-  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -118,12 +116,7 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
 
       //add action links.
       $allMailSettings[$mailSetting->id]['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $mailSetting->id),
-        ts('more'),
-        FALSE,
-        'mailSetting.manage.action',
-        'MailSetting',
-        $mailSetting->id
+        array('id' => $mailSetting->id)
       );
     }
 
@@ -150,8 +143,6 @@ class CRM_Admin_Page_MailSettings extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
-   *
-   * @param null $mode
    *
    * @return string user context.
    */

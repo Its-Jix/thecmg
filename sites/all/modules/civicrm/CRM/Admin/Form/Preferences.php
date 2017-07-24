@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -97,9 +97,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     $session->pushUserContext(CRM_Utils_System::url('civicrm/admin', 'reset=1'));
   }
 
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     $defaults = array();
 
@@ -112,9 +109,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
     return $defaults;
   }
 
-  /**
-   * @param $defaults
-   */
   function cbsDefaultValues(&$defaults) {
 
     foreach ($this->_varNames as $groupName => $groupValues) {
@@ -141,7 +135,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -194,17 +188,6 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
                 array('&nbsp;&nbsp;', '&nbsp;&nbsp;', '<br/>')
               );
               break;
-
-            case 'select':
-              $this->addElement('select',
-                $fieldName,
-                $fieldValue['title'],
-                $fieldValue['option_values']
-              );
-              break;
-
-            case 'entity_reference':
-              $this->addEntityRef($fieldName, $fieldValue['title'], CRM_Utils_Array::value('options', $fieldValue, array()));
           }
         }
 
@@ -236,7 +219,7 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $config = CRM_Core_Config::singleton();
@@ -255,14 +238,14 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcessCommon() {
     foreach ($this->_varNames as $groupName => $groupValues) {
       foreach ($groupValues as $settingName => $fieldValue) {
         switch ($fieldValue['html_type']) {
           case 'checkboxes':
-            if (!empty($this->_params[$settingName]) &&
+            if (CRM_Utils_Array::value($settingName, $this->_params) &&
               is_array($this->_params[$settingName])
             ) {
               $this->_config->$settingName = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR,
@@ -275,13 +258,12 @@ class CRM_Admin_Form_Preferences extends CRM_Core_Form {
             break;
 
           case 'checkbox':
-            $this->_config->$settingName = !empty($this->_params[$settingName]) ? 1 : 0;
+            $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params) ? 1 : 0;
             break;
 
           case 'text':
           case 'select':
           case 'radio':
-          case 'entity_reference':
             $this->_config->$settingName = CRM_Utils_Array::value($settingName, $this->_params);
             break;
 

@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -257,9 +257,7 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Option Group ID for Label Formats
    *
-   * @param string $name
-   *
-   * @internal param $void
+   * @param void
    *
    * @return int  Group ID (null if Group ID doesn't exist)
    * @access private
@@ -345,10 +343,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format from the DB
    *
-   * @param string $field Field name to search by
-   * @param int $val Field value to search for
-   *
-   * @param string $groupName
+   * @param string $field   Field name to search by
+   * @param int    $val     Field value to search for
    *
    * @return array  $values (reference) associative array of name/value pairs
    * @access public
@@ -392,11 +388,9 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
   /**
    * Get Label Format field from associative array
    *
-   * @param string $field name of a label format field
-   * @param array (reference) $values associative array of name/value pairs containing
+   * @param string              $field         name of a label format field
+   * @param array (reference)   $values        associative array of name/value pairs containing
    *                                           label format field selections
-   *
-   * @param null $default
    *
    * @return value
    * @access public
@@ -426,10 +420,8 @@ class CRM_Core_BAO_LabelFormat extends CRM_Core_DAO_OptionValue {
    * retrieves the relevant objects. Typically the valid params are only
    * label id. It also stores all the retrieved values in the default array.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $values (reference ) an assoc array to hold the flattened values
-   *
-   * @param string $groupName
+   * @param array $params   (reference ) an assoc array of name/value pairs
+   * @param array $values   (reference ) an assoc array to hold the flattened values
    *
    * @return object CRM_Core_DAO_OptionValue object
    * @access public

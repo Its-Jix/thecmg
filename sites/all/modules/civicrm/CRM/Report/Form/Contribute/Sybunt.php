@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -43,12 +43,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   protected $_add2groupSupported = FALSE;
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     $yearsInPast   = 10;
     $yearsInFuture = 1;
@@ -176,6 +170,22 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
           ),
         ),
       ),
+      'civicrm_group' =>
+      array(
+        'dao' => 'CRM_Contact_DAO_GroupContact',
+        'alias' => 'cgroup',
+        'filters' =>
+        array(
+          'gid' =>
+          array(
+            'name' => 'group_id',
+            'title' => ts('Group'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'group' => TRUE,
+            'options' => CRM_Core_PseudoConstant::nestedGroup(),
+          ),
+        ),
+      ),
     );
 
     // If we have a campaign, build out the relevant elements
@@ -190,7 +200,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       );
     }
 
-    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -212,7 +221,9 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
 
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (CRM_Utils_Array::value('required', $field) ||
+            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          ) {
             if ($fieldName == 'total_amount') {
               $select[] = "SUM({$field['dbAlias']}) as {$tableName}_{$fieldName}";
 
@@ -239,7 +250,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['type'] = CRM_Utils_Array::value('type', $field);
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['title'] = $field['title'];
             }
-            if (!empty($field['no_display'])) {
+            if (CRM_Utils_Array::value('no_display', $field)) {
               $this->_columnHeaders["{$tableName}_{$fieldName}"]['no_display'] = TRUE;
             }
           }
@@ -252,7 +263,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
 
   function from() {
 
-    $this->_from = "
+    $this->_from = " 
         FROM  civicrm_contribution  {$this->_aliases['civicrm_contribution']}
               INNER JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
                       ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_contribution']}.contact_id
@@ -328,11 +339,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->_groupBy = "Group BY {$this->_aliases['civicrm_contribution']}.contact_id, " . self::fiscalYearOffset($this->_aliases['civicrm_contribution'] . '.receive_date') . " WITH ROLLUP ";
   }
 
-  /**
-   * @param $rows
-   *
-   * @return array
-   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -365,7 +371,7 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->groupBy();
 
     $rows = $contactIds = array();
-    if (empty($this->_params['charts'])) {
+    if (!CRM_Utils_Array::value('charts', $this->_params)) {
       $this->limit();
       $getContacts = "SELECT SQL_CALC_FOUND_ROWS {$this->_aliases['civicrm_contact']}.id as cid {$this->_from} {$this->_where} GROUP BY {$this->_aliases['civicrm_contact']}.id {$this->_limit}";
 
@@ -378,8 +384,8 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
       $this->setPager();
     }
 
-    if (!empty($contactIds) || !empty($this->_params['charts'])) {
-      if (!empty($this->_params['charts'])) {
+    if (!empty($contactIds) || CRM_Utils_Array::value('charts', $this->_params)) {
+      if (CRM_Utils_Array::value('charts', $this->_params)) {
         $sql = "{$this->_select} {$this->_from} {$this->_where} {$this->_groupBy}";
       }
       else {
@@ -432,9 +438,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
-  /**
-   * @param $rows
-   */
   function buildChart(&$rows) {
     $graphRows           = array();
     $count               = 0;
@@ -470,9 +473,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
     }
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -510,12 +510,6 @@ class CRM_Report_Form_Contribute_Sybunt extends CRM_Report_Form {
   }
 
   // Override "This Year" $op options
-  /**
-   * @param string $type
-   * @param null $fieldName
-   *
-   * @return array
-   */
   function getOperationPair($type = "string", $fieldName = NULL) {
     if ($fieldName == 'yid') {
       return array('calendar' => ts('Is Calendar Year'), 'fiscal' => ts('Fiscal Year Starting'));

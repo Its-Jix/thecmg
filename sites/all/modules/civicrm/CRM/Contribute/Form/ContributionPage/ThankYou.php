@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -96,7 +96,7 @@ class CRM_Contribute_Form_ContributionPage_ThankYou extends CRM_Contribute_Form_
     $errors = array();
 
     // if is_email_receipt is set, the receipt message must be non-empty
-    if (!empty($fields['is_email_receipt'])) {
+    if (CRM_Utils_Array::value('is_email_receipt', $fields)) {
       //added for CRM-1348
       $email = trim(CRM_Utils_Array::value('receipt_from_email', $fields));
       if (empty($email) || !CRM_Utils_Rule::email($email)) {

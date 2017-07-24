@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -222,7 +222,9 @@ END AS 'relType'
 
       $this->assign('has_related', FALSE);
       // if membership can be granted, and we are the owner of the membership
-      if (!empty($membershipType['relationship_type_id']) && empty($values['owner_membership_id'])) {
+      if (CRM_Utils_Array::value('relationship_type_id', $membershipType)
+        && !CRM_Utils_Array::value('owner_membership_id', $values)
+      ) {
         // display related contacts/membership block
         $this->assign('has_related', TRUE);
         $this->assign('max_related', CRM_Utils_Array::value('max_related', $values, ts('Unlimited')));
@@ -284,12 +286,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
                 'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
                 'cid' => $row['cid'],
                 'mid' => $row['mid'],
-              ),
-              ts('more'),
-              FALSE,
-              'membership.relationship.action',
-              'Relationship',
-              CRM_Utils_Request::retrieve('id', 'Positive', $this)
+              )
             );
           }
           else {
@@ -299,12 +296,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
                   'id' => CRM_Utils_Request::retrieve('id', 'Positive', $this),
                   'cid' => $row['cid'],
                   'rid' => $row['cid'],
-                ),
-                ts('more'),
-                FALSE,
-                'membership.relationship.action',
-                'Relationship',
-                CRM_Utils_Request::retrieve('id', 'Positive', $this)
+                )
               );
             }
           }
@@ -373,7 +365,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
       $autoRenew = $isRecur ? TRUE : FALSE;
     }
 
-    if (!empty($values['is_test'])) {
+    if (CRM_Utils_Array::value('is_test', $values)) {
       $values['membership_type'] .= ' (test) ';
     }
 
@@ -392,7 +384,7 @@ SELECT r.id, c.id as cid, c.display_name as name, c.job_title as comment,
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {

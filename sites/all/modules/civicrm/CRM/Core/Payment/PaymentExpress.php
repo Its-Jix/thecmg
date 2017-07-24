@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -32,10 +32,6 @@
  * Grateful acknowledgements go to Donald Lobo for invaluable assistance
  * in creating this payment processor module
  */
-
-/**
- * Class CRM_Core_Payment_PaymentExpress
- */
 class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   CONST CHARSET = 'iso-8859-1';
 
@@ -55,9 +51,7 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_PaymentExpress
+   * @return void
    */
   function __construct($mode, &$paymentProcessor) {
 
@@ -71,14 +65,11 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param object $paymentProcessor
-   * @param null $paymentForm
-   * @param bool $force
-   *
    * @return object
    * @static
+   *
    */
-  static function &singleton($mode = 'test', &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
       self::$_singleton[$processorName] = new CRM_Core_Payment_PaymentExpress($mode, $paymentProcessor);
@@ -86,14 +77,6 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     return self::$_singleton[$processorName];
   }
 
-  /**
-   * This function checks to see if we have the right config values
-   *
-   * @internal param string $mode the mode we are operating in (live or test)
-   *
-   * @return string the error message if any
-   * @public
-   */
   function checkConfig() {
     $config = CRM_Core_Config::singleton();
 
@@ -115,42 +98,18 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
     }
   }
 
-  /**
-   * @param $params
-   *
-   * @throws Exception
-   */
   function setExpressCheckOut(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
-  /**
-   * @param $token
-   *
-   * @throws Exception
-   */
   function getExpressCheckoutDetails($token) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
-  /**
-   * @param $params
-   *
-   * @throws Exception
-   */
   function doExpressCheckout(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
 
-  /**
-   * This function collects all the information from a web/api form and invokes
-   * the relevant payment processor specific functions to perform the transaction
-   *
-   * @param  array $params assoc array of input parameters for this transaction
-   *
-   * @return array the result in an nice formatted array (or an error object)
-   * @abstract
-   */
   function doDirectPayment(&$params) {
     CRM_Core_Error::fatal(ts('This function is not implemented'));
   }
@@ -158,12 +117,11 @@ class CRM_Core_Payment_PaymentExpress extends CRM_Core_Payment {
   /**
    * Main transaction function
    *
-   * @param array $params name value pair of contribution data
-   *
-   * @param $component
+   * @param array $params  name value pair of contribution data
    *
    * @return void
    * @access public
+   *
    */
   function doTransferCheckout(&$params, $component) {
     $component = strtolower($component);

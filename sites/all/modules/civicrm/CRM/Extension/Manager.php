@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * uninstalling extensions.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -101,10 +101,7 @@ class CRM_Extension_Manager {
   public $statuses;
 
   /**
-   * @param CRM_Extension_Container_Interface $fullContainer
    * @param CRM_Extension_Container_Basic|FALSE $defaultContainer
-   * @param CRM_Extension_Mapper $mapper
-   * @param $typeManagers
    */
   function __construct(CRM_Extension_Container_Interface $fullContainer, $defaultContainer, CRM_Extension_Mapper $mapper, $typeManagers) {
     $this->fullContainer = $fullContainer;
@@ -190,7 +187,6 @@ class CRM_Extension_Manager {
     }
 
     $this->refresh();
-    CRM_Core_Invoke::rebuildMenuAndCaches(TRUE);
   }
 
   /**
@@ -362,8 +358,6 @@ class CRM_Extension_Manager {
   /**
    * Determine the status of an extension
    *
-   * @param $key
-   *
    * @return string constant (STATUS_INSTALLED, STATUS_DISABLED, STATUS_UNINSTALLED, STATUS_UNKNOWN)
    */
   public function getStatus($key) {
@@ -421,10 +415,8 @@ class CRM_Extension_Manager {
   /**
    * Find the $info and $typeManager for a $key
    *
-   * @param $key
-   *
-   * @throws CRM_Extension_Exception
    * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @throws CRM_Extension_Exception
    */
   private function _getInfoTypeHandler($key) {
     $info = $this->mapper->keyToInfo($key); // throws Exception
@@ -438,10 +430,8 @@ class CRM_Extension_Manager {
   /**
    * Find the $info and $typeManager for a $key
    *
-   * @param $key
-   *
-   * @throws CRM_Extension_Exception
    * @return array (0 => CRM_Extension_Info, 1 => CRM_Extension_Manager_Interface)
+   * @throws CRM_Extension_Exception
    */
   private function _getMissingInfoTypeHandler($key) {
     $info = $this->createInfoFromDB($key);
@@ -456,11 +446,6 @@ class CRM_Extension_Manager {
     }
   }
 
-  /**
-   * @param CRM_Extension_Info $info
-   *
-   * @return bool
-   */
   private function _createExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->label = $info->label;
@@ -472,11 +457,6 @@ class CRM_Extension_Manager {
     return (bool) ($dao->insert());
   }
 
-  /**
-   * @param CRM_Extension_Info $info
-   *
-   * @return bool
-   */
   private function _updateExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
@@ -493,11 +473,6 @@ class CRM_Extension_Manager {
     }
   }
 
-  /**
-   * @param CRM_Extension_Info $info
-   *
-   * @throws CRM_Extension_Exception
-   */
   private function _removeExtensionEntry(CRM_Extension_Info $info) {
     $dao = new CRM_Core_DAO_Extension();
     $dao->full_name = $info->key;
@@ -510,10 +485,6 @@ class CRM_Extension_Manager {
     } // else: post-condition already satisified
   }
 
-  /**
-   * @param CRM_Extension_Info $info
-   * @param $isActive
-   */
   private function _setExtensionActive(CRM_Extension_Info $info, $isActive) {
     CRM_Core_DAO::executeQuery('UPDATE civicrm_extension SET is_active = %1 where full_name = %2', array(
       1 => array($isActive, 'Integer'),
@@ -525,7 +496,6 @@ class CRM_Extension_Manager {
    * Auto-generate a place-holder for a missing extension using info from
    * database.
    *
-   * @param $key
    * @return CRM_Extension_Info|NULL
    */
   public function createInfoFromDB($key) {

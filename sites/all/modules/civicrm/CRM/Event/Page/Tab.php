@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -59,14 +59,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
-      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('participant', $this->_contactId);
-      // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = array(
-        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-      );
-      if (CRM_Core_Permission::access('CiviContribute')) {
-        $this->ajaxResponse['updateTabs']['#tab_contribute'] = CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId);
-      }
     }
   }
 
@@ -137,6 +129,9 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
+
+      // set page title
+      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
 
     $this->assign('action', $this->_action);
@@ -158,7 +153,7 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card registration
-    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
+    CRM_Core_Payment::allowBackofficeCreditCard($this);
 
     // Only show credit card registration button if user has CiviContribute permission
     if (CRM_Core_Permission::access('CiviContribute')) {
@@ -194,8 +189,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
       'String', $this
     );
 
-    $searchContext = CRM_Utils_Request::retrieve('searchContext', 'String', $this);
-
     $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
 
     //validate the qfKey
@@ -217,9 +210,6 @@ class CRM_Event_Page_Tab extends CRM_Core_Page {
 
         if ($compContext == 'advanced') {
           $url = CRM_Utils_System::url('civicrm/contact/search/advanced', $urlParams);
-        }
-        else if ($searchContext) {
-          $url = CRM_Utils_System::url("civicrm/$searchContext/search", $urlParams);
         }
         else {
           $url = CRM_Utils_System::url('civicrm/event/search', $urlParams);

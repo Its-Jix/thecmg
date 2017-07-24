@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -130,7 +130,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
 
@@ -145,7 +145,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
   /**
    * Function to actually build the components of the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -187,7 +187,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     // store the submitted values in an array
@@ -264,7 +264,7 @@ class CRM_Contribute_Form_UpdateSubscription extends CRM_Core_Form {
         }
         CRM_Activity_BAO_Activity::create($activityParams);
 
-        if (!empty($params['is_notify'])) {
+        if (CRM_Utils_Array::value('is_notify', $params)) {
           // send notification
           if ($this->_subscriptionDetails->contribution_page_id) {
             CRM_Core_DAO::commonRetrieveAll('CRM_Contribute_DAO_ContributionPage', 'id',

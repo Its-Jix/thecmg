@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -77,7 +77,7 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $deletedPledges = 0;
@@ -87,7 +87,10 @@ class CRM_Pledge_Form_Task_Delete extends CRM_Pledge_Form_Task {
       }
     }
 
-    $status = ts('Deleted Pledge(s): %1 (Total Selected: %2) ', array(1 => $deletedPledges, 2 => count($this->_pledgeIds)));
+    $status = array(
+      ts('Deleted Pledge(s): %1', array(1 => $deletedPledges)),
+      ts('Total Selected Pledge(s): %1', array(1 => count($this->_pledgeIds))),
+    );
     CRM_Core_Session::setStatus($status, '', 'info');
   }
 }

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -40,13 +40,6 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
   protected $_customGroupExtends = array('Grant');
 
   protected $_add2groupSupported = FALSE;
-
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     $this->_columns = array(
       'civicrm_grant' =>
@@ -255,7 +248,9 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
 
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (CRM_Utils_Array::value('required', $field) ||
+            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          ) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
 
@@ -290,10 +285,11 @@ class CRM_Report_Form_Grant_Statistics extends CRM_Report_Form {
   }
 
   function where() {
+    $approved = CRM_Core_PseudoConstant::getKey('CRM_Grant_DAO_Grant', 'status_id', 'Approved', array('labelColumn' => 'name'));
     $whereClause = "
 WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
   AND {$this->_aliases['civicrm_grant']}.amount_total > 0";
-    $this->_where = $whereClause;
+    $this->_where = $whereClause . " AND {$this->_aliases['civicrm_grant']}.status_id = {$approved} ";
 
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('filters', $table)) {
@@ -339,14 +335,14 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
   function groupBy() {
     $this->_groupBy = '';
 
-    if (!empty($this->_params['fields']) &&
+    if (CRM_Utils_Array::value('fields', $this->_params) &&
       is_array($this->_params['fields']) &&
       !empty($this->_params['fields'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('fields', $table)) {
           foreach ($table['fields'] as $fieldName => $field) {
-            if (!empty($this->_params['fields'][$fieldName])) {
+            if (CRM_Utils_Array::value($fieldName, $this->_params['fields'])) {
               $this->_groupBy[] = $field['dbAlias'];
             }
           }
@@ -379,9 +375,6 @@ WHERE {$this->_aliases['civicrm_grant']}.amount_total IS NOT NULL
     $this->endPostProcess($rows);
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     $totalStatistics     = $grantStatistics = array();
     $totalStatistics     = parent::statistics($rows);
@@ -428,11 +421,11 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     }
 
     foreach ($rows as $key => $values) {
-      if (!empty($values['civicrm_grant_grant_report_received'])) {
+      if (CRM_Utils_Array::value('civicrm_grant_grant_report_received', $values)) {
         $grantReportsReceived++;
       }
 
-      if (!empty($values['civicrm_grant_grant_type_id'])) {
+      if (CRM_Utils_Array::value('civicrm_grant_grant_type_id', $values)) {
         $grantType = CRM_Utils_Array::value($values['civicrm_grant_grant_type_id'], $grantTypes);
         $grantStatistics['civicrm_grant_grant_type_id']['title'] = ts('By Grant Type');
         self::getStatistics($grantStatistics['civicrm_grant_grant_type_id'], $grantType, $values,
@@ -548,14 +541,6 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     }
   }
 
-  /**
-   * @param $grantStatistics
-   * @param $fieldValue
-   * @param $values
-   * @param $awardedGrants
-   * @param $awardedGrantsAmount
-   * @param bool $customData
-   */
   static function getStatistics(&$grantStatistics, $fieldValue, $values,
     $awardedGrants, $awardedGrantsAmount, $customData = FALSE
   ) {
@@ -566,25 +551,13 @@ SELECT COUNT({$this->_aliases['civicrm_grant']}.id) as count ,
     $currencies = CRM_Core_PseudoConstant::get('CRM_Grant_DAO_Grant', 'currency', array('labelColumn' => 'symbol'));
     $currency = $currencies[$values['civicrm_grant_currency']];
 
-
     if (!$customData) {
-      if (!isset($grantStatistics['value'][$fieldValue]['currency'][$currency])
-        || !isset($grantStatistics['value'][$fieldValue]['currency'][$currency]['value'])) {
-        $grantStatistics['value'][$fieldValue]['currency'][$currency]['value'] = 0;
-      }
       $grantStatistics['value'][$fieldValue]['currency'][$currency]['value'] += $values['civicrm_grant_amount_total'];
       $grantStatistics['value'][$fieldValue]['currency'][$currency]['percentage'] = round(($grantStatistics['value'][$fieldValue]['currency'][$currency]['value'] / $awardedGrantsAmount) * 100);
-      if (!isset($grantStatistics['value'][$fieldValue]['count'])) {
-        $grantStatistics['value'][$fieldValue]['count'] = 0;
-      }
       $grantStatistics['value'][$fieldValue]['count']++;
       $grantStatistics['value'][$fieldValue]['percentage'] = round(($grantStatistics['value'][$fieldValue]['count'] / $awardedGrants) * 100);
     }
     else {
-      if (!isset($grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency])
-        || !isset($grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'])) {
-        $grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'] = 0;
-      }
       $grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'] += $values['civicrm_grant_amount_total'];
       $grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['percentage'] = round(($grantStatistics['value'][$fieldValue]['unassigned_currency'][$currency]['value'] / $awardedGrantsAmount) * 100);
       $grantStatistics['value'][$fieldValue]['unassigned_count']++;

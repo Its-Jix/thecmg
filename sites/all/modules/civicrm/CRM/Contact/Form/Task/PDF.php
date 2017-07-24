@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -87,17 +87,6 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
     $this->assign('single', $this->_single);
   }
 
-  /**
-   * This function sets the default values for the form. Relationship that in edit/view action
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
-   */
-  /**
-   *
-   */
   function setDefaultValues() {
     $defaults = array();
     if (isset($this->_activityId)) {
@@ -127,7 +116,7 @@ class CRM_Contact_Form_Task_PDF extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     CRM_Contact_Form_Task_PDFLetterCommon::postProcess($this);

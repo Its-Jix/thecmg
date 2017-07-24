@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -284,9 +284,6 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
    *
    * @param array $fields posted values of the form
    *
-   * @param $files
-   * @param $self
-   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -339,7 +336,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
             }
             else {
               $errors['_qf_default'] .= ts('Missing required contact matching fields.') . " $fieldMessage " . ts('(Sum of all weights should be greater than or equal to threshold: %1).', array(
-                1 => $threshold)) . ' ' . ts('Or Provide Contact ID or External ID.') . '<br />';
+                1 => $threshold)) . ' ' . ts('Or Provide Contact Id or External Identifier.') . '<br />';
             }
           }
           elseif (!in_array('event_title', $importKeys)) {
@@ -351,7 +348,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    if (!empty($fields['saveMapping'])) {
+    if (CRM_Utils_Array::value('saveMapping', $fields)) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
@@ -422,7 +419,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     $this->set('loadMappingId', CRM_Utils_Array::value('mappingId', $params));
 
     //Updating Mapping Records
-    if (!empty($params['updateMapping'])) {
+    if (CRM_Utils_Array::value('updateMapping', $params)) {
 
       $mappingFields = new CRM_Core_DAO_MappingField();
       $mappingFields->mapping_id = $params['mappingId'];
@@ -452,7 +449,7 @@ class CRM_Event_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     //Saving Mapping Details and Records
-    if (!empty($params['saveMapping'])) {
+    if (CRM_Utils_Array::value('saveMapping', $params)) {
       $mappingParams = array(
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],

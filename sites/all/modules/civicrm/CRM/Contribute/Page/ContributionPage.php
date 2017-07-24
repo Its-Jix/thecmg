@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -85,11 +85,13 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ContributionPage' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -228,9 +230,10 @@ class CRM_Contribute_Page_ContributionPage extends CRM_Core_Page {
     if (!isset(self::$_contributionLinks)) {
       //get contribution dates.
       $dates = CRM_Contribute_BAO_Contribution::getContributionDates();
-      $now = $dates['now'];
-      $yearDate = $dates['yearDate'];
-      $monthDate = $dates['monthDate'];
+      foreach (array(
+        'now', 'yearDate', 'monthDate') as $date) {
+        $$date = $dates[$date];
+      }
       $yearNow = $yearDate + 10000;
 
       $urlString = 'civicrm/contribute/search';
@@ -386,8 +389,6 @@ AND         cp.page_type = 'contribute'
   /**
    * Browse all contribution pages
    *
-   * @param null $action
-   *
    * @return void
    * @access public
    * @static
@@ -486,10 +487,7 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Configure'),
-        TRUE,
-        'contributionpage.configure.actions',
-        'ContributionPage',
-        $dao->id
+        TRUE
       );
 
       //build the contributions links.
@@ -497,10 +495,7 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Contributions'),
-        TRUE,
-        'contributionpage.contributions.search',
-        'ContributionPage',
-        $dao->id
+        TRUE
       );
 
       //build the online contribution links.
@@ -508,10 +503,7 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('Links'),
-        TRUE,
-        'contributionpage.online.links',
-        'ContributionPage',
-        $dao->id
+        TRUE
       );
 
       //build the normal action links.
@@ -519,10 +511,7 @@ ORDER BY title asc
         $action,
         array('id' => $dao->id),
         ts('more'),
-        TRUE,
-        'contributionpage.action.links',
-        'ContributionPage',
-        $dao->id
+        TRUE
       );
 
       //show campaigns on selector.
@@ -554,12 +543,6 @@ ORDER BY title asc
     $form->run();
   }
 
-  /**
-   * @param $params
-   * @param bool $sortBy
-   *
-   * @return int|string
-   */
   function whereClause(&$params, $sortBy = TRUE) {
     $values    = $clauses = array();
     $title     = $this->get('title');
@@ -620,10 +603,6 @@ ORDER BY title asc
     return implode(' AND ', $clauses);
   }
 
-  /**
-   * @param $whereClause
-   * @param $whereParams
-   */
   function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Contribution %%StatusMessage%%');
@@ -646,10 +625,6 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
-  /**
-   * @param $whereClause
-   * @param $whereParams
-   */
   function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "
@@ -664,11 +639,6 @@ SELECT count(id)
     $this->assign('aToZ', $aToZBar);
   }
 
-  /**
-   * @param $sectionsInfo
-   *
-   * @return array
-   */
   function formatConfigureLinks($sectionsInfo) {
     //build the formatted configure links.
     $formattedConfLinks = self::configureActionLinks();
@@ -683,7 +653,7 @@ SELECT count(id)
         $classes = $link['class'];
       }
 
-      if (empty($sectionsInfo[$sectionName])) {
+      if (!CRM_Utils_Array::value($sectionName, $sectionsInfo)) {
         $classes = array();
         if (isset($link['class'])) {
           $classes = $link['class'];

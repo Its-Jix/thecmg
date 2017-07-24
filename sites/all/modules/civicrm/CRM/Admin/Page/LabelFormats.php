@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright (C) 2011 Marty Wright                                    |
  | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -38,8 +38,6 @@
  * Page for displaying list of Label Formats
  */
 class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
-
-  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -112,8 +110,6 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
-   * @param null $mode
-   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -122,8 +118,6 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
 
   /**
    * Browse all Label Format settings.
-   *
-   * @param null $action
    *
    * @return void
    * @access public
@@ -137,19 +131,13 @@ class CRM_Admin_Page_LabelFormats extends CRM_Core_Page_Basic {
     // Add action links to each of the Label Formats
     foreach ($labelFormatList as & $format) {
       $action = array_sum(array_keys($this->links()));
-      if (!empty($format['is_reserved'])) {
+      if (CRM_Utils_Array::value('is_reserved', $format)) {
         $action -= CRM_Core_Action::DELETE;
       }
 
       $format['groupName'] = ts('Mailing Label');
       $format['action'] = CRM_Core_Action::formLink(self::links(), $action,
-        array('id' => $format['id'], 'group' => 'label_format'),
-        ts('more'),
-        FALSE,
-        'labelFormat.manage.action',
-        'LabelFormat',
-        $format['id']
-      );
+        array('id' => $format['id'], 'group' => 'label_format'));
     }
 
     // Add action links to each of the Label Formats

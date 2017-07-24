@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id: $
  *
  */
@@ -64,9 +64,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @param bool $check
-   *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm($check = FALSE) {
@@ -96,7 +94,10 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
       $attributes['api_action'], TRUE
     );
 
-    $this->add('select', 'run_frequency', ts('Run frequency'), CRM_Core_SelectValues::getJobFrequency());
+    $this->add('select', 'run_frequency', ts('Run frequency'),
+      array('Daily' => ts('Daily'), 'Hourly' => ts('Hourly'), 'Always' => ts('Every time cron job is run'))
+    );
+
 
     $this->add('textarea', 'parameters', ts('Command parameters'),
       "cols=50 rows=6"
@@ -108,24 +109,19 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     $this->addFormRule(array('CRM_Admin_Form_Job', 'formRule'));
   }
 
-  /**
-   * @param $fields
-   *
-   * @return array|bool
-   * @throws API_Exception
-   */
   static function formRule($fields) {
 
     $errors = array();
 
     require_once 'api/api.php';
 
-    /** @var \Civi\API\Kernel $apiKernel */
-    $apiKernel = \Civi\Core\Container::singleton()->get('civi_api_kernel');
-    $apiRequest = \Civi\API\Request::create($fields['api_entity'], $fields['api_action'], array('version' => 3), NULL);
-    try {
-      $apiKernel->resolve($apiRequest);
-    } catch (\Civi\API\Exception\NotImplementedException $e) {
+    $apiRequest = array();
+    $apiRequest['entity']  = CRM_Utils_String::munge($fields['api_entity']);
+    $apiRequest['action']  = CRM_Utils_String::munge($fields['api_action']);
+    $apiRequest['version'] = 3;
+    $apiRequest += _civicrm_api_resolve($apiRequest);    // look up function, file, is_generic
+
+    if( !$apiRequest['function'] ) {
       $errors['api_action'] = ts('Given API command is not defined.');
     }
 
@@ -136,9 +132,6 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     return empty($errors) ? TRUE : $errors;
   }
 
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     $defaults = array();
 
@@ -160,7 +153,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
     // CRM-10708
     // job entity thats shipped with core is all lower case.
     // this makes sure camel casing is followed for proper working of default population.
-    if (!empty($defaults['api_entity'])) {
+    if (CRM_Utils_Array::value('api_entity', $defaults)) {
       $defaults['api_entity'] = ucfirst($defaults['api_entity']);
     }
 
@@ -172,7 +165,7 @@ class CRM_Admin_Form_Job extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
 

@@ -58,7 +58,7 @@ function membership_type_create_expectedresult(){
           'relationship_type_id' => '',
           'relationship_direction' => '',
           'max_related' => '',
-          'visibility' => 'Public',
+          'visibility' => '1',
           'weight' => '',
           'receipt_text_signup' => '',
           'receipt_text_renewal' => '',

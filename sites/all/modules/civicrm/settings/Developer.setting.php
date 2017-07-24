@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -41,6 +41,7 @@ return array(
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
     'name' => 'debug_enabled',
+    'config_only' => 1, // store only in config - this is expected to be transitional
     'config_key' => 'debug', // we can't call the setting debug as that has other meanings in api
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
@@ -57,6 +58,7 @@ return array(
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
     'name' => 'userFrameworkLogging',
+    'config_only' => 1, // store only in config - this is expected to be transitional
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => '0',
@@ -73,6 +75,7 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
     'name' => 'backtrace',
+    'config_only' => 1, // store only in config - this is expected to be transitional
     'type' => 'Boolean',
     'quick_form_type' => 'YesNo',
     'default' => '0',
@@ -87,9 +90,9 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
     'name' => 'fatalErrorTemplate',
+    'config_only' => 1, // store only in config - this is expected to be transitional
     'type' => 'String',
-    'quick_form_type' => 'Element',
-    'html_type' => 'text',
+    'quick_form_type' => 'text',
     'default' => 'CRM/common/fatal.tpl',
     'add' => '4.3',
     'title' => 'Fatal Error Template',
@@ -102,10 +105,10 @@ In the case of Drupal, this will cause all CiviCRM error messages to appear in t
     'group_name' => 'Developer Preferences',
     'group' => 'developer',
     'name' => 'fatalErrorHandler',
+    'config_only' => 1, // store only in config - this is expected to be transitional
     'type' => 'String',
-    'quick_form_type' => 'Element',
-    'html_type' => 'text',
-    'default' => null,
+    'quick_form_type' => 'text',
+    'default' => 'null',
     'add' => '4.3',
     'title' => 'Fatal Error Handler',
     'is_domain' => 1,

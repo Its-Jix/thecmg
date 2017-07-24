@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,10 +37,6 @@
 // before the 4.1 release
 define('EMAIL_ACTIVITY_TYPE_ID', NULL);
 define('MAIL_BATCH_SIZE', 50);
-
-/**
- * Class CRM_Utils_Mail_EmailProcessor
- */
 class CRM_Utils_Mail_EmailProcessor {
 
   /**
@@ -116,7 +112,7 @@ class CRM_Utils_Mail_EmailProcessor {
   /**
    * Process the mailbox for all the settings from civicrm_mail_settings
    *
-   * @param bool|string $civiMail if true, processing is done in CiviMail context, or Activities otherwise.
+   * @param string $civiMail  if true, processing is done in CiviMail context, or Activities otherwise.
    *
    * @return void
    */
@@ -130,12 +126,6 @@ class CRM_Utils_Mail_EmailProcessor {
     }
   }
 
-  /**
-   * @param $civiMail
-   * @param $dao
-   *
-   * @throws Exception
-   */
   static function _process($civiMail, $dao) {
     // 0 = activities; 1 = bounce;
     $usedfor = $dao->is_default;

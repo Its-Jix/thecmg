@@ -1,8 +1,5 @@
 <?php
 
-/**
- * Class CRM_Case_Audit_AuditConfig
- */
 class CRM_Case_Audit_AuditConfig {
   private $filename;
   private $completionLabel;
@@ -13,9 +10,6 @@ class CRM_Case_Audit_AuditConfig {
   private $sortRegion;
   private $ifBlanks;
 
-  /**
-   * @param $filename
-   */
   public function __construct($filename) {
     $this->filename = $filename;
 
@@ -28,30 +22,18 @@ class CRM_Case_Audit_AuditConfig {
     $this->loadConfig();
   }
 
-  /**
-   * @return string
-   */
   public function getCompletionValue() {
     return $this->completionValue;
   }
 
-  /**
-   * @return string
-   */
   public function getCompletionLabel() {
     return $this->completionLabel;
   }
 
-  /**
-   * @return array
-   */
   public function getSortByLabels() {
     return $this->sortByLabels;
   }
 
-  /**
-   * @return array
-   */
   public function getIfBlanks() {
     return $this->ifBlanks;
   }
@@ -136,12 +118,6 @@ class CRM_Case_Audit_AuditConfig {
    * Check if label $n is explicitly listed in region $r in the config.
    */
 
-  /**
-   * @param $n
-   * @param $r
-   *
-   * @return bool
-   */
   public function inRegion($n, $r) {
     if (empty($this->regionFieldList[$r])) {
       return FALSE;
@@ -156,12 +132,6 @@ class CRM_Case_Audit_AuditConfig {
    * Should field $n be included in region $r, taking into account exclusion rules.
    */
 
-  /**
-   * @param $n
-   * @param $r
-   *
-   * @return bool
-   */
   public function includeInRegion($n, $r) {
     $add_it = FALSE;
     $rules = $this->includeRules[$r];
@@ -181,12 +151,6 @@ class CRM_Case_Audit_AuditConfig {
    * Should the time component of field $n in region $r be displayed?
    */
 
-  /**
-   * @param $n
-   * @param $r
-   *
-   * @return bool
-   */
   public function includeTime($n, $r) {
     $retval = FALSE;
     if (empty($this->regionFieldList[$r][$n]['includeTime'])) {
@@ -215,9 +179,6 @@ class CRM_Case_Audit_AuditConfig {
    * Return a list of all the regions in the config file.
    */
 
-  /**
-   * @return array
-   */
   public function getRegions() {
     return array_keys($this->regionFieldList);
   }
@@ -228,10 +189,6 @@ class CRM_Case_Audit_AuditConfig {
    * The array to be sorted should have elements that have a member with a key of 'label', and the value should be the field label.
    */
 
-  /**
-   * @param $f
-   * @param $r
-   */
   public function sort(&$f, $r) {
     // For exclusion-type regions, there's nothing to do, because we won't have been given any ordering.
     if ($this->includeRules[$r]['rule'] == 'exclude') {
@@ -248,12 +205,6 @@ class CRM_Case_Audit_AuditConfig {
    * See also PHP's usort().
    */
 
-  /**
-   * @param $a
-   * @param $b
-   *
-   * @return int
-   */
   public function compareFields($a, $b) {
     if (empty($this->regionFieldList[$this->sortRegion][$a['label']])) {
       $x = 0;

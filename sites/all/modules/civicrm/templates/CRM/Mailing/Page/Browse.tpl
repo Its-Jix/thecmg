@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -47,7 +47,7 @@
     {include file="CRM/common/pagerAToZ.tpl"}
 
     {strip}
-    <table class="selector row-highlight">
+    <table class="selector">
       <thead class="sticky">
       {foreach from=$columnHeaders item=header}
         <th>

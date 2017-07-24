@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,6 +54,7 @@
             if you want to cancel the automatic renewal option.{/ts}</p>
       </div>
     {/if}
+    <h3>{ts}Renew Membership{/ts}</h3>
   {/if}
   <div class="crm-block crm-form-block crm-member-membershiprenew-form-block">
     <div id="help" class="description">
@@ -136,13 +137,12 @@
                     <td>&nbsp;</td>
                     <td>
                       <table class="compressed">
-                        <tr class="crm-membership-form-block-soft-credit-type">
-                          <td class="label">{$form.soft_credit_type_id.label}</td>
-                          <td>{$form.soft_credit_type_id.html}</td>
+                        <tr class="crm-membership-form-block-honor-type">
+                          <td class="label">{$form.honor_type_id.label}</td>
+                          <td>{$form.honor_type_id.html}</td>
                         </tr>
-                        <tr class="crm-membership-form-block-soft-credit-contact-id">
-                          <td class="label">{$form.soft_credit_contact_id.label}</td>
-                          <td>{$form.soft_credit_contact_id.html}</td>
+                        <tr id='contributionContact' class="crm-membership-form-block-contribution-type">
+                          {include file="CRM/Contact/Form/NewContact.tpl"}
                         </tr>
                       </table>
                     </td>
@@ -206,13 +206,12 @@
             <td>&nbsp;</td>
             <td>
               <table class="form-layout-compressed">
-                <tr class="crm-membership-form-block-soft-credit-type">
-                  <td class="label">{$form.soft_credit_type_id.label}</td>
-                  <td>{$form.soft_credit_type_id.html}</td>
+                <tr class="crm-membership-form-block-honor-type">
+                  <td class="label">{$form.honor_type_id.label}</td>
+                  <td>{$form.honor_type_id.html}</td>
                 </tr>
-                <tr class="crm-membership-form-soft-credit-contact-id">
-                  <td class="label">{$form.soft_credit_contact_id.label}</td>
-                  <td>{$form.soft_credit_contact_id.html}</td>
+                <tr id='contributionContact' class="crm-membership-form-block-contribution-type">
+                  {include file="CRM/Contact/Form/NewContact.tpl"}
                 </tr>
               </table>
             </td>
@@ -302,9 +301,9 @@
   {/if}
 {literal}
   <script type="text/javascript">
-    CRM.$(function($) {
-      $('#membershipOrgType').hide();
-      $('#changeNumTerms').hide();
+    cj(function () {
+      cj('#membershipOrgType').hide();
+      cj('#changeNumTerms').hide();
       {/literal}
       CRM.buildCustomData('{$customDataType}');
       {if $customDataSubType}
@@ -338,9 +337,9 @@
       cj('#defaultNumTerms').hide();
     }
 
-    CRM.$(function($) {
+    cj(function () {
       cj('#record_contribution').click(function () {
-        if (cj(this).prop('checked')) {
+        if (cj(this).attr('checked')) {
           cj('#recordContribution').show();
           setPaymentBlock(true);
         }
@@ -372,11 +371,11 @@
 
       if (!checkboxEvent) {
         if (allMemberships[memType]['total_amount_numeric'] > 0) {
-          cj('#record_contribution').prop('checked', true);
+          cj('#record_contribution').attr('checked', 'checked');
           cj('#recordContribution').show();
         }
         else {
-          cj('#record_contribution').prop('checked', false);
+          cj('#record_contribution').removeAttr('checked');
           cj('#recordContribution').hide();
         }
       }
@@ -399,7 +398,7 @@
 
     function setDifferentContactBlock() {
       //get the
-      if (cj('#contribution_contact').prop('checked')) {
+      if (cj('#contribution_contact').attr('checked')) {
         cj('#record-different-contact').show();
       }
       else {

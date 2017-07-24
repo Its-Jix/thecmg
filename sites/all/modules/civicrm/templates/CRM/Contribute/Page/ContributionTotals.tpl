@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,13 +49,6 @@
             <th class="disabled right contriTotalRight"> &nbsp; {ts}Total Cancelled Amount{/ts} - {$contributionSummary.cancel.amount}</th>
           {/if}
       </tr>  
-      {if $contributionSummary.soft_credit.count}
-      <tr>
-        <th class="contriTotalLeft right">{ts}Total Soft Credit Amount{/ts} - {$contributionSummary.soft_credit.amount}</th>
-        <th class="right"> &nbsp; {ts}# Completed Soft Credits{/ts} - {$contributionSummary.soft_credit.count}</th>
-        <th class="right contriTotalRight"> &nbsp; {ts}Avg Soft Credit Amount{/ts} - {$contributionSummary.soft_credit.avg}</th>
-      </tr>  
-      {/if}
     {/if}
     
     </table>

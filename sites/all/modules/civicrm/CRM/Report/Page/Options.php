@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -38,8 +38,6 @@
  * Page for displaying list of Gender
  */
 class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
-
-  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -128,12 +126,14 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable %1', array(1 => self::$_gName)),
         ),
         CRM_Core_Action::DELETE => array(
@@ -203,8 +203,6 @@ class CRM_Report_Page_Options extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
-   *
-   * @param null $mode
    *
    * @return string user context.
    */

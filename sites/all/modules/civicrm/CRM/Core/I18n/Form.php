@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Core_I18n_Form extends CRM_Core_Form {
   function buildQuickForm() {
     $config = CRM_Core_Config::singleton();
-    global $tsLocale;
     $this->_locales = array_keys($config->languageLimit);
 
     // get the part of the database we want to edit and validate it
@@ -66,27 +65,19 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
 
     $languages = CRM_Core_I18n::languages(TRUE);
     foreach ($this->_locales as $locale) {
-      $this->addElement($type, "{$field}_{$locale}", $languages[$locale], array('class' => 'huge huge12' . ($locale == $tsLocale ? ' default-lang' : '')));
+      $this->addElement($type, "{$field}_{$locale}", $languages[$locale], array('cols' => 60, 'rows' => 3));
       $this->_defaults["{$field}_{$locale}"] = $dao->$locale;
     }
 
-    $this->addDefaultButtons(ts('Save'), 'next', NULL);
+    $this->addButtons(array(array('type' => 'next', 'name' => ts('Save'), 'isDefault' => TRUE)));
 
-    CRM_Utils_System::setTitle(ts('Languages'));
-
+    global $tsLocale;
+    $this->assign('tsLocale', $tsLocale);
     $this->assign('locales', $this->_locales);
     $this->assign('field', $field);
+    $this->assign('context', CRM_Utils_Request::retrieve('context', 'String', $this));
   }
 
-  /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
-   *
-   * @return array reference to the array of default values
-   *
-   */
   function setDefaultValues() {
     return $this->_defaults;
   }
@@ -113,6 +104,8 @@ class CRM_Core_I18n_Form extends CRM_Core_Form {
     $dao   = new CRM_Core_DAO();
     $query = CRM_Core_DAO::composeQuery($query, $params, TRUE);
     $dao->query($query, FALSE);
+
+    CRM_Utils_System::civiExit();
   }
 }
 

@@ -27,7 +27,12 @@ return $result;
  */
 function job_delete_expectedresult(){
 
-  $expectedResult = '';
+  $expectedResult = array(
+  'is_error' => 0,
+  'version' => 3,
+  'count' => 1,
+  'values' => true,
+);
 
   return $expectedResult;
 }

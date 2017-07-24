@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,17 +28,13 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
 
 require_once 'Mail/mime.php';
-
-/**
- * Class CRM_Mailing_Event_BAO_Subscribe
- */
 class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
 
   /**
@@ -52,10 +48,8 @@ class CRM_Mailing_Event_BAO_Subscribe extends CRM_Mailing_Event_DAO_Subscribe {
    * Register a subscription event.  Create a new contact if one does not
    * already exist.
    *
-   * @param int $group_id The group id to subscribe to
-   * @param string $email The email address of the (new) contact
-   * @param null $contactId
-   * @param null $context
+   * @param int $group_id         The group id to subscribe to
+   * @param string $email         The email address of the (new) contact
    * @params int $contactId       Currently used during event registration/contribution.
    *                              Specifically to avoid linking group to wrong duplicate contact
    *                              during event registration.
@@ -291,9 +285,9 @@ SELECT     civicrm_email.id as email_id
     $mailer = $config->getMailer();
 
     if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      CRM_Core_Error::ignoreException();
       $mailer->send($email, $h, $b);
-      unset($errorScope);
+      CRM_Core_Error::setCallback();
     }
   }
 
@@ -367,13 +361,7 @@ SELECT     civicrm_email.id as email_id
    * @params  int    $contactId  Currently used during event registration/contribution.
    *                             Specifically to avoid linking group to wrong duplicate contact
    *                             during event registration.
-   *
    * @public
-   *
-   * @param $groups
-   * @param $params
-   * @param null $contactId
-   * @param null $context
    *
    * @return void
    * @static

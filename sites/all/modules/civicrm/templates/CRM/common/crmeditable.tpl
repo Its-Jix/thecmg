@@ -1,6 +1,6 @@
 <script>
 {literal}
-CRM.$(function($) {
+cj(function ($){
   $('.crm-editable').crmEditable ();
 });
 </script>

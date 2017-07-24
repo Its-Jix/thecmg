@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -169,7 +169,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     if (is_array($groups) && !empty($groups)) {
       $hasExistingGroups = TRUE;
       $this->addElement('select', 'groups', ts('Add respondent(s) to existing group(s)'),
-        $groups, array('multiple' => "multiple", 'class' => 'crm-select2')
+        $groups, array('multiple' => "multiple", 'size' => 5)
       );
     }
     $this->assign('hasExistingGroups', $hasExistingGroups);
@@ -205,9 +205,6 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *
    * @param array $fields posted values of the form
    *
-   * @param $files
-   * @param $self
-   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -215,7 +212,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
   static function formRule($fields, $files, $self) {
     $errors = array();
     $invalidGroupName = FALSE;
-    if (!empty($fields['newGroupName'])) {
+    if (CRM_Utils_Array::value('newGroupName', $fields)) {
       $title  = trim($fields['newGroupName']);
       $name   = CRM_Utils_String::titleToVar($title);
       $query  = 'select count(*) from civicrm_group where name like %1 OR title like %2';
@@ -237,7 +234,7 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     //add reservation.
@@ -303,11 +300,6 @@ class CRM_Campaign_Form_Task_Reserve extends CRM_Campaign_Form_Task {
     }
   }
 
-  /**
-   * @param $contactIds
-   *
-   * @return array
-   */
   private function _addRespondentToGroup($contactIds) {
     $groupAdditions = array();
     if (empty($contactIds)) {

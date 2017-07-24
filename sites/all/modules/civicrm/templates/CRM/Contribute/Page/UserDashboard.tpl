@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -72,7 +72,6 @@
                 <tr class="columnheader">
                     <th >{ts}Contributor{/ts}</th>
                     <th>{ts}Amount{/ts}</th>
-                    <th>{ts}Type{/ts}</th>
                     <th>{ts}Financial Type{/ts}</th>
                     <th>{ts}Received date{/ts}</th>
                     <th>{ts}Receipt Sent{/ts}</th>
@@ -82,7 +81,6 @@
                     <tr id='rowid{$row.honorId}' class="{cycle values="odd-row,even-row"}">
                         <td><a href="{crmURL p="civicrm/contact/view" q="reset=1&cid=`$row.honorId`"}" id="view_contact">{$row.display_name}</a></td>
                         <td>{$row.amount}</td>
-                        <td>{$row.honor_type}</td>
                         <td>{$row.type}</td>
                         <td>{$row.receive_date|truncate:10:''|crmDate}</td>
                         <td>{$row.receipt_date|truncate:10:''|crmDate}</td>

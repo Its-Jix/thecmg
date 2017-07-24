@@ -2,9 +2,9 @@
 
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -96,21 +96,19 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
    * @return object
    */
   static function add(&$params, &$ids = array()) {
-    if(empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
-      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
-      $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
-    }
+    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, false);
+    $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, false);
+    $params['is_reserved'] = CRM_Utils_Array::value('is_reserved', $params, false);
 
     // action is taken depending upon the mode
     $financialType = new CRM_Financial_DAO_FinancialType();
     $financialType->copyValues($params);
-    if (!empty($ids['financialType'])) {
+    if (CRM_Utils_Array::value('financialType', $ids)) {
       $financialType->id = CRM_Utils_Array::value('financialType', $ids);
     }
     $financialType->save();
     // CRM-12470
-    if (empty($ids['financialType']) && empty($params['id'])) {
+    if (!CRM_Utils_Array::value('financialType', $ids)) {
       $titles = CRM_Financial_BAO_FinancialTypeAccount::createDefaultFinancialAccounts($financialType);
       $financialType->titles = $titles;
     }
@@ -120,10 +118,7 @@ class CRM_Financial_BAO_FinancialType extends CRM_Financial_DAO_FinancialType {
   /**
    * Function to delete financial Types
    *
-   * @param $financialTypeId
-   *
-   * @return array|bool
-   * @internal param int $contributionTypeId
+   * @param int $contributionTypeId
    * @static
    */
   static function del($financialTypeId) {

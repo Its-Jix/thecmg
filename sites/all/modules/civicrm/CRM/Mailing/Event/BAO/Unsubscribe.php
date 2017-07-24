@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
 require_once 'Mail/mime.php';
-
-/**
- * Class CRM_Mailing_Event_BAO_Unsubscribe
- */
 class CRM_Mailing_Event_BAO_Unsubscribe extends CRM_Mailing_Event_DAO_Unsubscribe {
 
   /**
@@ -398,20 +394,18 @@ WHERE  email = %2
     $mailer = $config->getMailer();
 
     if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      CRM_Core_Error::ignoreException();
       $mailer->send($eq->email, $h, $b);
-      unset($errorScope);
+      CRM_Core_Error::setCallback();
     }
   }
 
   /**
    * Get row count for the event selector
    *
-   * @param int $mailing_id ID of the mailing
-   * @param int $job_id Optional ID of a job to filter on
-   * @param boolean $is_distinct Group by queue ID?
-   *
-   * @param null $org_unsubscribe
+   * @param int $mailing_id       ID of the mailing
+   * @param int $job_id           Optional ID of a job to filter on
+   * @param boolean $is_distinct  Group by queue ID?
    *
    * @return int                  Number of rows in result set
    * @access public
@@ -467,14 +461,13 @@ WHERE  email = %2
   /**
    * Get rows for the event browser
    *
-   * @param int $mailing_id ID of the mailing
-   * @param int $job_id optional ID of the job
-   * @param boolean $is_distinct Group by queue id?
-   * @param int $offset Offset
-   * @param int $rowCount Number of rows
-   * @param array $sort sort array
+   * @param int $mailing_id       ID of the mailing
+   * @param int $job_id           optional ID of the job
+   * @param boolean $is_distinct  Group by queue id?
+   * @param int $offset           Offset
+   * @param int $rowCount         Number of rows
+   * @param array $sort           sort array
    *
-   * @param null $org_unsubscribe
    * @return array                Result set
    * @access public
    * @static
@@ -559,19 +552,13 @@ WHERE  email = %2
       $results[] = array(
         'name' => "<a href=\"$url\">{$dao->display_name}</a>",
         'email' => $dao->email,
-        // Next value displays in selector under either Unsubscribe OR Optout column header, so always s/b Yes.
-        'unsubOrOptout' => ts('Yes'),
+        'org' => $dao->org_unsubscribe ? ts('Yes') : ts('No'),
         'date' => CRM_Utils_Date::customFormat($dao->date),
       );
     }
     return $results;
   }
 
-  /**
-   * @param $queueID
-   *
-   * @return array
-   */
   public static function getContactInfo($queueID) {
     $query = "
 SELECT DISTINCT(civicrm_mailing_event_queue.contact_id) as contact_id,

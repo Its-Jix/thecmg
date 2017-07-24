@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
 require_once 'Mail/mime.php';
-
-/**
- * Class CRM_Mailing_Event_BAO_Resubscribe
- */
 class CRM_Mailing_Event_BAO_Resubscribe {
 
   /**
@@ -287,9 +283,9 @@ class CRM_Mailing_Event_BAO_Resubscribe {
     $mailer = $config->getMailer();
 
     if (is_object($mailer)) {
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      CRM_Core_Error::ignoreException();
       $mailer->send($eq->email, $h, $b);
-      unset($errorScope);
+      CRM_Core_Error::setCallback();
     }
   }
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -52,10 +52,6 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   // set to the id that we’re reverting at the given moment (if we are)
   protected $_revertedId;
 
-  /**
-   * @param null $title
-   * @param null $mode
-   */
   function __construct($title = NULL, $mode = NULL) {
     parent::__construct($title, $mode);
 
@@ -104,12 +100,14 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_MessageTemplate' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable this message template'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_MessageTemplate' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable this message template'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -136,14 +134,6 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     return self::$_links;
   }
 
-  /**
-   * @param CRM_Core_DAO $object
-   * @param int $action
-   * @param array $values
-   * @param array $links
-   * @param string $permission
-   * @param bool $forceAction
-   */
   function action(&$object, $action, &$values, &$links, $permission, $forceAction = FALSE) {
     if ($object->workflow_id) {
       // do not expose action link for reverting to default if the template did not diverge or we just reverted it now
@@ -165,13 +155,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
       $values['action'] = CRM_Core_Action::formLink($links, $action, array(
         'id' => $object->id,
           'orig_id' => CRM_Utils_Array::value($object->id, $this->_revertible),
-        ),
-        ts('more'),
-        FALSE,
-        'messageTemplate.manage.action',
-        'MessageTemplate',
-        $object->id
-      );
+        ));
     }
     else {
       $action &= ~CRM_Core_Action::REVERT;
@@ -180,13 +164,6 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
     }
   }
 
-  /**
-   * @param null $args
-   * @param null $pageArgs
-   * @param null $sort
-   *
-   * @throws Exception
-   */
   function run($args = NULL, $pageArgs = NULL, $sort = NULL) {
     // handle the revert action and offload the rest to parent
     if (CRM_Utils_Request::retrieve('action', 'String', $this) & CRM_Core_Action::REVERT) {
@@ -227,8 +204,6 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
-   * @param null $mode
-   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -238,7 +213,7 @@ class CRM_Admin_Page_MessageTemplates extends CRM_Core_Page_Basic {
   /**
    * browse all entities.
    *
-   * @internal param int $action
+   * @param int $action
    *
    * @return void
    * @access public

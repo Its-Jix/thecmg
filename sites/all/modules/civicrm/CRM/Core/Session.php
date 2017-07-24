@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,10 +27,6 @@
 
 
 require_once "PEAR.php";
-
-/**
- * Class CRM_Core_Session
- */
 class CRM_Core_Session {
 
   /**
@@ -83,7 +79,7 @@ class CRM_Core_Session {
    * This constructor is invoked whenever any module requests an instance of
    * the session and one is not available.
    *
-   * @return \CRM_Core_Session
+   * @return void
    */
   function __construct() {
     $this->_session = null;
@@ -153,8 +149,6 @@ class CRM_Core_Session {
    *
    * @access public
    *
-   * @param int $all
-   *
    * @return void
    */
   function reset($all = 1) {
@@ -189,7 +183,7 @@ class CRM_Core_Session {
       return;
     }
 
-    if (empty($this->_session[$this->_key][$prefix])) {
+    if (!CRM_Utils_Array::value($prefix, $this->_session[$this->_key])) {
       $this->_session[$this->_key][$prefix] = array();
     }
   }
@@ -519,14 +513,11 @@ class CRM_Core_Session {
         'text' => $text,
         'title' => $title,
         'type' => $type,
-        'options' => $options ? $options : NULL,
+        'options' => $options ? json_encode($options) : NULL,
       );
     }
   }
 
-  /**
-   * @param $names
-   */
   static function registerAndRetrieveSessionObjects($names) {
     if (!is_array($names)) {
       $names = array($names);
@@ -542,9 +533,6 @@ class CRM_Core_Session {
     CRM_Core_BAO_Cache::restoreSessionFromCache($names);
   }
 
-  /**
-   * @param bool $reset
-   */
   static function storeSessionObjects($reset = TRUE) {
     if (empty(self::$_managedNames)) {
       return;
@@ -569,9 +557,6 @@ class CRM_Core_Session {
     return $session->get('userID');
   }
 
-  /**
-   * @return bool
-   */
   function isEmpty() {
     // check if session is empty, if so we dont cache
     // stuff that we can get away with

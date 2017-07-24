@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  *
  */
 
@@ -64,7 +64,8 @@ class CRM_Campaign_Page_AJAX {
       }
     }
 
-    if (isset($_POST['field']) && !empty($_POST['field'][$voterId]) &&
+    if (isset($_POST['field']) &&
+      CRM_Utils_Array::value($voterId, $_POST['field']) &&
       is_array($_POST['field'][$voterId])
     ) {
       foreach ($_POST['field'][$voterId] as $fieldKey => $value) {
@@ -106,8 +107,7 @@ class CRM_Campaign_Page_AJAX {
 
   static function loadOptionGroupDetails() {
 
-    $id       = CRM_Utils_Array::value('option_group_id', $_POST);
-    $status   = 'fail';
+    $id = CRM_Utils_Request::retrieve('option_group_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
     $opValues = array();
 
     if ($id) {
@@ -115,7 +115,7 @@ class CRM_Campaign_Page_AJAX {
       CRM_Core_OptionValue::getValues($groupParams, $opValues);
     }
 
-    $surveyId = CRM_Utils_Array::value('survey_id', $_POST);
+    $surveyId = CRM_Utils_Request::retrieve('survey_id', 'Integer', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
     if ($surveyId) {
       $survey            = new CRM_Campaign_DAO_Survey();
       $survey->id        = $surveyId;
@@ -146,11 +146,12 @@ class CRM_Campaign_Page_AJAX {
 
   function voterList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (CRM_Utils_Array::value($param, $_POST)) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -177,7 +178,7 @@ class CRM_Campaign_Page_AJAX {
     $interviewerId = $surveyTypeId = $surveyId = NULL;
     $searchVoterFor = $params['campaign_search_voter_for'];
     if ($searchVoterFor == 'reserve') {
-      if (!empty($params['campaign_survey_id'])) {
+      if (CRM_Utils_Array::value('campaign_survey_id', $params)) {
         $survey = new CRM_Campaign_DAO_Survey();
         $survey->id = $surveyId = $params['campaign_survey_id'];
         $survey->selectAdd('campaign_id, activity_type_id');
@@ -253,7 +254,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (!empty($_POST[$pValues['name']])) {
+      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort')$$pName = $selectorCols[$$pName];
       }
@@ -347,6 +348,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -370,7 +372,7 @@ class CRM_Campaign_Page_AJAX {
     elseif ($operation == 'reserve') {
       $activityId = NULL;
       $createActivity = TRUE;
-      if (!empty($_POST['activity_id'])) {
+      if (CRM_Utils_Array::value('activity_id', $_POST)) {
         $activityId = CRM_Utils_Type::escape($_POST['activity_id'], 'Integer');
         if ($activityId) {
           $createActivity = FALSE;
@@ -551,11 +553,12 @@ class CRM_Campaign_Page_AJAX {
    **/
   function campaignList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (CRM_Utils_Array::value($param, $_POST)) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -606,7 +609,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (!empty($_POST[$pValues['name']])) {
+      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort') {
           $$pName = $selectorCols[$$pName];
@@ -637,6 +640,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -647,11 +651,12 @@ class CRM_Campaign_Page_AJAX {
    **/
   function surveyList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (CRM_Utils_Array::value($param, $_POST)) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -704,7 +709,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (!empty($_POST[$pValues['name']])) {
+      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort') {
           $$pName = $selectorCols[$$pName];
@@ -735,6 +740,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
@@ -745,11 +751,12 @@ class CRM_Campaign_Page_AJAX {
    **/
   function petitionList() {
     //get the search criteria params.
-    $searchParams = explode(',', CRM_Utils_Array::value('searchCriteria', $_POST));
+    $searchCriteria = CRM_Utils_Request::retrieve('searchCriteria', 'String', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST' );
+    $searchParams = explode(',', $searchCriteria);
 
     $params = $searchRows = array();
     foreach ($searchParams as $param) {
-      if (!empty($_POST[$param])) {
+      if (CRM_Utils_Array::value($param, $_POST)) {
         $params[$param] = $_POST[$param];
       }
     }
@@ -797,7 +804,7 @@ class CRM_Campaign_Page_AJAX {
     );
     foreach ($dataTableParams as $pName => $pValues) {
       $$pName = $pValues['default'];
-      if (!empty($_POST[$pValues['name']])) {
+      if (CRM_Utils_Array::value($pValues['name'], $_POST)) {
         $$pName = CRM_Utils_Type::escape($_POST[$pValues['name']], $pValues['type']);
         if ($pName == 'sort') {
           $$pName = $selectorCols[$$pName];
@@ -828,6 +835,7 @@ class CRM_Campaign_Page_AJAX {
 
     $iFilteredTotal = $iTotal;
 
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($searchRows, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

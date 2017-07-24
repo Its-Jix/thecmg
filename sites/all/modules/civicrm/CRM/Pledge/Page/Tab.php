@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -48,19 +48,12 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     $controller->reset();
     $controller->set('cid', $this->_contactId);
     $controller->set('context', 'pledge');
-    $controller->set('limit', '25');
     $controller->process();
     $controller->run();
 
     if ($this->_contactId) {
       $displayName = CRM_Contact_BAO_Contact::displayName($this->_contactId);
       $this->assign('displayName', $displayName);
-      $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('pledge', $this->_contactId);
-      // Refresh other tabs with related data
-      $this->ajaxResponse['updateTabs'] = array(
-        '#tab_contribute' => CRM_Contact_BAO_Contact::getCountComponent('contribution', $this->_contactId),
-        '#tab_activity' => CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId),
-      );
     }
   }
 
@@ -114,6 +107,9 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       // check logged in url permission
       CRM_Contact_Page_View::checkUserPermission($this);
+
+      // set page title
+      CRM_Contact_Page_View::setTitle($this->_contactId);
     }
 
     $this->assign('action', $this->_action);
@@ -135,9 +131,9 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     $this->preProcess();
 
     // check if we can process credit card registration
-    $this->assign('newCredit', CRM_Core_Config::isEnabledBackOfficeCreditCardPayments());
+    CRM_Core_Payment::allowBackofficeCreditCard($this);
 
-    self::setContext($this);
+    $this->setContext();
 
     if ($this->_action & CRM_Core_Action::VIEW) {
       $this->view();
@@ -158,10 +154,10 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
     return parent::run();
   }
 
-  public static function setContext(&$form) {
-    $context = CRM_Utils_Request::retrieve('context', 'String', $form, FALSE, 'search');
+  function setContext() {
+    $context = CRM_Utils_Request::retrieve('context', 'String', $this, FALSE, 'search');
 
-    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $form);
+    $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
     //validate the qfKey
     if (!CRM_Utils_Rule::qfKey($qfKey)) {
       $qfKey = NULL;
@@ -188,7 +184,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'pledge':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$form->_contactId}&selectedChild=pledge"
+          "reset=1&force=1&cid={$this->_contactId}&selectedChild=pledge"
         );
         break;
 
@@ -198,7 +194,7 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       case 'activity':
         $url = CRM_Utils_System::url('civicrm/contact/view',
-          "reset=1&force=1&cid={$form->_contactId}&selectedChild=activity"
+          "reset=1&force=1&cid={$this->_contactId}&selectedChild=activity"
         );
         break;
 
@@ -208,8 +204,8 @@ class CRM_Pledge_Page_Tab extends CRM_Core_Page {
 
       default:
         $cid = NULL;
-        if ($form->_contactId) {
-          $cid = '&cid=' . $form->_contactId;
+        if ($this->_contactId) {
+          $cid = '&cid=' . $this->_contactId;
         }
         $url = CRM_Utils_System::url('civicrm/pledge/search',
           'force=1' . $cid

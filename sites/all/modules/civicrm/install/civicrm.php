@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -62,10 +62,6 @@ function civicrm_setup($filesDirectory) {
   $compileDir = addslashes($compileDir);
 }
 
-/**
- * @param $name
- * @param $buffer
- */
 function civicrm_write_file($name, &$buffer) {
   $fd = fopen($name, "w");
   if (!$fd) {
@@ -75,9 +71,6 @@ function civicrm_write_file($name, &$buffer) {
   fclose($fd);
 }
 
-/**
- * @param $config
- */
 function civicrm_main(&$config) {
   global $sqlPath, $crmPath, $cmsPath, $installType;
 
@@ -128,11 +121,6 @@ function civicrm_main(&$config) {
 
 }
 
-/**
- * @param $dsn
- * @param $fileName
- * @param bool $lineMode
- */
 function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   global $crmPath;
 
@@ -142,7 +130,6 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   if (PEAR::isError($db)) {
     die("Cannot open $dsn: " . $db->getMessage());
   }
-  $db->query("SET NAMES utf8");
 
   $db->query("SET NAMES utf8");
 
@@ -186,11 +173,6 @@ function civicrm_source($dsn, $fileName, $lineMode = FALSE) {
   }
 }
 
-/**
- * @param $config
- *
- * @return string
- */
 function civicrm_config(&$config) {
   global $crmPath, $comPath;
   global $compileDir;
@@ -243,9 +225,6 @@ function civicrm_config(&$config) {
   return trim($str);
 }
 
-/**
- * @return string
- */
 function civicrm_cms_base() {
   global $installType;
 
@@ -296,9 +275,6 @@ function civicrm_cms_base() {
   return $url . $baseURL;
 }
 
-/**
- * @return string
- */
 function civicrm_home_url() {
   $drupalURL = civicrm_cms_base();
   return $drupalURL . 'index.php?q=civicrm';

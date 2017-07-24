@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_mail_settings
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  */
 
 /**
@@ -60,13 +60,13 @@ function _civicrm_api3_mail_settings_create_spec(&$params) {
 }
 
 /**
- * Returns array of mail_settings  matching a set of one or more group properties
+ * Returns array of mail_settingss  matching a set of one or more group properties
  *
- * @param array $params  Array of one or more valid
+ * @param array $params  (referance) Array of one or more valid
  *                       property_name=>value pairs. If $params is set
- *                       as null, all mail_settings will be returned
+ *                       as null, all mail_settingss will be returned
  *
- * @return array Array of matching mail_settings
+ * @return array  (referance) Array of matching mail_settingss
  * {@getfields mail_settings_get}
  * @access public
  */
@@ -80,10 +80,11 @@ function civicrm_api3_mail_settings_get($params) {
  * This method is used to delete any existing mail_settings. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
+ * @param array $params  (reference) array containing id of the group
  *                       to be deleted
  *
- * @return array api result array
+ * @return array  returns flag true if successfull, error
+ *                message otherwise
  * {@getfields mail_settings_delete}
  * @access public
  */

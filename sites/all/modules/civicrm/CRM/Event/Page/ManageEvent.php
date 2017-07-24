@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -70,12 +70,14 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       self::$_actionLinks = array(
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_Event' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable Event'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_Event' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable Event'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -100,8 +102,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
   /**
    * Get tab  Links for events
    *
-   * @param $enableCart
-   *
    * @return array (reference) of tab links
    */
   static function &tabs($enableCart) {
@@ -110,58 +110,48 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
       self::$_tabLinks = array();
     }
     if (!isset(self::$_tabLinks[$cacheKey])) {
-      self::$_tabLinks[$cacheKey]['settings'] =
-        array(
+      self::$_tabLinks[$cacheKey] = array(
+        'settings' => array(
           'title' => ts('Info and Settings'),
           'url' => 'civicrm/event/manage/settings',
           'field' => 'id'
-        );
-      self::$_tabLinks[$cacheKey]['location'] =
-        array(
+        ),
+        'location' => array(
           'title' => ts('Location'),
           'url' => 'civicrm/event/manage/location',
           'field' => 'loc_block_id',
-        );
-
-      self::$_tabLinks[$cacheKey]['fee'] =
-        array(
+        ),
+        'fee' => array(
           'title' => ts('Fees'),
           'url' => 'civicrm/event/manage/fee',
           'field' => 'is_monetary',
-        );
-      self::$_tabLinks[$cacheKey]['registration'] =
-        array(
+        ),
+        'registration' => array(
           'title' => ts('Online Registration'),
           'url' => 'civicrm/event/manage/registration',
           'field' => 'is_online_registration',
-        );
-      if (CRM_Core_Permission::check('administer CiviCRM')) {
-      self::$_tabLinks[$cacheKey]['reminder'] =
-        array(
+        ),
+        'reminder' => array(
           'title' => ts('Schedule Reminders'),
           'url' => 'civicrm/event/manage/reminder',
           'field' => 'reminder',
-        );
-      }
-      self::$_tabLinks[$cacheKey]['conference'] =
-        array(
+        ),
+        'conference' => array(
           'title' => ts('Conference Slots'),
           'url' => 'civicrm/event/manage/conference',
           'field' => 'slot_label_id',
-        );
-      self::$_tabLinks[$cacheKey]['friend'] =
-        array(
+        ),
+        'friend' => array(
           'title' => ts('Tell a Friend'),
           'url' => 'civicrm/event/manage/friend',
           'field' => 'friend',
-        );
-      self::$_tabLinks[$cacheKey]['pcp'] =
-        array(
+        ),
+        'pcp' => array(
           'title' => ts('Personal Campaign Pages'),
           'url' => 'civicrm/event/manage/pcp',
           'field' => 'is_pcp_enabled',
-        );
-
+        ),
+      );
     }
 
     if (!$enableCart) {
@@ -240,7 +230,6 @@ class CRM_Event_Page_ManageEvent extends CRM_Core_Page {
    * @return void
    */
   function browse() {
-    $this->assign('includeWysiwygEditor', TRUE);
     $this->_sortByCharacter = CRM_Utils_Request::retrieve('sortByCharacter',
       'String',
       $this
@@ -334,10 +323,7 @@ ORDER BY start_date desc
           $action,
           array('id' => $dao->id),
           ts('more'),
-          TRUE,
-          'event.manage.list',
-          'Event',
-          $dao->id
+          TRUE
         );
 
         $params = array(
@@ -362,7 +348,7 @@ ORDER BY start_date desc
         $manageEvent[$dao->id]['reminder'] = CRM_Core_BAO_ActionSchedule::isConfigured($dao->id, $mappingID);
         $manageEvent[$dao->id]['is_pcp_enabled'] = CRM_Utils_Array::value($dao->id, $eventPCPS);
         $manageEvent[$dao->id]['event_type'] = CRM_Utils_Array::value($manageEvent[$dao->id]['event_type_id'], $eventType);
-
+        
         // allow hooks to set 'field' value which allows configuration pop-up to show a tab as enabled/disabled
         CRM_Utils_Hook::tabset('civicrm/event/manage/rows', $manageEvent, array('event_id' => $dao->id));
       }
@@ -417,13 +403,6 @@ ORDER BY start_date desc
     $form->run();
   }
 
-  /**
-   * @param $params
-   * @param bool $sortBy
-   * @param $force
-   *
-   * @return string
-   */
   function whereClause(&$params, $sortBy = TRUE, $force) {
     $values    = array();
     $clauses   = array();
@@ -512,10 +491,6 @@ ORDER BY start_date desc
     return !empty($clauses) ? implode(' AND ', $clauses) : '(1)';
   }
 
-  /**
-   * @param $whereClause
-   * @param $whereParams
-   */
   function pager($whereClause, $whereParams) {
 
     $params['status'] = ts('Event %%StatusMessage%%');
@@ -538,10 +513,6 @@ SELECT count(id)
     $this->assign_by_ref('pager', $this->_pager);
   }
 
-  /**
-   * @param $whereClause
-   * @param $whereParams
-   */
   function pagerAtoZ($whereClause, $whereParams) {
 
     $query = "

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -52,12 +52,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     'pieChart' => 'Pie Chart',
   );
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     $this->_columns = array();
 
@@ -197,7 +191,20 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
       'grouping' => 'contact-fields',
     );
 
-    $this->_groupFilter = TRUE;
+    $this->_columns['civicrm_group'] = array(
+      'dao' => 'CRM_Contact_DAO_Group',
+      'alias' => 'cgroup',
+      'filters' => array(
+        'gid' => array(
+          'name' => 'group_id',
+          'title' => ts('Group'),
+          'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+          'group' => TRUE,
+          'options' => CRM_Core_PseudoConstant::nestedGroup(),
+        ),
+      ),
+    );
+
     $this->_tagFilter = TRUE;
     parent::__construct();
   }
@@ -214,7 +221,9 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (CRM_Utils_Array::value('required', $field) ||
+            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          ) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -232,7 +241,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     }
 
 
-    if (!empty($this->_params['charts'])) {
+    if (CRM_Utils_Array::value('charts', $this->_params)) {
       $select[] = "COUNT({$this->_aliases['civicrm_mailing_event_bounce']}.id) as civicrm_mailing_bounce_count";
       $this->_columnHeaders["civicrm_mailing_bounce_count"]['title'] = ts('Bounce Count');
     }
@@ -240,13 +249,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  /**
-   * @param $fields
-   * @param $files
-   * @param $self
-   *
-   * @return array
-   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -288,7 +290,7 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
   }
 
   function groupBy() {
-    if (!empty($this->_params['charts'])) {
+    if (CRM_Utils_Array::value('charts', $this->_params)) {
       $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_mailing']}.id";
     }
     else {
@@ -312,9 +314,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     $this->endPostProcess($rows);
   }
 
-  /**
-   * @param $rows
-   */
   function buildChart(&$rows) {
     if (empty($rows)) {
       return;
@@ -335,9 +334,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     $this->assign('chartType', $this->_params['charts']);
   }
 
-  /**
-   * @return array
-   */
   function bounce_type() {
 
     $data = array('' => '--Please Select--');
@@ -353,9 +349,6 @@ class CRM_Report_Form_Mailing_Bounce extends CRM_Report_Form {
     return $data;
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,20 +35,20 @@
  * To do this, perform a 'get' action to load the existing values, then merge in the updates
  * and call 'create' to save the revised entity.
  *
- * @param array $apiRequest array with keys:
+ * @param $apiRequest an array with keys:
  *  - entity: string
  *  - action: string
  *  - version: string
  *  - function: callback (mixed)
  *  - params: array, varies
- *
- * @return array|int|mixed
  */
 function civicrm_api3_generic_update($apiRequest) {
+  $errorFnName = 'civicrm_api3_create_error';
+
   //$key_id = strtolower ($apiRequest['entity'])."_id";
   $key_id = "id";
   if (!array_key_exists($key_id, $apiRequest['params'])) {
-    return civicrm_api3_create_error("Mandatory parameter missing $key_id");
+    return $errorFnName("Mandatory parameter missing $key_id");
   }
   // @fixme
   // tests show that contribution works better with create
@@ -62,13 +62,14 @@ function civicrm_api3_generic_update($apiRequest) {
     return $existing;
   }
   if ($existing['count'] > 1) {
-    return civicrm_api3_create_error("More than one " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
+    return $errorFnName("More than one " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
   }
   if ($existing['count'] == 0) {
-    return civicrm_api3_create_error("No " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
+    return $errorFnName("No " . $apiRequest['entity'] . " with id " . $apiRequest['params'][$key_id]);
   }
 
   $existing = array_pop($existing['values']);
   $p = array_merge($existing, $apiRequest['params']);
   return civicrm_api($apiRequest['entity'], 'create', $p);
 }
+

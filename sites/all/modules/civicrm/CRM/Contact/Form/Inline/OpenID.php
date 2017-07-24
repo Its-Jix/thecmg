@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -99,23 +99,25 @@ class CRM_Contact_Form_Inline_OpenID extends CRM_Contact_Form_Inline {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
-   * @param array $errors list of errors to be posted back to the form
+   * @param array $fields     posted values of the form
+   * @param array $errors     list of errors to be posted back to the form
    *
-   * @return array $errors@static
+   * @return $errors
+   * @static
    * @access public
    */
   static function formRule($fields, $errors) {
     $hasData = $hasPrimary = $errors = array();
-    if (!empty($fields['openid']) && is_array($fields['openid'])) {
+    if (CRM_Utils_Array::value('openid', $fields) && is_array($fields['openid'])) {
       foreach ($fields['openid'] as $instance => $blockValues) {
         $dataExists = CRM_Contact_Form_Contact::blockDataExists($blockValues);
 
         if ($dataExists) {
           $hasData[] = $instance;
-          if (!empty($blockValues['is_primary'])) {
+          if (CRM_Utils_Array::value('is_primary', $blockValues)) {
             $hasPrimary[] = $instance;
-            if (!$primaryID && !empty($blockValues['openid'])) {
+            if (!$primaryID &&
+              CRM_Utils_Array::value('openid', $blockValues)) {
                 $primaryID = $blockValues['openid'];
             }
           }

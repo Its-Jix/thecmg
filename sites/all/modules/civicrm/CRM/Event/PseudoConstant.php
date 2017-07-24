@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -97,10 +97,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
-   * @param bool $all
-   * @param null $condition
-   *
    * @return array - array of all events if any
    * @static
    */
@@ -134,11 +130,7 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
-   * @param null $cond
-   * @param string $retColumn
-   *
-   * @internal param $string - $retColumn  tells populate() whether to return 'name' (default) or 'label' values
+   * @param  string - $retColumn  tells populate() whether to return 'name' (default) or 'label' values
    *
    * @return array  - array reference of all participant statuses if any
    * @static
@@ -185,9 +177,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
-   * @param null $cond
-   *
    * @return array - array reference of all participant roles if any
    * @static
    */
@@ -218,8 +207,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
-   *
    * @return array - array reference of all participant listings if any
    * @static
    */
@@ -241,7 +228,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
    * @return array - array reference of all event types.
    * @static
    */
@@ -260,8 +246,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
 
   /**
    * get event template titles
-   *
-   * @param null $id
    *
    * @return array  of event id → template title pairs
    */
@@ -288,7 +272,8 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param boolean $name pseudoconstant to be flushed
+   *
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {
@@ -301,7 +286,6 @@ class CRM_Event_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
    * @return array - array reference of all pcp if any
    * @static
    */

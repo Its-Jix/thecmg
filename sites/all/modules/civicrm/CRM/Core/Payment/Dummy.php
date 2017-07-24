@@ -24,14 +24,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
   protected $_mode = NULL;
 
   protected $_params = array();
-  protected $_doDirectPaymentResult = array();
-
-  /**
-   * @param array $doDirectPaymentResult
-   */
-  public function setDoDirectPaymentResult($doDirectPaymentResult) {
-    $this->_doDirectPaymentResult = $doDirectPaymentResult;
-  }
 
   /**
    * We only need one instance of this object. So we use the singleton
@@ -47,9 +39,7 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_Dummy
+   * @return void
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
@@ -62,12 +52,9 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param object $paymentProcessor
-   * @param null $paymentForm
-   * @param bool $force
-   *
    * @return object
    * @static
+   *
    */
   static function &singleton($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
     $processorName = $paymentProcessor['name'];
@@ -98,10 +85,8 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
       $params,
       $cookedParams
     );
-    //end of hook invocation
-    if (!empty($this->_doDirectPaymentResult)) {
-      return $this->_doDirectPaymentResult;
-    }
+    //end of hook invokation
+
     if ($this->_mode == 'test') {
       $query             = "SELECT MAX(trxn_id) FROM civicrm_contribution WHERE trxn_id LIKE 'test\\_%'";
       $p                 = array();
@@ -122,12 +107,6 @@ class CRM_Core_Payment_Dummy extends CRM_Core_Payment {
     return $params;
   }
 
-  /**
-   * @param null $errorCode
-   * @param null $errorMessage
-   *
-   * @return object
-   */
   function &error($errorCode = NULL, $errorMessage = NULL) {
     $e = CRM_Core_Error::singleton();
     if ($errorCode) {

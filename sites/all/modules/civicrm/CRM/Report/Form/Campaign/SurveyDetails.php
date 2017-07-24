@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -47,12 +47,6 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   private static $_surveyRespondentStatus;
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     //filter options for survey activity status.
     $responseStatus = array('' => '- Any -');
@@ -90,6 +84,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         'fields' => array('contact_id' => array('title' => ts('Interviewer Name'))),
         'filters' => array(
           'contact_id' => array('name' => 'contact_id',
+            'alias' => 'civicrm_activity_assignment',
             'title' => ts('Interviewer Name'),
             'type' => CRM_Utils_Type::T_INT,
             'operatorType' =>
@@ -291,7 +286,8 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         continue;
       }
       foreach ($table['fields'] as $fieldName => $field) {
-        if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName]) || CRM_Utils_Array::value('is_required', $field)
+        if (CRM_Utils_Array::value('required', $field) ||
+          CRM_Utils_Array::value($fieldName, $this->_params['fields']) || CRM_Utils_Array::value('is_required', $field)
         ) {
 
           $fieldsName = CRM_Utils_Array::value(1, explode('_', $tableName));
@@ -325,8 +321,8 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
                       ( {$this->_aliases['civicrm_contact']}.id = civicrm_activity_target.contact_id AND civicrm_activity_target.record_type_id = {$targetID}) \n";
     $this->_from .= " INNER JOIN civicrm_activity {$this->_aliases['civicrm_activity']} ON
                       ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_target.activity_id )\n";
-    $this->_from .= " INNER JOIN civicrm_activity_contact activity_contact_civireport ON
-                      ( {$this->_aliases['civicrm_activity']}.id = activity_contact_civireport.activity_id  AND activity_contact_civireport.record_type_id = {$assigneeID} )\n";
+    $this->_from .= " INNER JOIN civicrm_activity_contact civicrm_activity_assignment ON
+                      ( {$this->_aliases['civicrm_activity']}.id = civicrm_activity_assignment.activity_id  AND civicrm_activity_assignment.record_type_id = {$assigneeID} )\n";
 
     //get the address table.
     $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases['civicrm_address']} ON
@@ -344,7 +340,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
     if($this->_locationBasedPhoneField){
       foreach($this->_surveyResponseFields as $key => $value){
-        if(substr($key,0,5) == 'phone' && !empty($value['location_type_id'])){
+        if(substr($key,0,5) == 'phone' && CRM_Utils_Array::value('location_type_id',$value)){
           $fName = str_replace('-','_',$key);
           $this->_from .= "LEFT JOIN civicrm_phone ".$this->_aliases["civicrm_phone_{$fName}"]." ON {$this->_aliases['civicrm_contact']}.id = ".$this->_aliases["civicrm_phone_{$fName}"].".contact_id AND ".$this->_aliases["civicrm_phone_{$fName}"].".location_type_id = {$value['location_type_id']} AND ".$this->_aliases["civicrm_phone_{$fName}"].".phone_type_id = {$value['phone_type_id']}\n";
         }
@@ -502,9 +498,6 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
 
   }
 
-  /**
-   * @return bool|mixed|null|string
-   */
   private function _surveyCoverSheet() {
     $coverSheet = NULL;
     $surveyIds = CRM_Utils_Array::value('survey_id_value', $this->_params);
@@ -520,7 +513,7 @@ class CRM_Report_Form_Campaign_SurveyDetails extends CRM_Report_Form {
         continue;
       }
       foreach ($values['fields'] as $name => $field) {
-        if (!empty($field['isSurveyResponseField'])) {
+        if (CRM_Utils_Array::value('isSurveyResponseField', $field)) {
           $fldId = substr($name, 7);
           $fieldIds[$fldId] = $fldId;
           $title = CRM_Utils_Array::value('label', $field, $field['title']);
@@ -577,9 +570,6 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
     return $coverSheet;
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
 
     //format the survey result data.
@@ -622,8 +612,8 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
       }
 
 
-      if (array_key_exists('civicrm_activity_contact_contact_id', $row)) {
-        $rows[$rowNum]['civicrm_activity_contact_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_contact_contact_id'],
+      if (array_key_exists('civicrm_activity_assignment_assignee_contact_id', $row)) {
+        $rows[$rowNum]['civicrm_activity_assignment_assignee_contact_id'] = CRM_Utils_Array::value($row['civicrm_activity_assignment_assignee_contact_id'],
           CRM_Campaign_BAO_Survey::getInterviewers()
         );
         $entryFound = TRUE;
@@ -645,12 +635,10 @@ INNER JOIN  civicrm_option_value val ON ( val.option_group_id = survey.result_id
     }
   }
 
-  /**
-   * @param $rows
-   */
   private function _formatSurveyResult(&$rows) {
     $surveyIds = CRM_Utils_Array::value('survey_id_value', $this->_params);
-    if (CRM_Utils_System::isNull($surveyIds) || empty($this->_params['fields']['result']) ||
+    if (CRM_Utils_System::isNull($surveyIds) ||
+      !CRM_Utils_Array::value('result', $this->_params['fields']) ||
       !in_array($this->_outputMode, array('print', 'pdf'))
     ) {
       return;
@@ -678,7 +666,7 @@ INNER JOIN  civicrm_survey survey ON ( survey.result_id = grp.id )
 
     $surveyId = CRM_Utils_Array::value(0, $surveyIds);
     foreach ($rows as & $row) {
-      if (!empty($row['civicrm_activity_survey_id'])) {
+      if (CRM_Utils_Array::value('civicrm_activity_survey_id', $row)) {
         $surveyId = $row['civicrm_activity_survey_id'];
       }
       $result = CRM_Utils_Array::value($surveyId, $resultSet, array());
@@ -695,12 +683,11 @@ INNER JOIN  civicrm_survey survey ON ( survey.result_id = grp.id )
     }
   }
 
-  /**
-   * @param $rows
-   */
   private function _formatSurveyResponseData(&$rows) {
     $surveyIds = CRM_Utils_Array::value('survey_id_value', $this->_params);
-    if (CRM_Utils_System::isNull($surveyIds) || empty($this->_params['fields']['survey_response'])) {
+    if (CRM_Utils_System::isNull($surveyIds) ||
+      !CRM_Utils_Array::value('survey_response', $this->_params['fields'])
+    ) {
       return;
     }
 
@@ -711,7 +698,7 @@ INNER JOIN  civicrm_survey survey ON ( survey.result_id = grp.id )
         continue;
       }
       foreach ($values['fields'] as $name => $field) {
-        if (!empty($field['isSurveyResponseField'])) {
+        if (CRM_Utils_Array::value('isSurveyResponseField', $field)) {
           $fldId = substr($name, 7);
           $surveyResponseFields[$name] = "{$tableName}_{$name}";
           $surveyResponseFieldIds[$fldId] = $fldId;
@@ -726,7 +713,7 @@ INNER JOIN  civicrm_survey survey ON ( survey.result_id = grp.id )
     $hasResponseData = FALSE;
     foreach ($surveyResponseFields as $fldName) {
       foreach ($rows as $row) {
-        if (!empty($row[$fldName])) {
+        if (CRM_Utils_Array::value($fldName, $row)) {
           $hasResponseData = TRUE;
           break;
         }
@@ -820,7 +807,9 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
 
   private function _addSurveyResponseColumns() {
     $surveyIds = CRM_Utils_Array::value('survey_id_value', $this->_params);
-    if (CRM_Utils_System::isNull($surveyIds) || empty($this->_params['fields']['survey_response'])) {
+    if (CRM_Utils_System::isNull($surveyIds) ||
+      !CRM_Utils_Array::value('survey_response', $this->_params['fields'])
+    ) {
       return;
     }
 
@@ -830,7 +819,7 @@ INNER JOIN  civicrm_custom_group cg ON ( cg.id = cf.custom_group_id )
       $this->_surveyResponseFields = $responseFields;
     }
     foreach($responseFields as $key => $value){
-      if(substr($key,0,5) == 'phone' && !empty($value['location_type_id'])){
+      if(substr($key,0,5) == 'phone' && CRM_Utils_Array::value('location_type_id',$value)){
         $fName = str_replace('-','_',$key);
         $this->_columns["civicrm_{$fName}"] =
           array( 'dao' => 'CRM_Core_DAO_Phone',
@@ -882,7 +871,7 @@ INNER  JOIN  civicrm_custom_field cf ON ( cg.id = cf.custom_group_id )
         $this->_columns[$resTable]['dao'] = 'CRM_Contact_DAO_Contact';
         $this->_columns[$resTable]['extends'] = $response->extends;
       }
-      if (empty($this->_columns[$resTable]['alias'])) {
+      if (!CRM_Utils_Array::value('alias', $this->_columns[$resTable])) {
         $this->_columns[$resTable]['alias'] = "{$resTable}_survey_response";
       }
       if (!is_array(CRM_Utils_Array::value('fields', $this->_columns[$resTable]))) {

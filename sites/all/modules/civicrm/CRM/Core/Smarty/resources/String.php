@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,32 +37,15 @@ function civicrm_smarty_resource_string_get_template($tpl_name, &$tpl_source, &$
   return TRUE;
 }
 
-/**
- * @param $tpl_name
- * @param $tpl_timestamp
- * @param $smarty_obj
- *
- * @return bool
- */
 function civicrm_smarty_resource_string_get_timestamp($tpl_name, &$tpl_timestamp, &$smarty_obj) {
   $tpl_timestamp = time();
   return TRUE;
 }
 
-/**
- * @param $tpl_name
- * @param $smarty_obj
- *
- * @return bool
- */
 function civicrm_smarty_resource_string_get_secure($tpl_name, &$smarty_obj) {
   return TRUE;
 }
 
-/**
- * @param $tpl_name
- * @param $smarty_obj
- */
 function civicrm_smarty_resource_string_get_trusted($tpl_name, &$smarty_obj) {}
 
 function civicrm_smarty_register_string_resource() {

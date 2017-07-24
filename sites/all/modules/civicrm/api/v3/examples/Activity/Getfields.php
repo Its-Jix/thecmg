@@ -40,15 +40,12 @@ function activity_getfields_expectedresult(){
       'activity_type_id' => array(
           'name' => 'activity_type_id',
           'type' => 1,
-          'title' => 'Activity Type',
+          'title' => 'Activity Type ID',
           'required' => true,
           'import' => true,
           'where' => 'civicrm_activity.activity_type_id',
           'headerPattern' => '/(activity.)?type(.id$)/i',
           'default' => '1',
-          'html' => array(
-              'type' => 'Select',
-            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'activity_type',
             ),
@@ -61,18 +58,12 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.activity_date_time',
           'headerPattern' => '/(activity.)?date(.time$)?/i',
           'export' => true,
-          'html' => array(
-              'type' => 'Select Date',
-            ),
         ),
       'phone_id' => array(
           'name' => 'phone_id',
           'type' => 1,
           'title' => 'Phone (called) ID',
           'FKClassName' => 'CRM_Core_DAO_Phone',
-          'html' => array(
-              'type' => 'Autocomplete-Select',
-            ),
         ),
       'phone_number' => array(
           'name' => 'phone_number',
@@ -80,17 +71,11 @@ function activity_getfields_expectedresult(){
           'title' => 'Phone (called) Number',
           'maxlength' => 64,
           'size' => 30,
-          'html' => array(
-              'type' => 'Text',
-            ),
         ),
       'priority_id' => array(
           'name' => 'priority_id',
           'type' => 1,
           'title' => 'Priority',
-          'html' => array(
-              'type' => 'Select',
-            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'priority',
             ),
@@ -122,9 +107,6 @@ function activity_getfields_expectedresult(){
           'headerPattern' => '/(is.)?(current.)?(revision|version(ing)?)/i',
           'export' => true,
           'default' => '1',
-          'html' => array(
-              'type' => 'CheckBox',
-            ),
         ),
       'original_id' => array(
           'name' => 'original_id',
@@ -136,9 +118,6 @@ function activity_getfields_expectedresult(){
           'name' => 'weight',
           'type' => 1,
           'title' => 'Weight',
-          'html' => array(
-              'type' => 'Text',
-            ),
         ),
       'id' => array(
           'name' => 'id',
@@ -163,9 +142,6 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.subject',
           'headerPattern' => '/(activity.)?subject/i',
           'export' => true,
-          'html' => array(
-              'type' => 'Text',
-            ),
           'uniqueName' => 'activity_subject',
         ),
       'duration' => array(
@@ -176,9 +152,6 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.duration',
           'headerPattern' => '/(activity.)?duration(s)?$/i',
           'export' => true,
-          'html' => array(
-              'type' => 'Text',
-            ),
           'uniqueName' => 'activity_duration',
         ),
       'location' => array(
@@ -191,9 +164,6 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.location',
           'headerPattern' => '/(activity.)?location$/i',
           'export' => true,
-          'html' => array(
-              'type' => 'Text',
-            ),
           'uniqueName' => 'activity_location',
         ),
       'details' => array(
@@ -206,21 +176,15 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.details',
           'headerPattern' => '/(activity.)?detail(s)?$/i',
           'export' => true,
-          'html' => array(
-              'type' => 'RichTextEditor',
-            ),
           'uniqueName' => 'activity_details',
         ),
       'status_id' => array(
           'name' => 'status_id',
           'type' => 1,
-          'title' => 'Activity Status',
+          'title' => 'Activity Status Id',
           'import' => true,
           'where' => 'civicrm_activity.status_id',
           'headerPattern' => '/(activity.)?status(.label$)?/i',
-          'html' => array(
-              'type' => 'Select',
-            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'activity_status',
             ),
@@ -237,9 +201,6 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.is_test',
           'headerPattern' => '/(is.)?test(.activity)?/i',
           'export' => true,
-          'html' => array(
-              'type' => 'Select',
-            ),
           'uniqueName' => 'activity_is_test',
         ),
       'medium_id' => array(
@@ -247,9 +208,6 @@ function activity_getfields_expectedresult(){
           'type' => 1,
           'title' => 'Activity Medium',
           'default' => 'NULL',
-          'html' => array(
-              'type' => 'Select',
-            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'encounter_medium',
             ),
@@ -261,9 +219,6 @@ function activity_getfields_expectedresult(){
           'title' => 'Result',
           'maxlength' => 255,
           'size' => 45,
-          'html' => array(
-              'type' => 'Text',
-            ),
           'uniqueName' => 'activity_result',
         ),
       'is_deleted' => array(
@@ -274,9 +229,6 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.is_deleted',
           'headerPattern' => '/(activity.)?(trash|deleted)/i',
           'export' => true,
-          'html' => array(
-              'type' => 'Text',
-            ),
           'uniqueName' => 'activity_is_deleted',
         ),
       'campaign_id' => array(
@@ -287,9 +239,6 @@ function activity_getfields_expectedresult(){
           'where' => 'civicrm_activity.campaign_id',
           'export' => true,
           'FKClassName' => 'CRM_Campaign_DAO_Campaign',
-          'html' => array(
-              'type' => 'CheckBox',
-            ),
           'pseudoconstant' => array(
               'table' => 'civicrm_campaign',
               'keyColumn' => 'id',
@@ -304,9 +253,6 @@ function activity_getfields_expectedresult(){
           'import' => true,
           'where' => 'civicrm_activity.engagement_level',
           'export' => true,
-          'html' => array(
-              'type' => 'Select',
-            ),
           'pseudoconstant' => array(
               'optionGroupName' => 'engagement_index',
             ),

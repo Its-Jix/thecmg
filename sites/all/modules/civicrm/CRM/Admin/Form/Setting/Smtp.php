@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -43,7 +43,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -79,7 +79,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     // flush caches so we reload details for future requests
@@ -168,9 +168,9 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
 
         $mailer = Mail::factory($mailerName, $params);
 
-        $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+        CRM_Core_Error::ignoreException();
         $result = $mailer->send($toEmail, $headers, $message);
-        unset($errorScope);
+        CRM_Core_Error::setCallback();
         if (!is_a($result, 'PEAR_Error')) {
           CRM_Core_Session::setStatus($testMailStatusMsg . ts('Your %1 settings are correct. A test email has been sent to your email address.', array(1 => strtoupper($mailerName))), ts("Mail Sent"), "success");
         }
@@ -211,17 +211,17 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    */
   static function formRule($fields) {
     if ($fields['outBound_option'] == CRM_Mailing_Config::OUTBOUND_OPTION_SMTP) {
-      if (empty($fields['smtpServer'])) {
+      if (!CRM_Utils_Array::value('smtpServer', $fields)) {
         $errors['smtpServer'] = 'SMTP Server name is a required field.';
       }
-      if (empty($fields['smtpPort'])) {
+      if (!CRM_Utils_Array::value('smtpPort', $fields)) {
         $errors['smtpPort'] = 'SMTP Port is a required field.';
       }
-      if (!empty($fields['smtpAuth'])) {
-        if (empty($fields['smtpUsername'])) {
+      if (CRM_Utils_Array::value('smtpAuth', $fields)) {
+        if (!CRM_Utils_Array::value('smtpUsername', $fields)) {
           $errors['smtpUsername'] = 'If your SMTP server requires authentication please provide a valid user name.';
         }
-        if (empty($fields['smtpPassword'])) {
+        if (!CRM_Utils_Array::value('smtpPassword', $fields)) {
           $errors['smtpPassword'] = 'If your SMTP server requires authentication, please provide a password.';
         }
       }
@@ -244,7 +244,7 @@ class CRM_Admin_Form_Setting_Smtp extends CRM_Admin_Form_Setting {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     if (!$this->_defaults) {

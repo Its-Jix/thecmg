@@ -2,9 +2,9 @@
 /*
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -68,9 +68,6 @@ function civicrm_api3_price_field_value_create($params) {
  */
 function _civicrm_api3_price_field_value_create_spec(&$params) {
   $params['price_field_id']['api.required'] = TRUE;
-  $params['label']['api.required'] = TRUE;
-  $params['amount']['api.required'] = TRUE;
-  $params['is_active']['api.default'] = TRUE;
 }
 
 /**
@@ -96,7 +93,7 @@ function civicrm_api3_price_field_value_get($params) {
  * @param array $params array containing id of the group
  *  to be deleted
  *
- * @return array API result array
+ * @return array  returns flag true if successfull, error message otherwise
  * {@getfields price_field_value_delete}
  * @access public
  */

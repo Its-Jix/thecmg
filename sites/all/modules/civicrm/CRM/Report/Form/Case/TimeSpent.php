@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,17 +29,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
 
     $this->activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
@@ -186,8 +180,9 @@ class CRM_Report_Form_Case_TimeSpent extends CRM_Report_Form {
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) ||
-            (!empty($this->_params['fields'][$fieldName]) && ((!$this->has_grouping) || !in_array($fieldName, array('case_id', 'subject', 'status_id')))
+          if (CRM_Utils_Array::value('required', $field) ||
+            (CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+              && ((!$this->has_grouping) || !in_array($fieldName, array('case_id', 'subject', 'status_id')))
             )
           ) {
 
@@ -310,13 +305,6 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
     parent::postProcess();
   }
 
-  /**
-   * @param $fields
-   * @param $files
-   * @param $self
-   *
-   * @return array
-   */
   static function formRule($fields, $files, $self) {
     $errors = array();
     if (!empty($fields['group_bys']) &&
@@ -328,9 +316,6 @@ GROUP BY {$this->_aliases['civicrm_contact']}.id,
     return $errors;
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
 

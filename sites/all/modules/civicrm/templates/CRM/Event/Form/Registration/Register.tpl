@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -71,7 +71,6 @@
         <p>{$event.intro_text}</p>
       </div>
     {/if}
-
     {include file="CRM/common/cidzero.tpl"}
     {if $pcpSupporterText}
       <div class="crm-section pcpSupporterText-section">
@@ -91,12 +90,6 @@
         <div class="clear"></div>
       </div>
     {/if}
-
-    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
-    {include file="CRM/common/CMSUser.tpl"}
-
-    {* Display "Top of page" profile immediately after the introductory text *}
-    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
 
     {if $priceSet}
       {if ! $quickConfig}<fieldset id="priceset" class="crm-group priceset-group">
@@ -140,6 +133,11 @@
         </div>
       </fieldset>
     {/if}
+
+    {* User account registration option. Displays if enabled for one of the profiles on this page. *}
+    {include file="CRM/common/CMSUser.tpl"}
+
+    {include file="CRM/UF/Form/Block.tpl" fields=$customPre}
 
     {if $form.payment_processor.label}
       <fieldset class="crm-group payment_options-group" style="display:none;">
@@ -200,49 +198,37 @@
       toggleConfirmButton();
     });
 
-    cj("#additional_participants").change(function () {
-      skipPaymentMethod();
-    });
-
-    CRM.$(function($) {
+    cj(function () {
       toggleConfirmButton();
       skipPaymentMethod();
     });
 
-    // Hides billing and payment options block - but only if a price set is used.
-    // Called from display() in Calculate.tpl, depends on display() having been called.
     function skipPaymentMethod() {
-      // If we're in quick-config price set, we do not have the pricevalue hidden element, so just return.
-      if (cj('#pricevalue').length == 0) {
-        return;
-      }
-      // CRM-15433 Remove currency symbol, decimal separator so we can check for zero numeric total regardless of localization.
-      currentTotal = cj('#pricevalue').text().replace(/[^\/\d]/g,'');
+      var symbol = '{/literal}{$currencySymbol}{literal}';
       var isMultiple = '{/literal}{$event.is_multiple_registrations}{literal}';
 
       var flag = 1;
-      var payment_options = cj(".payment_options-group");
-      var payment_processor = cj("div.payment_processor-section");
-      var payment_information = cj("div#payment_information");
-
-      // Do not hide billing and payment blocks if user is registering additional participants, since we do not know total owing.
-      if (isMultiple && cj("#additional_participants").val() && currentTotal == 0) {
+      if (isMultiple && cj("#additional_participants").val()) {
         flag = 0;
       }
 
-      if (currentTotal == 0 && flag) {
-        payment_options.hide();
-        payment_processor.hide();
-        payment_information.hide();
+      if ((cj('#pricevalue').text() == symbol + " 0.00") && flag) {
+        cj(".payment_options-group").hide();
+        cj("div.payment_processor-section").hide();
+        cj("div#payment_information").hide();
         // also unset selected payment methods
         cj('input[name="payment_processor"]').removeProp('checked');
       }
       else {
-        payment_options.show();
-        payment_processor.show();
-        payment_information.show();
+        cj(".payment_options-group").show();
+        cj("div.payment_processor-section").show();
+        cj("div#payment_information").show();
       }
     }
+
+    cj('#priceset input, #priceset select').change(function () {
+      skipPaymentMethod();
+    });
 
     {/literal}
   </script>
@@ -268,6 +254,43 @@
   {literal}
   showHidePayPalExpressOption();
   {/literal}{/if}{literal}
+
+  function showHidePayment(flag) {
+    var payment_options = cj(".payment_options-group");
+    var payment_processor = cj("div.payment_processor-section");
+    var payment_information = cj("div#payment_information");
+    if (flag) {
+      payment_options.hide();
+      payment_processor.hide();
+      payment_information.hide();
+      // also unset selected payment methods
+      cj('input[name="payment_processor"]').removeProp('checked');
+    }
+    else {
+      payment_options.show();
+      payment_processor.show();
+      payment_information.show();
+    }
+  }
+
+  function skipPaymentMethod() {
+    var flag = false;
+    cj('.price-set-option-content input').each( function(){
+      currentTotal = cj(this).attr('data-amount').replace(/[^\/\d]/g,'');
+      if( cj(this).is(':checked') && currentTotal == 0 ) {
+        flag = true;
+      }
+    });
+    cj('.price-set-option-content input').change( function () {
+      if (cj(this).attr('data-amount').replace(/[^\/\d]/g,'') == 0 ) {
+        flag = true;
+      } else {
+        flag = false;
+      }
+      showHidePayment(flag);
+    });
+    showHidePayment(flag);
+  }
 
   function showHidePayPalExpressOption() {
     if (( cj("#bypass_payment").val() == 1 )) {

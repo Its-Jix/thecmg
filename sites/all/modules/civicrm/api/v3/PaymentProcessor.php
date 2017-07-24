@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.2                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2012                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_PaymentProcessor
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  */
 
 /**
@@ -39,8 +39,6 @@
  *
  * Allowed @params array keys are:
  * {@getfields payment_processor_create}
- *
- * @param $params
  *
  * @return array of newly created PaymentProcessor property values.
  * @access public

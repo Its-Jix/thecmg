@@ -3,9 +3,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,10 +34,15 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Job
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id: Contact.php 30879 2010-11-22 15:45:55Z shot $
  *
  */
+
+/**
+ * Include common API util functions
+ */
+require_once 'api/v3/utils.php';
 
 /**
  * Adjust metadata for "Create" action
@@ -83,7 +88,7 @@ function civicrm_api3_job_get($params) {
 /**
  * Delete a job
  *
- * @param array $params
+ * @param int $id
  *
  * @return array API Result Array
  * {@getfields Job_delete}
@@ -91,14 +96,22 @@ function civicrm_api3_job_get($params) {
  * @access public
  */
 function civicrm_api3_job_delete($params) {
-  _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
+  if ($params['id'] != NULL && !CRM_Utils_Rule::integer($params['id'])) {
+    return civicrm_api3_create_error('Invalid value for job ID');
+  }
+
+  $result = CRM_Core_BAO_Job::del($params['id']);
+  if (!$result) {
+    return civicrm_api3_create_error('Could not delete job');
+  }
+  return civicrm_api3_create_success($result, $params, 'job', 'delete');
 }
 
 /**
  * Dumb wrapper to execute scheduled jobs. Always creates success - errors
  * and results are handled in the job log.
  *
- * @param  array $params (reference ) input parameters
+ * @param  array       $params (reference ) input parameters
  *
  * @return array API Result Array
  *
@@ -148,11 +161,8 @@ function civicrm_api3_job_geocode($params) {
     return civicrm_api3_create_error($result['messages']);
   }
 }
-
 /**
  * First check on Code documentation
- *
- * @param array $params
  */
 function _civicrm_api3_job_geocode_spec(&$params) {
   $params['start'] = array('title' => 'Start Date');
@@ -242,11 +252,10 @@ function civicrm_api3_job_mail_report($params) {
  *
  *                        id - Integer - greetings option group
  *
- * @param array $params
- *
  * @return boolean        true if success, else false
  * @static
  * @access public
+ *
  */
 function civicrm_api3_job_update_greeting($params) {
 
@@ -357,10 +366,6 @@ function civicrm_api3_job_process_sms($params) {
 
 /**
  * Job to get mail responses from civimailing
- *
- * @param array $params
- *
- * @return array
  */
 function civicrm_api3_job_fetch_bounces($params) {
   $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
@@ -380,10 +385,6 @@ function civicrm_api3_job_fetch_bounces($params) {
 
 /**
  * Job to get mail and create activities
- *
- * @param array $params
- *
- * @return array
  */
 function civicrm_api3_job_fetch_activities($params) {
   $lock = new CRM_Core_Lock('civimail.job.EmailProcessor');
@@ -578,9 +579,6 @@ function civicrm_api3_job_cleanup( $params ) {
 /**
  * Set expired relationships to disabled.
  *
- * @param array $params
- *
- * @return array
  */
 function civicrm_api3_job_disable_expired_relationships($params) {
   $result = CRM_Contact_BAO_Relationship::disableExpiredRelationships();
@@ -597,12 +595,8 @@ function civicrm_api3_job_disable_expired_relationships($params) {
  * it is recommended that they use the limit clause to limit the number of smart groups
  * evaluated on a per job basis. Might also help to increase the smartGroupCacheTimeout
  * and use the cache
- *
- * @param array $params
- *
- * @return array
  */
-function civicrm_api3_job_group_rebuild($params) {
+function civicrm_api3_job_group_rebuild( $params ) {
   $lock = new CRM_Core_Lock('civimail.job.groupRebuild');
   if (!$lock->isAcquired()) {
     return civicrm_api3_create_error('Could not acquire lock, another EmailProcessor process is running');

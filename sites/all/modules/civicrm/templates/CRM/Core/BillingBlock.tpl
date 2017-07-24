@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -171,16 +171,16 @@
      <script type="text/javascript">
      {literal}
 
-CRM.$(function($) {
+cj( function( ) {
   // build list of ids to track changes on
   var address_fields = {/literal}{$profileAddressFields|@json_encode}{literal};
   var input_ids = {};
   var select_ids = {};
-  var orig_id, field, field_name;
+  var orig_id = field = field_name = null;
 
   // build input ids
-  $('.billing_name_address-section input').each(function(i){
-    orig_id = $(this).attr('id');
+  cj('.billing_name_address-section input').each(function(i){
+    orig_id = cj(this).attr('id');
     field = orig_id.split('-');
     field_name = field[0].replace('billing_', '');
     if(field[1]) {
@@ -189,16 +189,16 @@ CRM.$(function($) {
       }
     }
   });
-  if($('#first_name').length)
+  if(cj('#first_name').length)
     input_ids['#first_name'] = '#billing_first_name';
-  if($('#middle_name').length)
+  if(cj('#middle_name').length)
     input_ids['#middle_name'] = '#billing_middle_name';
-  if($('#last_name').length)
+  if(cj('#last_name').length)
     input_ids['#last_name'] = '#billing_last_name';
 
   // build select ids
-  $('.billing_name_address-section select').each(function(i){
-    orig_id = $(this).attr('id');
+  cj('.billing_name_address-section select').each(function(i){
+    orig_id = cj(this).attr('id');
     field = orig_id.split('-');
     field_name = field[0].replace('billing_', '').replace('_id', '');
     if(field[1]) {
@@ -211,86 +211,82 @@ CRM.$(function($) {
   // detect if billing checkbox should default to checked
   var checked = true;
   for(var id in input_ids) {
-    orig_id = input_ids[id];
-    if($(id).val() != $(orig_id).val()) {
+    var orig_id = input_ids[id];
+    if(cj(id).val() != cj(orig_id).val()) {
       checked = false;
       break;
     }
   }
   for(var id in select_ids) {
-    orig_id = select_ids[id];
-    if($(id).val() != $(orig_id).val()) {
+    var orig_id = select_ids[id];
+    if(cj(id).val() != cj(orig_id).val()) {
       checked = false;
       break;
     }
   }
   if(checked) {
-    $('#billingcheckbox').prop('checked', true);
-    if (!CRM.billing || CRM.billing.billingProfileIsHideable) {
-      $('.billing_name_address-group').hide();
-    }
+    cj('#billingcheckbox').attr('checked', 'checked');
+    cj('.billing_name_address-group').hide();
   }
 
   // onchange handlers for non-billing fields
   for(var id in input_ids) {
-    orig_id = input_ids[id];
-    $(id).change(function(){
-      var id = '#'+$(this).attr('id');
+    var orig_id = input_ids[id];
+    cj(id).change(function(){
+      var id = '#'+cj(this).attr('id');
       var orig_id = input_ids[id];
 
       // if billing checkbox is active, copy other field into billing field
-      if($('#billingcheckbox').prop('checked')) {
-        $(orig_id).val( $(id).val() );
-      }
+      if(cj('#billingcheckbox').attr('checked')) {
+        cj(orig_id).val( cj(id).val() );
+      };
     });
-  }
+  };
   for(var id in select_ids) {
-    orig_id = select_ids[id];
-    $(id).change(function(){
-      var id = '#'+$(this).attr('id');
+    var orig_id = select_ids[id];
+    cj(id).change(function(){
+      var id = '#'+cj(this).attr('id');
       var orig_id = select_ids[id];
 
       // if billing checkbox is active, copy other field into billing field
-      if($('#billingcheckbox').prop('checked')) {
-        $(orig_id+' option').prop('selected', false);
-        $(orig_id+' option[value="'+$(id).val()+'"]').prop('selected', true);
-      }
+      if(cj('#billingcheckbox').attr('checked')) {
+        cj(orig_id+' option').removeAttr('selected');
+        cj(orig_id+' option[value="'+cj(id).val()+'"]').attr('selected', 'selected');
+      };
 
       if(orig_id == '#billing_country_id-5') {
-        $(orig_id).change();
+        cj(orig_id).change();
       }
     });
-  }
+  };
 
 
   // toggle show/hide
-  $('#billingcheckbox').click(function(){
+  cj('#billingcheckbox').click(function(){
     if(this.checked) {
-      if (!CRM.billing || CRM.billing.billingProfileIsHideable) {
-        $('.billing_name_address-group').hide(200);
-      }
+      cj('.billing_name_address-group').hide(200);
 
       // copy all values
       for(var id in input_ids) {
-        orig_id = input_ids[id];
-        $(orig_id).val( $(id).val() );
-      }
+        var orig_id = input_ids[id];
+        cj(orig_id).val( cj(id).val() );
+      };
       for(var id in select_ids) {
-        orig_id = select_ids[id];
-        $(orig_id+' option').prop('selected', false);
-        $(orig_id+' option[value="'+$(id).val()+'"]').prop('selected', true);
-      }
+        var orig_id = select_ids[id];
+        cj(orig_id+' option').removeAttr('selected');
+        cj(orig_id+' option[value="'+cj(id).val()+'"]').attr('selected', 'selected');
+      };
     } else {
-      $('.billing_name_address-group').show(200);
+      cj('.billing_name_address-group').show(200);
     }
   });
 
   // remove spaces, dashes from credit card number
-  $('#credit_card_number').change(function(){
-    var cc = $('#credit_card_number').val()
+  cj('#credit_card_number').change(function(){
+    var cc = cj('#credit_card_number').val()
       .replace(/ /g, '')
       .replace(/-/g, '');
-    $('#credit_card_number').val(cc);
+    cj('#credit_card_number').val(cc);
   });
 });
 {/literal}

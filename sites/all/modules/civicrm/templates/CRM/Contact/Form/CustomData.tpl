@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,11 +24,8 @@
  +--------------------------------------------------------------------+
 *}
 {* this template is used for building tabbed custom data *}
-{if $cdType || $postedInfo}
-   {include file="CRM/Custom/Form/CustomData.tpl"}
-   {if $multiRecordDisplay eq 'single'}
-     <div class="html-adjust">{$form.buttons.html}</div>
-   {/if}
+{if $cdType }
+    {include file="CRM/Custom/Form/CustomData.tpl"}
 {else}
     <div id="customData"></div>
     <div class="html-adjust">{$form.buttons.html}</div>
@@ -36,7 +33,8 @@
     {*include custom data js file*}
     {include file="CRM/common/customData.tpl"}
 
-  {if $customValueCount}
+
+  {if $customValueCount }
     {literal}
     <script type="text/javascript">
       var customValueCount = {/literal}"{$customValueCount}"{literal};

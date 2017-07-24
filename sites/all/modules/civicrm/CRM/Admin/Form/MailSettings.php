@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,12 +42,11 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
     parent::buildQuickForm();
-    $this->setPageTitle(ts('Mail Account'));
 
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
@@ -126,7 +125,7 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -183,6 +182,5 @@ class CRM_Admin_Form_MailSettings extends CRM_Admin_Form {
       CRM_Core_Session::setStatus("", ts('Changes Not Saved.'), "info");
     }
   }
-
 }
 

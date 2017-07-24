@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -45,31 +45,26 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
    * @access public
    */
   public function buildQuickForm() {
+    $types = array_merge(array('Contact', 'Individual', 'Contribution', 'Membership'),
+      CRM_Contact_BAO_ContactType::subTypes('Individual')
+    );
 
-    // Register 'contact_1' model
-    $entities = array();
-    $entities[] = array('entity_name' => 'contact_1', 'entity_type' => 'IndividualModel');
-    $allowCoreTypes = array_merge(array('Contact', 'Individual'), CRM_Contact_BAO_ContactType::subTypes('Individual'));
-    $allowSubTypes = array();
+    $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
+    $excludeTypes = array('Organization', 'Household', 'Participant', 'Activity');
 
-    // Register 'contribution_1'
-    $financialTypeId = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $this->_id, 'financial_type_id');
-    $allowCoreTypes[] = 'Contribution';
-    //CRM-15427
-    $allowSubTypes['ContributionType'] = array($financialTypeId);
-    $entities[] = array('entity_name' => 'contribution_1', 'entity_type' => 'ContributionModel', 'entity_sub_type' => '*');
-
-    // If applicable, register 'membership_1'
-    $member = CRM_Member_BAO_Membership::getMembershipBlock($this->_id);
-    if ($member && $member['is_active']) {
-      //CRM-15427
-      $entities[] = array('entity_name' => 'membership_1', 'entity_type' => 'MembershipModel', 'entity_sub_type' => '*');
-      $allowCoreTypes[] = 'Membership';
-      $allowSubTypes['MembershipType'] = explode(',', $member['membership_types']);
+    $excludeProfiles = CRM_Core_BAO_UFGroup::getProfiles($excludeTypes);
+    foreach ($excludeProfiles as $key => $value) {
+      if (array_key_exists( $key, $profiles)) {
+        unset($profiles[$key]);
+      }
     }
-    //CRM-15427
-    $this->addProfileSelector('custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
-    $this->addProfileSelector('custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), $allowCoreTypes, $allowSubTypes, $entities, TRUE);
+
+    if (empty($profiles)) {
+      $this->assign('noProfile', TRUE);
+    }
+
+    $this->add('select', 'custom_pre_id', ts('Include Profile') . '<br />' . ts('(top of page)'), array('' => ts('- select -')) + $profiles);
+    $this->add('select', 'custom_post_id', ts('Include Profile') . '<br />' . ts('(bottom of page)'), array('' => ts('- select -')) + $profiles);
 
     $this->addFormRule(array('CRM_Contribute_Form_ContributionPage_Custom', 'formRule'), $this->_id);
 
@@ -99,9 +94,8 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
       'entity_id' => $this->_id,
     );
     list($defaults['custom_pre_id'],
-      $second) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
-    $defaults['custom_post_id'] = $second ? array_shift($second) : '';
-
+      $defaults['custom_post_id']
+    ) = CRM_Core_BAO_UFJoin::getUFGroupIds($ufJoinParams);
 
     return $defaults;
   }
@@ -164,10 +158,7 @@ class CRM_Contribute_Form_ContributionPage_Custom extends CRM_Contribute_Form_Co
   /**
    * global form rule
    *
-   * @param array $fields the input form values
-   *
-   * @param $files
-   * @param $contributionPageId
+   * @param array $fields  the input form values
    *
    * @return true if no errors, else array of errors
    * @access public

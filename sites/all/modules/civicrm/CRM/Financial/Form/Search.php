@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -41,9 +41,6 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
     $this->assign('batchStatus', $this->_batchStatus);
   }
 
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     $defaults = array();
     $status = CRM_Utils_Request::retrieve('status', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, 1);
@@ -55,11 +52,10 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
   }
 
   public function buildQuickForm() {
-    CRM_Core_Resources::singleton()->addScriptFile('civicrm', 'packages/jquery/plugins/jquery.redirect.min.js', 0, 'html-header');
     $attributes = CRM_Core_DAO::getAttribute('CRM_Batch_DAO_Batch');
     $attributes['total']['class'] = $attributes['item_count']['class'] = 'number';
     $this->add('text', 'title', ts('Batch Name'), $attributes['title']);
-
+    
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id', array('labelColumn' => 'name'));
     $this->add(
       'select',
@@ -103,7 +99,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
 
     $this->add('submit','submit', ts('Go'),
       array(
-        'class' => 'crm-form-submit',
+        'class' => 'form-submit',
         'id' => 'Go',
       ));
 
@@ -127,7 +123,7 @@ class CRM_Financial_Form_Search extends CRM_Core_Form {
         $batchIds[] = $batch[1];
       }
     }
-    if (!empty($_POST['batch_update'])) {
+    if (CRM_Utils_Array::value('batch_update', $_POST)) {
       CRM_Batch_BAO_Batch::closeReOpen($batchIds, $_POST['batch_update']);
     }
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -39,9 +39,6 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
 
   protected $loggingDB;
 
-  /**
-   *
-   */
   function __construct() {
     // don’t display the ‘Add these Contacts to Group’ button
     $this->_add2groupSupported = FALSE;
@@ -168,7 +165,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
           ),
           'bracket_info' => array(
             'entity_column' => 'case_type_id',
-            'options' => CRM_Case_PseudoConstant::caseType('title', FALSE)
+            'options' => CRM_Case_PseudoConstant::caseType('label', FALSE)
           ),
         ),
       );
@@ -184,7 +181,7 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     // build _logTables for address custom tables
     $customTables = $logging->entityCustomDataLogTables('Address');
     foreach ($customTables as $table) {
-      $this->_logTables[$table] =
+      $this->_logTables[$table] = 
         array(
           'fk' => 'contact_id',// for join of fk_table with contact table
           'joins' => array(
@@ -224,9 +221,6 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
   }
 
   function where() {
-    // reset where clause as its called multiple times, every time insert sql is built.
-    $this->_whereClauses = array();
-
     parent::where();
     $this->_where .= " AND (entity_log_civireport.log_action != 'Initialization')";
   }
@@ -236,15 +230,15 @@ class CRM_Logging_ReportSummary extends CRM_Report_Form {
     $rows = array();
 
     $tempColumns = "id int(10)";
-    if (!empty($this->_params['fields']['log_action'])) {
+    if (CRM_Utils_Array::value('log_action', $this->_params['fields'])) {
       $tempColumns .= ", log_action varchar(64)";
     }
     $tempColumns .= ", log_type varchar(64), log_user_id int(10), log_date timestamp";
-    if (!empty($this->_params['fields']['altered_contact'])) {
+    if (CRM_Utils_Array::value('altered_contact', $this->_params['fields'])) {
       $tempColumns .= ", altered_contact varchar(128)";
     }
     $tempColumns .= ", altered_contact_id int(10), log_conn_id int(11), is_deleted tinyint(4)";
-    if (!empty($this->_params['fields']['display_name'])) {
+    if (CRM_Utils_Array::value('display_name', $this->_params['fields'])) {
       $tempColumns .= ", display_name varchar(128)";
     }
 
@@ -341,30 +335,18 @@ ORDER BY log_civicrm_entity_log_date DESC {$this->_limit}";
     $this->endPostProcess($rows);
   }
 
-  /**
-   * @param $entity
-   *
-   * @return string
-   */
   function getLogType($entity) {
-    if (!empty($this->_logTables[$entity]['log_type'])) {
+    if (CRM_Utils_Array::value('log_type', $this->_logTables[$entity])) {
       return $this->_logTables[$entity]['log_type'];
     }
     $logType = ucfirst(substr($entity, strrpos($entity, '_') + 1));
     return $logType;
   }
 
-  /**
-   * @param $id
-   * @param $entity
-   * @param $logDate
-   *
-   * @return mixed|null|string
-   */
   function getEntityValue($id, $entity, $logDate) {
-    if (!empty($this->_logTables[$entity]['bracket_info'])) {
-      if (!empty($this->_logTables[$entity]['bracket_info']['entity_column'])) {
-        $logTable = !empty($this->_logTables[$entity]['table_name']) ? $this->_logTables[$entity]['table_name'] : $entity;
+    if (CRM_Utils_Array::value('bracket_info', $this->_logTables[$entity])) {
+      if (CRM_Utils_Array::value('entity_column', $this->_logTables[$entity]['bracket_info'])) {
+        $logTable = CRM_Utils_Array::value('table_name', $this->_logTables[$entity]) ? $this->_logTables[$entity]['table_name'] : $entity;
         $sql = "
 SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
   FROM `{$this->loggingDB}`.{$logTable}
@@ -381,6 +363,11 @@ SELECT {$this->_logTables[$entity]['bracket_info']['entity_column']}
         $entityID = $id;
       }
 
+      // since case_type_id is a varchar field with separator
+      if ($entity == 'log_civicrm_case') {
+        $entityID = explode(CRM_Case_BAO_Case::VALUE_SEPARATOR, $entityID);
+        $entityID = CRM_Utils_Array::value(1, $entityID);
+      }
 
       if ($entityID && $logDate && array_key_exists('table', $this->_logTables[$entity]['bracket_info'])) {
         $sql = "
@@ -401,16 +388,8 @@ WHERE  log_date <= %1 AND id = %2 ORDER BY log_date DESC LIMIT 1";
     return NULL;
   }
 
-  /**
-   * @param $id
-   * @param $connId
-   * @param $entity
-   * @param $oldAction
-   *
-   * @return null|string
-   */
   function getEntityAction($id, $connId, $entity, $oldAction) {
-    if (!empty($this->_logTables[$entity]['action_column'])) {
+    if (CRM_Utils_Array::value('action_column', $this->_logTables[$entity])) {
       $sql = "select {$this->_logTables[$entity]['action_column']} from `{$this->loggingDB}`.{$entity} where id = %1 AND log_conn_id = %2";
       $newAction = CRM_Core_DAO::singleValueQuery($sql, array(
         1 => array($id, 'Integer'),

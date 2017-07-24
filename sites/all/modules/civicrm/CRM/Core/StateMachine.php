@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -87,10 +87,8 @@ class CRM_Core_StateMachine {
    *
    * @param object $controller the controller for this state machine
    *
-   * @param \const|int $action
-   *
-   * @return \CRM_Core_StateMachine
-  @access public
+   * @return object
+   * @access public
    */
   function __construct(&$controller, $action = CRM_Core_Action::NONE) {
     $this->_controller = &$controller;
@@ -255,11 +253,11 @@ class CRM_Core_StateMachine {
    *
    * @access public
    *
-   * @param array $pages (reference ) the array of page objects
-   *
-   * @internal param array $states states is an array of arrays. Each element
+   * @param array $states states is an array of arrays. Each element
    * of the top level array describes a state. Each state description
    * includes the name, the display name and the class name
+   *
+   * @param array $pages (reference ) the array of page objects
    *
    * @return void
    */
@@ -269,7 +267,7 @@ class CRM_Core_StateMachine {
 
     $this->_pageNames = array();
     foreach ($pages as $tempName => $value) {
-      if (!empty($value['className'])) {
+      if (CRM_Utils_Array::value('className', $value)) {
         $this->_pageNames[] = $tempName;
       }
       else {
@@ -357,30 +355,18 @@ class CRM_Core_StateMachine {
     return $this->_controller->getContent();
   }
 
-  /**
-   * @return mixed
-   */
   function getDestination() {
     return $this->_controller->getDestination();
   }
 
-  /**
-   * @return mixed
-   */
   function getSkipRedirection() {
     return $this->_controller->getSkipRedirection();
   }
 
-  /**
-   * @return mixed
-   */
   function fini() {
     return $this->_controller->fini();
   }
 
-  /**
-   * @return mixed
-   */
   function cancelAction() {
     return $this->_controller->cancelAction();
   }

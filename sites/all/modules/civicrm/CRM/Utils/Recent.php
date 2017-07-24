@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -86,16 +86,11 @@ class CRM_Utils_Recent {
   /**
    * add an item to the recent stack
    *
-   * @param string $title the title to display
-   * @param string $url the link for the above title
-   * @param string $id object id
+   * @param string $title  the title to display
+   * @param string $url    the link for the above title
+   * @param string $icon   a link to a graphical image
+   * @param string $id     object id
    *
-   * @param $type
-   * @param $contactId
-   * @param $contactName
-   * @param array $others
-   *
-   * @internal param string $icon a link to a graphical image
    * @return void
    * @access public
    * @static

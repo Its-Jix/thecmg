@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -43,19 +43,30 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
-    $this->setPageTitle($this->_isTagSet ? ts('Tag Set') : ts('Tag'));
-
     if ($this->_action == CRM_Core_Action::DELETE) {
       if ($this->_id && $tag = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'name', 'parent_id')) {
+        CRM_Core_Session::setStatus(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), ts('Sorry'), 'error');
         $url = CRM_Utils_System::url('civicrm/admin/tag', "reset=1");
-        CRM_Core_Error::statusBounce(ts("This tag cannot be deleted. You must delete all its child tags ('%1', etc) prior to deleting this tag.", array(1 => $tag)), $url);
+        CRM_Utils_System::redirect($url);
+        return TRUE;
       }
-      if ($this->_values['is_reserved'] == 1 && !CRM_Core_Permission::check('administer reserved tags')) {
-        CRM_Core_Error::statusBounce(ts("You do not have sufficient permission to delete this reserved tag."));
+      else {
+        $this->addButtons(array(
+            array(
+              'type' => 'next',
+              'name' => ts('Delete'),
+              'isDefault' => TRUE,
+            ),
+            array(
+              'type' => 'cancel',
+              'name' => ts('Cancel'),
+            ),
+          )
+        );
       }
     }
     else {
@@ -68,14 +79,14 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
         $this->_isTagSet = TRUE;
       }
 
-      $allTag = array('' => ts('- select -')) + CRM_Core_BAO_Tag::getTagsNotInTagset();
+      $allTag = array('' => '- ' . ts('select') . ' -') + CRM_Core_BAO_Tag::getTagsNotInTagset();
 
       if ($this->_id) {
         unset($allTag[$this->_id]);
       }
 
       if (!$this->_isTagSet) {
-        $this->add('select', 'parent_id', ts('Parent Tag'), $allTag, FALSE, array('class' => 'crm-select2'));
+        $this->add('select', 'parent_id', ts('Parent Tag'), $allTag);
       }
 
       $this->assign('isTagSet', $this->_isTagSet);
@@ -92,11 +103,14 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       );
 
       //@lobo haven't a clue why the checkbox isn't displayed (it should be checked by default
-      $this->add('checkbox', 'is_selectable');
+      $this->add('checkbox', 'is_selectable', ts("If it's a tag or a category"));
 
       $isReserved = $this->add('checkbox', 'is_reserved', ts('Reserved?'));
 
-      $usedFor = $this->addSelect('used_for', array('multiple' => TRUE, 'option_url' => NULL));
+      $usedFor = $this->add('select', 'used_for', ts('Used For'),
+        CRM_Core_OptionGroup::values('tag_used_for')
+      );
+      $usedFor->setMultiple(TRUE);
 
       if ($this->_id &&
         CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $this->_id, 'parent_id')
@@ -117,8 +131,8 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       }
       $this->assign('adminReservedTags', $adminReservedTags);
 
+      parent::buildQuickForm();
     }
-    parent::buildQuickForm();
   }
 
   /**
@@ -126,7 +140,7 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $params = $ids = array();
@@ -162,6 +176,6 @@ class CRM_Admin_Form_Tag extends CRM_Admin_Form {
       CRM_Core_Session::setStatus(ts('The tag \'%1\' has been saved.', array(1 => $tag->name)), ts('Saved'), 'success');
     }
   }
-
+  //end of function
 }
 

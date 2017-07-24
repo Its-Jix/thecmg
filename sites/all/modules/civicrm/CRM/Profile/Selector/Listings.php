@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -132,20 +132,13 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   protected $_profileIds = array();
 
   protected $_multiRecordTableName = NULL;
-
   /**
    * Class constructor
    *
-   * @param $params
-   * @param $customFields
    * @param string params the params for the where clause
    *
-   * @param bool $map
-   * @param bool $editLink
-   * @param bool $linkToUF
-   *
-   * @return \CRM_Profile_Selector_Listings
-  @access public
+   * @return CRM_Contact_Selector_Profile
+   * @access public
    */
   function __construct(
     &$params,
@@ -179,7 +172,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
     // add group id to params if a uf group belong to a any group
     if ($groupId) {
-      if (!empty($this->_params['group'])) {
+      if (CRM_Utils_Array::value('group', $this->_params)) {
         $this->_params['group'][$groupId] = 1;
       }
       else {
@@ -214,13 +207,9 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    * This method returns the links that are given for each search row.
    *
-   * @param bool $map
-   * @param bool $editLink
-   * @param bool $ufLink
-   * @param null $gids
-   *
    * @return array
    * @access public
+   *
    */
   static function &links($map = FALSE, $editLink = FALSE, $ufLink = FALSE, $gids = NULL) {
     if (!self::$_links) {
@@ -281,10 +270,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param $action
-   * @param $params
-   *
-   * @internal param $
+   * @param
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -332,7 +318,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
           continue;
         }
 
-        if (!empty($field['in_selector']) &&
+        if (CRM_Utils_Array::value('in_selector', $field) &&
           !in_array($name, $skipFields)
         ) {
 
@@ -446,7 +432,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
    *
    * @return int   the total number of rows for this action
    */
-  function &getRows($action, $offset, $rowCount, $sort, $output = NULL, $extraWhereClause = NULL) {
+  function &getRows($action, $offset, $rowCount, $sort, $output = NULL) {
 
     $multipleFields = array('url');
     //$sort object processing for location fields
@@ -479,11 +465,6 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
     }
 
     $additionalWhereClause = 'contact_a.is_deleted = 0';
-
-    if ($extraWhereClause) {
-      $additionalWhereClause .= " AND {$extraWhereClause}";
-    }
-
     $returnQuery = NULL;
     if ($this->_multiRecordTableName) {
       $returnQuery = TRUE;
@@ -528,7 +509,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
         continue;
       }
 
-      if (!empty($field['in_selector']) &&
+      if (CRM_Utils_Array::value('in_selector', $field) &&
         !in_array($key, $skipFields)
       ) {
         if (strpos($key, '-') !== FALSE) {
@@ -713,12 +694,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
 
       $row[] = CRM_Core_Action::formLink($newLinks,
         $mask,
-        $params,
-        ts('more'),
-        FALSE,
-        'profile.selector.row',
-        'Contact',
-        $result->contact_id
+        $params
       );
 
       if (!$empty) {
@@ -773,7 +749,7 @@ class CRM_Profile_Selector_Listings extends CRM_Core_Selector_Base implements CR
             }
           }
 
-          if (!empty($properties['in_selector'])) {
+          if (CRM_Utils_Array::value('in_selector', $properties)) {
             $selectorSet = TRUE;
           }
         }

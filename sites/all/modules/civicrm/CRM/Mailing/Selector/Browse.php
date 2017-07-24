@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -59,10 +59,10 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * Class constructor
    *
-   * @internal param $
+   * @param
    *
-   * @return \CRM_Mailing_Selector_Browse
-  @access public
+   * @return CRM_Contact_Selector_Profile
+   * @access public
    */
   function __construct() {
   }
@@ -83,10 +83,7 @@ class CRM_Mailing_Selector_Browse extends CRM_Core_Selector_Base implements CRM_
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param $action
-   * @param $params
-   *
-   * @internal param $
+   * @param
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -377,7 +374,7 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
           }
         }
 
-        if (in_array($row['status'], array('Complete', 'Canceled')) &&
+        if (in_array($row['status'], array('Complete', 'Canceled')) && 
           !$row['archived']) {
           if ($allAccess || $showCreateLinks) {
             $actionMask |= CRM_Core_Action::RENEW;
@@ -430,19 +427,10 @@ LEFT JOIN  civicrm_contact scheduledContact ON ( $mailing.scheduled_id = schedul
     return ts('CiviMail Mailings');
   }
 
-  /**
-   * @param $parent
-   */
   function setParent($parent) {
     $this->_parent = $parent;
   }
 
-  /**
-   * @param $params
-   * @param bool $sortBy
-   *
-   * @return int|string
-   */
   function whereClause(&$params, $sortBy = TRUE) {
     $values = $clauses = array();
     $isFormSubmitted   = $this->_parent->get('hidden_find_mailings');

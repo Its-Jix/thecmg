@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  * This is a part of CiviCRM extension management functionality.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -97,6 +97,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
           'name' => ts('Disable'),
           'url' => 'civicrm/admin/extensions',
           'qs' => 'action=disable&id=%%id%%&key=%%key%%',
+          'ref' => 'disable-action',
           'title' => ts('Disable'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -196,15 +197,8 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         array(
           'id' => $row['id'],
           'key' => $obj->key,
-        ),
-        ts('more'),
-        FALSE,
-        'extension.local.action',
-        'Extension',
-        $row['id']
+        )
       );
-      // Key would be better to send, but it's not an integer.  Moreover, sending the
-      // values to hook_civicrm_links means that you can still get at the key
 
       $localExtensionRows[$row['id']] = $row;
     }
@@ -221,12 +215,7 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
         array(
           'id' => $row['id'],
           'key' => $row['key'],
-        ),
-        ts('more'),
-        FALSE,
-        'extension.remote.action',
-        'Extension',
-        $row['id']
+        )
       );
       if (isset($localExtensionRows[$info->key])) {
         if (version_compare($localExtensionRows[$info->key]['version'], $info->version, '<')) {
@@ -259,8 +248,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
   /**
    * Get user context.
    *
-   * @param null $mode
-   *
    * @return string user context.
    */
   function userContext($mode = NULL) {
@@ -284,8 +271,6 @@ class CRM_Admin_Page_Extensions extends CRM_Core_Page_Basic {
    * extension's status on the local system.
    *
    * The result format resembles the old CRM_Core_Extensions_Extension.
-   *
-   * @param CRM_Extension_Info $obj
    *
    * @return array
    */

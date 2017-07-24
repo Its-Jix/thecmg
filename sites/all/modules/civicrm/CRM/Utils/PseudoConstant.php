@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -54,8 +54,6 @@ class CRM_Utils_PseudoConstant {
    * @access public
    * @static
    *
-   * @param $constant
-   *
    * @return array - array reference of all relevant constant
    */
   public static function getConstant($constant) {
@@ -74,8 +72,6 @@ class CRM_Utils_PseudoConstant {
    *
    * @access public
    * @static
-   *
-   * @param $constant
    *
    * @return array - array reference of all relevant constant
    */
@@ -97,9 +93,7 @@ class CRM_Utils_PseudoConstant {
    * If there's a full, preloaded map, use it. Otherwise, use search
    * class space.
    *
-   * @param $constant
-   *
-   * @internal param string $name constant-name
+   * @param string $name constant-name
    * @return string|NULL class-name
    */
   public static function findConstantClass($constant) {
@@ -139,8 +133,6 @@ class CRM_Utils_PseudoConstant {
    * any static properties which have corresponding static methods.
    *
    * This may be inefficient and should generally be avoided.
-   *
-   * @param $class
    *
    * @return array of string, constant names
    */

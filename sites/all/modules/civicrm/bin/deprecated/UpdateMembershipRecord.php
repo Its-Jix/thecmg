@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                               |
+ | CiviCRM version 4.4                                               |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,14 +38,7 @@
  *
  * Save the file as UpdateMembershipRecord.php prior to running this script.
  */
-
-/**
- * Class CRM_UpdateMembershipRecord
- */
 class CRM_UpdateMembershipRecord {
-  /**
-   *
-   */
   function __construct() {
     // you can run this program either from an apache command, or from the cli
     if (php_sapi_name() == "cli") {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,17 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
-  /**
-   * @param $caseType
-   * @param $params
-   *
-   * @throws Exception
-   */
   function run($caseType, &$params) {
     $xml = $this->retrieve($caseType);
 
@@ -56,15 +50,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     $this->process($xml, $params);
   }
 
-  /**
-   * @param $caseType
-   * @param $fieldSet
-   * @param bool $isLabel
-   * @param bool $maskAction
-   *
-   * @return array|bool|mixed
-   * @throws Exception
-   */
   function get($caseType, $fieldSet, $isLabel = FALSE, $maskAction = FALSE) {
     $xml = $this->retrieve($caseType);
     if ($xml === FALSE) {
@@ -87,12 +72,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     }
   }
 
-  /**
-   * @param $xml
-   * @param $params
-   *
-   * @throws Exception
-   */
   function process($xml, &$params) {
     $standardTimeline = CRM_Utils_Array::value('standardTimeline', $params);
     $activitySetName  = CRM_Utils_Array::value('activitySetName', $params);
@@ -140,10 +119,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     }
   }
 
-  /**
-   * @param $activitySetXML
-   * @param $params
-   */
   function processStandardTimeline($activitySetXML, &$params) {
     if ('Change Case Type' == CRM_Utils_Array::value('activityTypeName', $params)
       && CRM_Utils_Array::value('resetTimeline', $params, TRUE)) {
@@ -158,10 +133,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     }
   }
 
-  /**
-   * @param $activitySetXML
-   * @param $params
-   */
   function processActivitySet($activitySetXML, &$params) {
     foreach ($activitySetXML->ActivityTypes as $activityTypesXML) {
       foreach ($activityTypesXML as $activityTypeXML) {
@@ -170,12 +141,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     }
   }
 
-  /**
-   * @param $caseRolesXML
-   * @param bool $isCaseManager
-   *
-   * @return array|mixed
-   */
   function &caseRoles($caseRolesXML, $isCaseManager = FALSE) {
     $relationshipTypes = &$this->allRelationshipTypes();
 
@@ -201,13 +166,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     return $result;
   }
 
-  /**
-   * @param $relationshipTypeName
-   * @param $params
-   *
-   * @return bool
-   * @throws Exception
-   */
   function createRelationships($relationshipTypeName, &$params) {
     $relationshipTypes = &$this->allRelationshipTypes();
     // get the relationship id
@@ -244,11 +202,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     return TRUE;
   }
 
-  /**
-   * @param $params
-   *
-   * @return bool
-   */
   function createRelationship(&$params) {
     $dao = new CRM_Contact_DAO_Relationship();
     $dao->copyValues($params);
@@ -259,14 +212,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     return TRUE;
   }
 
-  /**
-   * @param $activityTypesXML
-   * @param bool $maxInst
-   * @param bool $isLabel
-   * @param bool $maskAction
-   *
-   * @return array
-   */
   function activityTypes($activityTypesXML, $maxInst = FALSE, $isLabel = FALSE, $maskAction = FALSE) {
     $activityTypes = &$this->allActivityTypes(TRUE, TRUE);
     $result = array();
@@ -308,55 +253,6 @@ class CRM_Case_XMLProcessor_Process extends CRM_Case_XMLProcessor {
     return $result;
   }
 
-  /**
-   * @param SimpleXMLElement $caseTypeXML
-   * @return array<string> symbolic activity-type names
-   */
-  function getDeclaredActivityTypes($caseTypeXML) {
-    $result = array();
-
-    if (!empty($caseTypeXML->ActivityTypes) && $caseTypeXML->ActivityTypes->ActivityType) {
-      foreach ($caseTypeXML->ActivityTypes->ActivityType as $activityTypeXML) {
-        $result[] = (string) $activityTypeXML->name;
-      }
-    }
-
-    if (!empty($caseTypeXML->ActivitySets) && $caseTypeXML->ActivitySets->ActivitySet) {
-      foreach ($caseTypeXML->ActivitySets->ActivitySet as $activitySetXML) {
-        if ($activitySetXML->ActivityTypes && $activitySetXML->ActivityTypes->ActivityType) {
-          foreach ($activitySetXML->ActivityTypes->ActivityType as $activityTypeXML) {
-            $result[] = (string) $activityTypeXML->name;
-          }
-        }
-      }
-    }
-
-    $result = array_unique($result);
-    sort($result);
-    return $result;
-  }
-
-  /**
-   * @param SimpleXMLElement $caseTypeXML
-   * @return array<string> symbolic relationship-type names
-   */
-  function getDeclaredRelationshipTypes($caseTypeXML) {
-    $result = array();
-
-    if (!empty($caseTypeXML->CaseRoles) && $caseTypeXML->CaseRoles->RelationshipType) {
-      foreach ($caseTypeXML->CaseRoles->RelationshipType as $relTypeXML) {
-        $result[] = (string) $relTypeXML->name;
-      }
-    }
-
-    $result = array_unique($result);
-    sort($result);
-    return $result;
-  }
-
-  /**
-   * @param $params
-   */
   function deleteEmptyActivity(&$params) {
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
@@ -374,11 +270,6 @@ AND    a.is_current_revision = 1
     CRM_Core_DAO::executeQuery($query, $sqlParams);
   }
 
-  /**
-   * @param $params
-   *
-   * @return bool
-   */
   function isActivityPresent(&$params) {
     $query = "
 SELECT     count(a.id)
@@ -401,14 +292,6 @@ AND        a.is_deleted = 0
     return $maxInstance ? ($count < $maxInstance ? FALSE : TRUE) : FALSE;
   }
 
-  /**
-   * @param $activityTypeXML
-   * @param $params
-   *
-   * @return bool
-   * @throws CRM_Core_Exception
-   * @throws Exception
-   */
   function createActivity($activityTypeXML, &$params) {
     $activityTypeName = (string) $activityTypeXML->name;
     $activityTypes    = &$this->allActivityTypes(TRUE, TRUE);
@@ -505,7 +388,7 @@ AND        a.is_deleted = 0
       if ($referenceActivityName = (string) $activityTypeXML->reference_activity) {
 
         //we skip open case as reference activity.CRM-4374.
-        if (!empty($params['resetTimeline']) && $referenceActivityName == 'Open Case') {
+        if (CRM_Utils_Array::value('resetTimeline', $params) && $referenceActivityName == 'Open Case') {
           $activityDate = $params['activity_date_time'];
         }
         else {
@@ -551,7 +434,7 @@ AND        a.is_deleted = 0
       return TRUE;
     }
     $activityParams['case_id'] = $params['caseID'];
-    if (!empty($activityParams['is_auto'])) {
+    if (CRM_Utils_Array::value('is_auto', $activityParams)) {
       $activityParams['skipRecentView'] = TRUE;
     }
 
@@ -571,12 +454,7 @@ AND        a.is_deleted = 0
     return TRUE;
   }
 
-  /**
-   * @param $activitySetsXML
-   *
-   * @return array
-   */
-  static function activitySets($activitySetsXML) {
+  function activitySets($activitySetsXML) {
     $result = array();
     foreach ($activitySetsXML as $activitySetXML) {
       foreach ($activitySetXML as $recordXML) {
@@ -589,13 +467,6 @@ AND        a.is_deleted = 0
     return $result;
   }
 
-  /**
-   * @param $caseType
-   * @param null $activityTypeName
-   *
-   * @return array|bool|mixed
-   * @throws Exception
-   */
   function getMaxInstance($caseType, $activityTypeName = NULL) {
     $xml = $this->retrieve($caseType);
 
@@ -608,35 +479,11 @@ AND        a.is_deleted = 0
     return $activityTypeName ? CRM_Utils_Array::value($activityTypeName, $activityInstances) : $activityInstances;
   }
 
-  /**
-   * @param $caseType
-   *
-   * @return array|mixed
-   */
   function getCaseManagerRoleId($caseType) {
     $xml = $this->retrieve($caseType);
     return $this->caseRoles($xml->CaseRoles, TRUE);
   }
 
-  /**
-   * @param string $caseType
-   * @return array<\Civi\CCase\CaseChangeListener>
-   */
-  function getListeners($caseType) {
-    $xml = $this->retrieve($caseType);
-    $listeners = array();
-    if ($xml->Listeners && $xml->Listeners->Listener) {
-      foreach ($xml->Listeners->Listener as $listenerXML) {
-        $class = (string) $listenerXML;
-        $listeners[] = new $class();
-      }
-    }
-    return $listeners;
-  }
-
-  /**
-   * @return int
-   */
   function getRedactActivityEmail() {
     $xml = $this->retrieve("Settings");
     return ( string ) $xml->RedactActivityEmail ? 1 : 0;

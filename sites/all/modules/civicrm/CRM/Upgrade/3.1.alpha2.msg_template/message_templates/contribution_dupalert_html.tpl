@@ -47,7 +47,7 @@ Duplicate Matching Rules for your site.{/ts}</p>
      </tr>
      <tr>
       <td {$labelStyle}>
-       {ts}Organization Contact ID{/ts}
+       {ts}Organization Contact Id{/ts}
       </td>
       <td {$valueStyle}>
        {$onBehalfID}

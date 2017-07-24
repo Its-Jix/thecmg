@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -44,19 +44,16 @@ class CRM_Mailing_BAO_Spool extends CRM_Mailing_DAO_Spool {
   /**
    * Store Mails into Spool table.
    *
-   * @param $recipient
-   * @param array $headers The string of headers to send with the mail.
-   *
-   * @param string $body The full text of the message body, including any
-   *               Mime parts, etc.
-   *
-   * @param null $job_id
-   *
-   * @internal param mixed $recipients Either a comma-seperated list of recipients
+   * @param mixed $recipients Either a comma-seperated list of recipients
    *              (RFC822 compliant), or an array of recipients,
    *              each RFC822 valid. This may contain recipients not
    *              specified in the headers, for Bcc:, resending
    *              messages, etc.
+   *
+   * @param array $headers The string of headers to send with the mail.
+   *
+   * @param string $body The full text of the message body, including any
+   *               Mime parts, etc.
    *
    * @return mixed Returns true on success, or a CRM_Eore_Error
    *               containing a descriptive error message on

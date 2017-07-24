@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  */
 
@@ -35,8 +35,6 @@ class CRM_Utils_XML {
 
   /**
    * Read a well-formed XML file
-   *
-   * @param $file
    *
    * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
@@ -66,8 +64,6 @@ class CRM_Utils_XML {
   /**
    * Read a well-formed XML file
    *
-   * @param $string
-   *
    * @return array (0 => SimpleXMLElement|FALSE, 1 => errorMessage|FALSE)
    */
   public static function parseString($string) {
@@ -89,11 +85,6 @@ class CRM_Utils_XML {
     return array($xml, $error);
   }
 
-  /**
-   * @param $errors
-   *
-   * @return string
-   */
   protected static function formatErrors($errors) {
     $messages = array();
 
@@ -120,8 +111,6 @@ class CRM_Utils_XML {
    * Convert an XML element to an array
    *
    * @pararm $obj SimpleXMLElement
-   * @param $obj
-   *
    * @return array
    */
   public static function xmlObjToArray($obj) {

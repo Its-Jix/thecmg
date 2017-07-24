@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,15 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Contact_BAO_Contact_Optimizer {
-  /**
-   * @param $newValues
-   * @param $oldValues
-   */
   static function edit( &$newValues, &$oldValues ) {
     // still need to do more work on this
     // CRM-10192
@@ -45,10 +41,6 @@ class CRM_Contact_BAO_Contact_Optimizer {
     self::website( $newValues, $oldValues );
   }
 
-  /**
-   * @param $newValues
-   * @param $oldValues
-   */
   static function website( &$newValues, &$oldValues ) {
     $oldWebsiteValues = CRM_Utils_Array::value( 'website', $oldValues );
     $newWebsiteValues = CRM_Utils_Array::value( 'website', $newValues );
@@ -108,10 +100,6 @@ class CRM_Contact_BAO_Contact_Optimizer {
     unset( $newValues['website'] );
   }
 
-  /**
-   * @param $newValues
-   * @param $oldValues
-   */
   static function email( &$newValues, &$oldValues ) {
     $oldEmailValues = CRM_Utils_Array::value( 'email', $oldValues );
     $newEmailValues = CRM_Utils_Array::value( 'email', $newValues );

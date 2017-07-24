@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -140,16 +140,17 @@
 
 <script type="text/javascript">
   {literal}
-  CRM.$(function($) {
+  cj(function () {
+    cj().crmAccordions();
 
     // bind click event to premiums_active checkbox
-    $('#premiums_active').click(function () {
+    cj('#premiums_active').click(function () {
       premiumBlock();
     });
 
     // hide premium setting if premium block is not enabled
-    if (!$('#premiums_active').prop('checked')) {
-      $('#premiumSettings').hide();
+    if (!cj('#premiums_active').prop('checked')) {
+      cj('#premiumSettings').hide();
     }
   });
 
@@ -166,3 +167,6 @@
 
   {/literal}
 </script>
+
+{* include jscript to warn if unsaved form field changes *}
+{include file="CRM/common/formNavigate.tpl"}

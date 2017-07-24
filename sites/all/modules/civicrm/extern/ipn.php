@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  */
 
@@ -38,13 +38,11 @@ require_once '../civicrm.config.php';
 /* Cache the real UF, override it with the SOAP environment */
 
 $config = CRM_Core_Config::singleton();
-$log = new CRM_Utils_SystemLogger();
+
 if (empty($_GET)) {
-  $log->alert('payment_notification processor_name=PayPal', $_REQUEST);
   $paypalIPN = new CRM_Core_Payment_PayPalProIPN($_REQUEST);
 }
 else {
-  $log->alert('payment_notification PayPal_Standard', $_REQUEST);
   $paypalIPN = new CRM_Core_Payment_PayPalIPN();
   // @todo upgrade standard per Pro
 }

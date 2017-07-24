@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -71,7 +71,7 @@ class CRM_Custom_Form_Preview extends CRM_Core_Form {
       $fieldDAO = new CRM_Core_DAO_CustomField();
       CRM_Core_DAO::commonRetrieve('CRM_Core_DAO_CustomField', $params, $defaults);
 
-      if (!empty($defaults['is_view'])) {
+      if (CRM_Utils_Array::value('is_view', $defaults)) {
         CRM_Core_Error::statusBounce(ts('This field is view only so it will not display on edit form.'));
       }
       elseif (CRM_Utils_Array::value('is_active', $defaults) == 0) {

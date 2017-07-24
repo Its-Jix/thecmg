@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -151,17 +151,14 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * Class constructor
    *
-   * @param array $queryParams array of parameters for query
-   * @param \const|int $action - action of search basic or advanced.
-   * @param string $eventClause if the caller wants to further restrict the search (used in participations)
+   * @param array   $queryParams array of parameters for query
+   * @param int     $action - action of search basic or advanced.
+   * @param string  $eventClause if the caller wants to further restrict the search (used in participations)
    * @param boolean $single are we dealing only with one contact?
-   * @param int $limit how many participations do we want returned
+   * @param int     $limit  how many participations do we want returned
    *
-   * @param string $context
-   * @param null $compContext
-   *
-   * @return \CRM_Event_Selector_Search
-  @access public
+   * @return CRM_Contact_Selector
+   * @access public
    */
   function __construct(&$queryParams,
     $action      = CRM_Core_Action::NONE,
@@ -214,12 +211,9 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * - View
    * - Edit
    *
-   * @param null $qfKey
-   * @param null $context
-   * @param null $compContext
-   *
    * @return array
    * @access public
+   *
    */
   static function &links($qfKey = NULL, $context = NULL, $compContext = NULL) {
     $extraParams = NULL;
@@ -264,10 +258,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param $action
-   * @param $params
-   *
-   * @internal param $
+   * @param
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -364,43 +355,19 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       $row['showConfirmUrl'] = ($statusClass == 'Pending') ? TRUE : FALSE;
 
-      if (!empty($row['participant_is_test'])) {
+      if (CRM_Utils_Array::value('participant_is_test', $row)) {
         $row['participant_status'] .= ' (' . ts('test') . ')';
       }
 
       $row['checkbox'] = CRM_Core_Form::CB_PREFIX . $result->participant_id;
-      $links = self::links($this->_key, $this->_context, $this->_compContext);
 
-      if ($statusTypes[$row['participant_status_id']] == 'Partially paid') {
-        $links[CRM_Core_Action::ADD] = array(
-          'name' => ts('Record Payment'),
-          'url' => 'civicrm/payment',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
-          'title' => ts('Record Payment'),
-        );
-      }
-
-      if ($statusTypes[$row['participant_status_id']] == 'Pending refund') {
-        $links[CRM_Core_Action::ADD] = array(
-          'name' => ts('Record Refund'),
-          'url' => 'civicrm/payment',
-          'qs' => 'reset=1&id=%%id%%&cid=%%cid%%&action=add&component=event',
-          'title' => ts('Record Refund'),
-        );
-      }
-
-      $row['action'] = CRM_Core_Action::formLink($links,
+      $row['action'] = CRM_Core_Action::formLink(self::links($this->_key, $this->_context, $this->_compContext),
         $mask,
         array(
           'id' => $result->participant_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        ),
-        ts('more'),
-        FALSE,
-        'participant.selector.row',
-        'Participant',
-        $result->participant_id
+        )
       );
 
 
@@ -410,7 +377,7 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
 
       $row['paid'] = CRM_Event_BAO_Event::isMonetary($row['event_id']);
 
-      if (!empty($row['participant_fee_level'])) {
+      if (CRM_Utils_Array::value('participant_fee_level', $row)) {
         CRM_Event_BAO_Participant::fixEventLevel($row['participant_fee_level']);
       }
 
@@ -464,12 +431,12 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
         ),
         array(
           'name' => ts('Fee Level'),
-          'sort' => 'participant_fee_level',
+          'sort' => 'fee_level',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
           'name' => ts('Amount'),
-          'sort' => 'participant_fee_amount',
+          'sort' => 'fee_amount',
           'direction' => CRM_Utils_Sort::DONTCARE,
         ),
         array(
@@ -510,16 +477,10 @@ class CRM_Event_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     return self::$_columnHeaders;
   }
 
-  /**
-   * @return mixed
-   */
   function alphabetQuery() {
     return $this->_query->searchQuery(NULL, NULL, NULL, FALSE, FALSE, TRUE);
   }
 
-  /**
-   * @return string
-   */
   function &getQuery() {
     return $this->_query;
   }

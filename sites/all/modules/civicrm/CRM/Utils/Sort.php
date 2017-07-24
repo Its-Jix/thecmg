@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -41,7 +41,7 @@
  * if introducing additional functionality
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -116,11 +116,11 @@ class CRM_Utils_Sort {
    * key names of variable (which should be the same as the column name)
    * value: ascending or descending
    *
-   * @param mixed $vars - assoc array as described above
+   * @param mixed  $vars             - assoc array as described above
    * @param string $defaultSortOrder - order to sort
    *
-   * @return \CRM_Utils_Sort
-  @access public
+   * @return void
+   * @access public
    */
   function __construct(&$vars, $defaultSortOrder = NULL) {
     $this->_vars = array();
@@ -139,7 +139,7 @@ class CRM_Utils_Sort {
       $this->_currentSortDirection = $this->_vars[$this->_currentSortID]['direction'];
     }
     $this->_urlVar = self::SORT_ID;
-    $this->_link = CRM_Utils_System::makeURL($this->_urlVar, TRUE);
+    $this->_link = CRM_Utils_System::makeURL($this->_urlVar);
 
     $this->initialize($defaultSortOrder);
   }
@@ -151,7 +151,7 @@ class CRM_Utils_Sort {
    * @access public
    */
   function orderBy() {
-    if (empty($this->_vars[$this->_currentSortID])) {
+    if (!CRM_Utils_Array::value($this->_currentSortID, $this->_vars)) {
       return '';
     }
 
@@ -276,9 +276,6 @@ class CRM_Utils_Sort {
 
   /**
    * Universal callback function for sorting by weight
-   *
-   * @param $a
-   * @param $b
    *
    * @return array of items sorted by weight
    * @access public

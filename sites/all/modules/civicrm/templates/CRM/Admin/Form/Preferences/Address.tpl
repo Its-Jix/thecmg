@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,10 +30,14 @@
         <tr class="crm-preferences-address-form-block-mailing_format">
             <td class="label">{$form.mailing_format.label}<br />{help id='label-tokens'}</td>
             <td>
-              <div class="helpIcon" id="helphtml">
-                <input class="crm-token-selector big" data-field="mailing_format" />
-                {help id="id-token-text" tplFile=$tplFile file="CRM/Contact/Form/Task/Email.hlp"}
-              </div>
+                <span>
+                     <a href="#" onClick="return showToken('Text', 1);">{ts}Insert Tokens{/ts}</a>
+                     <div id='tokenText' style="display:none">
+                         <input  style="border:1px solid #999999;" type="text" id="filter1" size="20" name="filter1" onkeyup="filter(this, 1)"/><br />
+                         <span class="description">{ts}Begin typing to filter list of tokens{/ts}</span><br/>
+                         {$form.token1.html}
+                     </div>
+                </span><br />
                 {$form.mailing_format.html|crmAddClass:huge12}<br />
                 <span class="description">{ts}Content and format for mailing labels.{/ts}</span>
             </td>

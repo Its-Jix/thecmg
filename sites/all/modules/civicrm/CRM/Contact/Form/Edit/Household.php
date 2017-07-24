@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -68,7 +68,7 @@ class CRM_Contact_Form_Edit_Household {
     }
 
     if ( !$inlineEditMode ) {
-      $form->add('text', 'external_identifier', ts('External ID'), $attributes['external_identifier'], FALSE);
+      $form->add('text', 'external_identifier', ts('External Id'), $attributes['external_identifier'], FALSE);
       $form->addRule('external_identifier',
         ts('External ID already exists in Database.'),
         'objectExists',
@@ -82,11 +82,8 @@ class CRM_Contact_Form_Edit_Household {
    *
    * @params array $fields array of form values
    *
-   * @param $fields
-   * @param $files
-   * @param null $contactID
-   *
-   * @return array|bool $error@static
+   * @return $error
+   * @static
    * @public
    */
   static function formRule($fields, $files, $contactID = NULL) {
@@ -94,7 +91,7 @@ class CRM_Contact_Form_Edit_Household {
     $primaryID = CRM_Contact_Form_Contact::formRule($fields, $errors, $contactID);
 
     // make sure that household name is set
-    if (empty($fields['household_name'])) {
+    if (!CRM_Utils_Array::value('household_name', $fields)) {
       $errors['household_name'] = 'Household Name should be set.';
     }
 

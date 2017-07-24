@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,10 +23,10 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 *}
-{include file="CRM/common/accesskeys.tpl"}
-{if !empty($contactId)}
-  {include file="CRM/common/contactFooter.tpl"}
-{/if}
+{if call_user_func(array('CRM_Core_Permission','check'), 'access CiviCRM')}
+  {if !empty($contactId)}
+    {include file="CRM/common/contactFooter.tpl"}
+  {/if}
 
 <div class="crm-footer" id="civicrm-footer">
   {crmVersion assign=version}
@@ -41,3 +41,4 @@
   {docURL page="" text="Online documentation."}
 </div>
 {include file="CRM/common/notifications.tpl"}
+{/if}

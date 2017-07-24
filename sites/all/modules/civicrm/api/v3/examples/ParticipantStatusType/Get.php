@@ -38,13 +38,13 @@ function participant_status_type_get_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 16,
+  'id' => 14,
   'values' => array(
-      '16' => array(
-          'id' => '16',
+      '14' => array(
+          'id' => '14',
           'name' => 'test status',
           'label' => 'I am a test',
-          'class' => '14',
+          'class' => 'Positive',
           'is_reserved' => 0,
           'is_active' => '1',
           'is_counted' => '1',

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -157,9 +157,13 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     );
 
     foreach ($this->_fields as $name => $field) {
-      if ((substr($name, 0, 6) == 'custom') && !empty($field['is_search_range'])) {
-        $from = CRM_Utils_Request::retrieve($name . '_from', 'String', $this);
-        $to = CRM_Utils_Request::retrieve($name . '_to', 'String', $this);
+      if ((substr($name, 0, 6) == 'custom') && CRM_Utils_Array::value('is_search_range', $field)) {
+        $from = CRM_Utils_Request::retrieve($name . '_from', 'String',
+          $this, FALSE, NULL, 'REQUEST'
+        );
+        $to = CRM_Utils_Request::retrieve($name . '_to', 'String',
+          $this, FALSE, NULL, 'REQUEST'
+        );
         $value = array();
         if ($from && $to) {
           $value['from'] = $from;
@@ -223,7 +227,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
       $customField = CRM_Utils_Array::value($name, $this->_customFields);
 
-      if (!empty($_POST) && empty($_POST[$name])) {
+      if (!empty($_POST) && !CRM_Utils_Array::value($name, $_POST)) {
         if ($customField) {
           // reset checkbox/radio because a form does not send null checkbox values
           if (in_array($customField['html_type'],
@@ -243,10 +247,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
       if (isset($value) && $value != NULL) {
         if (!is_array($value)) {
           $value = trim($value);
-        }
-        $operator = CRM_Utils_Request::retrieve($name . '_operator', 'String', $this);
-        if ($operator) {
-          $this->_params[$name . '_operator'] = $operator;
         }
         $this->_params[$name] = $this->_fields[$name]['value'] = $value;
       }
@@ -327,7 +327,9 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     $this->assign('search', $this->_search);
 
     // search if search returned a form error?
-    if ((empty($_GET['reset']) || !empty($_GET['force'])) &&
+    if ((!CRM_Utils_Array::value('reset', $_GET) ||
+        CRM_Utils_Array::value('force', $_GET)
+      ) &&
       !$searchError
     ) {
       $this->assign('isReset', FALSE);
@@ -357,7 +359,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
           )
         );
       }
-      if (!empty($this->_params['group'])) {
+      if (CRM_Utils_Array::value('group', $this->_params)) {
         foreach ($this->_params['group'] as $key => $val) {
           if (!$val) {
             unset($this->_params['group'][$key]);
@@ -400,10 +402,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
   /**
    * Function to get the list of contacts for a profile
    *
-   * @param $gid
-   *
-   * @return array
-   * @internal param object $form
+   * @param $form object
    *
    * @access public
    */
@@ -424,7 +423,7 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
 
     // add group id to params if a uf group belong to a any group
     if ($groupId) {
-      if (!empty($params['group'])) {
+      if (CRM_Utils_Array::value('group', $params)) {
         $params['group'][$groupId] = 1;
       }
       else {
@@ -459,11 +458,6 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     return $contactIds;
   }
 
-  /**
-   * @param string $suffix
-   *
-   * @return null|string
-   */
   function checkTemplateFileExists($suffix = '') {
     if ($this->_gid) {
       $templateFile = "CRM/Profile/Page/{$this->_gid}/Listings.{$suffix}tpl";
@@ -484,30 +478,11 @@ class CRM_Profile_Page_Listings extends CRM_Core_Page {
     return NULL;
   }
 
-  /**
-   * Use the form name to create the tpl file name
-   *
-   * @return string
-   * @access public
-   */
-  /**
-   * @return string
-   */
   function getTemplateFileName() {
     $fileName = $this->checkTemplateFileExists();
     return $fileName ? $fileName : parent::getTemplateFileName();
   }
 
-  /**
-   * Default extra tpl file basically just replaces .tpl with .extra.tpl
-   * i.e. we dont override
-   *
-   * @return string
-   * @access public
-   */
-  /**
-   * @return string
-   */
   function overrideExtraTemplateFileName() {
     $fileName = $this->checkTemplateFileExists('extra.');
     return $fileName ? $fileName : parent::overrideExtraTemplateFileName();

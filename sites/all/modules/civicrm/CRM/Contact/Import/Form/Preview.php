@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -129,7 +129,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
   /**
    * Function to actually build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -139,7 +139,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $groups = $this->get('groups');
 
     if (!empty($groups)) {
-      $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, array('multiple' => "multiple", 'class' => 'crm-select2'));
+      $this->addElement('select', 'groups', ts('Add imported records to existing group(s)'), $groups, array('multiple' => "multiple", 'size' => 5));
     }
 
     //display new tag
@@ -192,9 +192,6 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
    *
    * @param array $fields posted values of the form
    *
-   * @param $files
-   * @param $self
-   *
    * @return array list of errors to be posted back to the form
    * @static
    * @access public
@@ -203,7 +200,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
     $errors = array();
     $invalidTagName = $invalidGroupName = FALSE;
 
-    if (!empty($fields['newTagName'])) {
+    if (CRM_Utils_Array::value('newTagName', $fields)) {
       if (!CRM_Utils_Rule::objectExists(trim($fields['newTagName']),
           array('CRM_Core_DAO_Tag')
         )) {
@@ -214,7 +211,7 @@ class CRM_Contact_Import_Form_Preview extends CRM_Import_Form_Preview {
       }
     }
 
-    if (!empty($fields['newGroupName'])) {
+    if (CRM_Utils_Array::value('newGroupName', $fields)) {
       $title  = trim($fields['newGroupName']);
       $name   = CRM_Utils_String::titleToVar($title);
       $query  = 'select count(*) from civicrm_group where name like %1 OR title like %2';

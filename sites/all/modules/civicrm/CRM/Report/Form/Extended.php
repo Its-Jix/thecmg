@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,12 +42,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   protected $_customGroupExtends = array();
   protected $_baseTable = 'civicrm_contact';
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     parent::__construct();
   }
@@ -82,9 +76,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /*
    * Define any from clauses in use (child classes to override)
    */
-  /**
-   * @return array
-   */
   function fromClauses() {
     return array();
   }
@@ -109,25 +100,17 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     parent::orderBy();
   }
 
-  /**
-   * @param $rows
-   *
-   * @return array
-   */
   function statistics(&$rows) {
     return parent::statistics($rows);
   }
 
   function postProcess() {
-    if (!empty($this->_aclTable) && !empty($this->_aliases[$this->_aclTable])) {
+    if (!empty($this->_aclTable) && CRM_Utils_Array::value($this->_aclTable, $this->_aliases)) {
       $this->buildACLClause($this->_aliases[$this->_aclTable]);
     }
     parent::postProcess();
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     parent::alterDisplay($rows);
 
@@ -166,9 +149,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     }
   }
 
-  /**
-   * @return array
-   */
   function getLineItemColumns() {
     return array(
       'civicrm_line_item' =>
@@ -222,9 +202,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getPriceFieldValueColumns() {
     return array(
       'civicrm_price_field_value' =>
@@ -266,9 +243,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getPriceFieldColumns() {
     return array(
       'civicrm_price_field' =>
@@ -308,9 +282,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getParticipantColumns() {
     static $_events = array();
     if (!isset($_events['all'])) {
@@ -379,9 +350,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getMembershipColumns() {
     return array(
       'civicrm_membership' => array(
@@ -421,9 +389,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getMembershipTypeColumns() {
     return array(
       'civicrm_membership_type' => array(
@@ -442,9 +407,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getEventColumns() {
     return array(
       'civicrm_event' => array(
@@ -500,9 +462,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getContributionColumns() {
     return array(
       'civicrm_contribution' =>
@@ -579,9 +538,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getContactColumns() {
     return array(
       'civicrm_contact' => array(
@@ -627,9 +583,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
     );
   }
 
-  /**
-   * @return array
-   */
   function getCaseColumns() {
     return array(
       'civicrm_case' => array(
@@ -720,18 +673,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
    * - filters enable these fields for filtering
    * - defaults - (is this working?) values to pre-populate
    * @return array address fields for construct clause
-   */
-  /**
-   * Get address columns to add to array
-   * @param array $options
-   *  - prefix Prefix to add to table (in case of more than one instance of the table)
-   *  - prefix_label Label to give columns from this address table instance
-   * @return array address columns definition
-   */
-  /**
-   * @param array $options
-   *
-   * @return array
    */
   function getAddressColumns($options = array()) {
     $defaultOptions = array(
@@ -932,9 +873,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /*
    * Get Information about advertised Joins
    */
-  /**
-   * @return array
-   */
   function getAvailableJoins() {
     return array(
       'priceFieldValue_from_lineItem' => array(
@@ -1023,9 +961,6 @@ class CRM_Report_Form_Extended extends CRM_Report_Form {
   /*
    * Add join from contact table to address. Prefix will be added to both tables
    * as it's assumed you are using it to get address of a secondary contact
-   */
-  /**
-   * @param string $prefix
    */
   function joinAddressFromContact( $prefix = '') {
     $this->_from .= " LEFT JOIN civicrm_address {$this->_aliases[$prefix . 'civicrm_address']}
@@ -1234,12 +1169,6 @@ WHERE   line_item_civireport.id IS NOT NULL
   /*
     * Retrieve text for financial type from pseudoconstant
     */
-  /**
-   * @param $value
-   * @param $row
-   *
-   * @return string
-   */
   function alterNickName($value, &$row) {
     if(empty($row['civicrm_contact_id'])){
       return;
@@ -1253,24 +1182,12 @@ WHERE   line_item_civireport.id IS NOT NULL
   /*
    * Retrieve text for contribution type from pseudoconstant
    */
-  /**
-   * @param $value
-   * @param $row
-   *
-   * @return array|string
-   */
   function alterContributionType($value, &$row) {
     return is_string(CRM_Contribute_PseudoConstant::financialType($value, FALSE)) ? CRM_Contribute_PseudoConstant::financialType($value, FALSE) : '';
   }
 
   /*
    * Retrieve text for contribution status from pseudoconstant
-   */
-  /**
-   * @param $value
-   * @param $row
-   *
-   * @return array
    */
   function alterContributionStatus($value, &$row) {
     return CRM_Contribute_PseudoConstant::contributionStatus($value);
@@ -1279,54 +1196,22 @@ WHERE   line_item_civireport.id IS NOT NULL
   /*
    * Retrieve text for payment instrument from pseudoconstant
    */
-  /**
-   * @param $value
-   * @param $row
-   *
-   * @return array
-   */
   function alterEventType($value, &$row) {
     return CRM_Event_PseudoConstant::eventType($value);
   }
 
-  /**
-   * @param $value
-   * @param $row
-   *
-   * @return array|string
-   */
   function alterEventID($value, &$row) {
     return is_string(CRM_Event_PseudoConstant::event($value, FALSE)) ? CRM_Event_PseudoConstant::event($value, FALSE) : '';
   }
 
-  /**
-   * @param $value
-   * @param $row
-   *
-   * @return array|string
-   */
   function alterMembershipTypeID($value, &$row) {
     return is_string(CRM_Member_PseudoConstant::membershipType($value, FALSE)) ? CRM_Member_PseudoConstant::membershipType($value, FALSE) : '';
   }
 
-  /**
-   * @param $value
-   * @param $row
-   *
-   * @return array|string
-   */
   function alterMembershipStatusID($value, &$row) {
     return is_string(CRM_Member_PseudoConstant::membershipStatus($value, FALSE)) ? CRM_Member_PseudoConstant::membershipStatus($value, FALSE) : '';
   }
 
-  /**
-   * @param $value
-   * @param $row
-   * @param $selectedfield
-   * @param $criteriaFieldName
-   *
-   * @return array
-   */
   function alterCountryID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
@@ -1337,14 +1222,6 @@ WHERE   line_item_civireport.id IS NOT NULL
     }
   }
 
-  /**
-   * @param $value
-   * @param $row
-   * @param $selectedfield
-   * @param $criteriaFieldName
-   *
-   * @return array
-   */
   function alterCountyID($value, &$row,$selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
@@ -1355,14 +1232,6 @@ WHERE   line_item_civireport.id IS NOT NULL
     }
   }
 
-  /**
-   * @param $value
-   * @param $row
-   * @param $selectedfield
-   * @param $criteriaFieldName
-   *
-   * @return array
-   */
   function alterStateProvinceID($value, &$row, $selectedfield, $criteriaFieldName) {
     $url = CRM_Utils_System::url(CRM_Utils_System::currentPath(), "reset=1&force=1&{$criteriaFieldName}_op=in&{$criteriaFieldName}_value={$value}", $this->_absoluteUrl);
     $row[$selectedfield . '_link'] = $url;
@@ -1374,23 +1243,11 @@ WHERE   line_item_civireport.id IS NOT NULL
     }
   }
 
-  /**
-   * @param $value
-   * @param $row
-   * @param $fieldname
-   *
-   * @return mixed
-   */
   function alterContactID($value, &$row, $fieldname) {
     $row[$fieldname . '_link'] = CRM_Utils_System::url("civicrm/contact/view", 'reset=1&cid=' . $value, $this->_absoluteUrl);
     return $value;
   }
 
-  /**
-   * @param $value
-   *
-   * @return array
-   */
   function alterParticipantStatus($value) {
     if (empty($value)) {
       return;
@@ -1398,11 +1255,6 @@ WHERE   line_item_civireport.id IS NOT NULL
     return CRM_Event_PseudoConstant::participantStatus($value, FALSE, 'label');
   }
 
-  /**
-   * @param $value
-   *
-   * @return string
-   */
   function alterParticipantRole($value) {
     if (empty($value)) {
       return;
@@ -1415,11 +1267,6 @@ WHERE   line_item_civireport.id IS NOT NULL
     return implode(', ', $value);
   }
 
-  /**
-   * @param $value
-   *
-   * @return mixed
-   */
   function alterPaymentType($value) {
     $paymentInstruments = CRM_Contribute_PseudoConstant::paymentInstrument();
     return $paymentInstruments[$value];

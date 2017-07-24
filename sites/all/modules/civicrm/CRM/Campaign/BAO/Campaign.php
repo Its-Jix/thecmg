@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -76,20 +76,20 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
 
     $groupTableName = CRM_Contact_BAO_Group::getTableName();
 
-    if (isset($params['groups']) && !empty($params['groups']['include']) && is_array($params['groups']['include'])) {
+    if (isset($params['groups']) && CRM_Utils_Array::value('include', $params['groups']) && is_array($params['groups']['include'])) {
       foreach ($params['groups']['include'] as $entityId) {
         $dao               = new CRM_Campaign_DAO_CampaignGroup();
         $dao->campaign_id  = $campaign->id;
         $dao->entity_table = $groupTableName;
         $dao->entity_id    = $entityId;
-        $dao->group_type   = 'Include';
+        $dao->group_type   = 'include';
         $dao->save();
         $dao->free();
       }
     }
 
     //store custom data
-    if (!empty($params['custom']) &&
+    if (CRM_Utils_Array::value('custom', $params) &&
       is_array($params['custom'])
     ) {
       CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_campaign', $campaign->id);
@@ -102,8 +102,6 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * function to delete the campaign
    *
    * @param  int $id id of the campaign
-   *
-   * @return bool|mixed
    */
   public static function del($id) {
     if (!$id) {
@@ -119,10 +117,9 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
    * retrieves the relevant objects. Typically the valid params are only
    * campaign_id.
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $defaults (reference ) an assoc array to hold the flattened values
+   * @param array  $params   (reference ) an assoc array of name/value pairs
+   * @param array  $defaults (reference ) an assoc array to hold the flattened values
    *
-   * @return \CRM_Campaign_DAO_Campaign|null
    * @access public
    */
   public function retrieve(&$params, &$defaults) {
@@ -140,15 +137,12 @@ Class CRM_Campaign_BAO_Campaign extends CRM_Campaign_DAO_Campaign {
   /**
    * Return the all eligible campaigns w/ cache.
    *
-   * @param int $includeId lets inlcude this campaign by force.
-   * @param int $excludeId do not include this campaign.
-   * @param boolean $onlyActive consider only active campaigns.
+   * @param int      $includeId  lets inlcude this campaign by force.
+   * @param int      $excludeId  do not include this campaign.
+   * @param boolean  $onlyActive consider only active campaigns.
    *
-   * @param bool $onlyCurrent
-   * @param bool $appendDatesToTitle
-   * @param bool $forceAll
-   *
-   * @return mixed $campaigns a set of campaigns.@access public
+   * @return $campaigns a set of campaigns.
+   * @access public
    */
   public static function getCampaigns(
     $includeId = NULL,
@@ -289,9 +283,9 @@ Order By  camp.title";
     return $validCampaigns[$cacheKey];
   }
 
-  /**
+  /*
    * Is CiviCampaign enabled.
-   * @return bool
+   *
    */
   public static function isCampaignEnable() {
     static $isEnable = NULL;
@@ -326,7 +320,7 @@ Order By  camp.title";
         'sortOrder' => 'desc',
       );
       foreach ($sortParams as $name => $default) {
-        if (!empty($params[$name])) {
+        if (CRM_Utils_Array::value($name, $params)) {
           $sortParams[$name] = $params[$name];
         }
       }
@@ -360,40 +354,40 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
 
     //build the where clause.
     $queryParams = $where = array();
-    if (!empty($params['id'])) {
+    if (CRM_Utils_Array::value('id', $params)) {
       $where[] = "( campaign.id = %1 )";
       $queryParams[1] = array($params['id'], 'Positive');
     }
-    if (!empty($params['name'])) {
+    if (CRM_Utils_Array::value('name', $params)) {
       $where[] = "( campaign.name LIKE %2 )";
       $queryParams[2] = array('%' . trim($params['name']) . '%', 'String');
     }
-    if (!empty($params['title'])) {
+    if (CRM_Utils_Array::value('title', $params)) {
       $where[] = "( campaign.title LIKE %3 )";
       $queryParams[3] = array('%' . trim($params['title']) . '%', 'String');
     }
-    if (!empty($params['start_date'])) {
+    if (CRM_Utils_Array::value('start_date', $params)) {
       $startDate      = CRM_Utils_Date::processDate($params['start_date']);
       $where[]        = "( campaign.start_date >= %4 OR campaign.start_date IS NULL )";
       $queryParams[4] = array($startDate, 'String');
     }
-    if (!empty($params['end_date'])) {
+    if (CRM_Utils_Array::value('end_date', $params)) {
       $endDate        = CRM_Utils_Date::processDate($params['end_date'], '235959');
       $where[]        = "( campaign.end_date <= %5 OR campaign.end_date IS NULL )";
       $queryParams[5] = array($endDate, 'String');
     }
-    if (!empty($params['description'])) {
+    if (CRM_Utils_Array::value('description', $params)) {
       $where[] = "( campaign.description LIKE %6 )";
       $queryParams[6] = array('%' . trim($params['description']) . '%', 'String');
     }
-    if (!empty($params['campaign_type_id'])) {
+    if (CRM_Utils_Array::value('campaign_type_id', $params)) {
       $typeId = $params['campaign_type_id'];
       if (is_array($params['campaign_type_id'])) {
         $typeId = implode(' , ', $params['campaign_type_id']);
       }
       $where[] = "( campaign.campaign_type_id IN ( {$typeId} ) )";
     }
-    if (!empty($params['status_id'])) {
+    if (CRM_Utils_Array::value('status_id', $params)) {
       $statusId = $params['status_id'];
       if (is_array($params['status_id'])) {
         $statusId = implode(' , ', $params['status_id']);
@@ -402,7 +396,7 @@ INNER JOIN civicrm_option_group grp ON ( campaign_type.option_group_id = grp.id 
     }
     if (array_key_exists('is_active', $params)) {
       $active = "( campaign.is_active = 1 )";
-      if (!empty($params['is_active'])) {
+      if (CRM_Utils_Array::value('is_active', $params)) {
         $active = "( campaign.is_active = 0 OR campaign.is_active IS NULL )";
       }
       $where[] = $active;
@@ -470,7 +464,6 @@ SELECT  campaign.id               as id,
    *
    * @param int $campaignId campaign id
    *
-   * @return array
    * @static
    */
   static function getCampaignGroups($campaignId) {
@@ -512,9 +505,6 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     return CRM_Core_DAO::setFieldValue('CRM_Campaign_DAO_Campaign', $id, 'is_active', $is_active);
   }
 
-  /**
-   * @return bool
-   */
   static function accessCampaign() {
     static $allow = NULL;
 
@@ -534,10 +524,6 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
    * Add select element for campaign
    * and assign needful info to templates.
    *
-   */
-  /**
-   * @param $form
-   * @param null $connectedCampaignId
    */
   public static function addCampaign(&$form, $connectedCampaignId = NULL) {
     //some forms do set default and freeze.
@@ -577,9 +563,8 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       $campaign = &$form->add('select',
         'campaign_id',
         ts('Campaign'),
-        array('' => ts('- select -')) + $campaigns,
-        FALSE,
-        array('class' => 'crm-select2')
+        array(
+          '' => ts('- select -')) + $campaigns
       );
       //lets freeze when user does not has access or campaign is disabled.
       if (!$isCampaignEnabled || !$hasAccessCampaign) {
@@ -615,12 +600,10 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
     $form->assign('campaignInfo', $campaignInfo);
   }
 
-  /**
+  /*
    * Add campaign in compoent search.
    * and assign needful info to templates.
    *
-   * @param $form
-   * @param string $elementName
    */
   public static function addCampaignInComponentSearch(&$form, $elementName = 'campaign_id') {
     $campaignInfo    = array();
@@ -634,15 +617,19 @@ INNER JOIN  civicrm_group grp ON ( grp.id = campgrp.entity_id )
       $pastCampaigns    = array_diff($campaigns, $currentCampaigns);
       $allCampaigns     = array();
       if (!empty($currentCampaigns)) {
-        $allCampaigns = array('crm_optgroup_current_campaign' => ts('Current Campaigns')) + $currentCampaigns;
+        $allCampaigns = array('current_campaign' => ts('Current Campaigns'));
+        foreach ($currentCampaigns as & $camp) $camp = "&nbsp;&nbsp;&nbsp;{$camp}";
+        $allCampaigns += $currentCampaigns;
       }
       if (!empty($pastCampaigns)) {
-        $allCampaigns += array('crm_optgroup_past_campaign' => ts('Past Campaigns')) + $pastCampaigns;
+        $allCampaigns += array('past_campaign' => ts('Past Campaigns'));
+        foreach ($pastCampaigns as & $camp) $camp = "&nbsp;&nbsp;&nbsp;{$camp}";
+        $allCampaigns += $pastCampaigns;
       }
 
       $showCampaignInSearch = TRUE;
       $form->add('select', $elementName, ts('Campaigns'), $allCampaigns, FALSE,
-        array('id' => 'campaigns', 'multiple' => 'multiple', 'class' => 'crm-select2')
+        array('id' => 'campaigns', 'multiple' => 'multiple', 'title' => ts('- select -'))
       );
     }
     $infoFields = array(

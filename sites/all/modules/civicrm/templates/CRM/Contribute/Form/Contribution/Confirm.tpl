@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -97,9 +97,17 @@
                 {else}
 {crmRegion name="contribution-confirm-recur"}
                     {if $installments}
-                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}I want to contribute this amount every %1 %2(s) for %3 installments.{/ts}</strong></p>
+                      {if $frequency_interval > 1}
+                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit 3=$installments}I want to contribute this amount every %1 %2s for %3 installments.{/ts}</strong></p>
+                      {else}
+                        <p><strong>{ts 1=$frequency_unit 2=$installments}I want to contribute this amount every %1 for %2 installments.{/ts}</strong></p>
+                      {/if}
                     {else}
-                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}I want to contribute this amount every %1 %2(s).{/ts}</strong></p>
+                      {if $frequency_interval > 1}
+                        <p><strong>{ts 1=$frequency_interval 2=$frequency_unit}I want to contribute this amount every %1 %2s.{/ts}</strong></p>
+                      {else}
+                        <p><strong>{ts 1=$frequency_unit }I want to contribute this amount every %1.{/ts}</strong></p>
+                      {/if}
                     {/if}
                     <p>{ts}Your initial contribution will be processed once you complete the confirmation step. You will be able to cancel the recurring contribution by visiting the web page link that will be included in your receipt.{/ts}</p>
 {/crmRegion}
@@ -121,20 +129,7 @@
         </div>
     </div>
     {/if}
-
-    {if $honor_block_is_active}
-        <div class="crm-group honor_block-group">
-            <div class="header-dark">
-                {$soft_credit_type}
-            </div>
-            <div class="display-block">
-                <div class="label-left crm-section honoree_profile-section">
-                    <strong>{$honorName}</strong></br>
-                    {include file="CRM/UF/Form/Block.tpl" fields=$honoreeProfileFields prefix='honor'}
-                </div>
-            </div>
-         </div>
-    {/if}
+    {include file="CRM/Contribute/Form/Contribution/Honor.tpl"}
 
     {if $customPre}
       <fieldset class="label-left crm-profile-view">
@@ -170,7 +165,7 @@
 
     {if $onbehalfProfile}
       <div class="crm-group onBehalf_display-group label-left crm-profile-view">
-         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile prefix='onbehalf'}
+         {include file="CRM/UF/Form/Block.tpl" fields=$onbehalfProfile}
          <div class="crm-section organization_email-section">
             <div class="label">{ts}Organization Email{/ts}</div>
             <div class="content">{$onBehalfEmail}</div>

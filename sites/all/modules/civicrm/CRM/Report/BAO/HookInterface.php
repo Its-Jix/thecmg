@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -38,22 +38,10 @@
  */
 class CRM_Report_BAO_HookInterface {
 
-  /**
-   * @param $reportObj
-   * @param $logTables
-   *
-   * @return null
-   */
   public function alterLogTables(&$reportObj, &$logTables) {
     return NULL;
   }
-
-  /**
-   * @param $reportObj
-   * @param $table
-   *
-   * @return array
-   */public function logDiffClause(&$reportObj, $table) {
+  public function logDiffClause(&$reportObj, $table) {
     return array();
   }
 }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id: Email.php 45499 2013-02-08 12:31:05Z kurund $
  *
  */
@@ -96,7 +96,7 @@ class CRM_Event_Form_Task_Email extends CRM_Event_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     CRM_Contact_Form_Task_EmailCommon::postProcess($this);

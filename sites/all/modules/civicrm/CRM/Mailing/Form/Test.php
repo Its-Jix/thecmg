@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -61,7 +61,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     $count = $this->get('count');
@@ -77,7 +77,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
     $this->add('select',
       'test_group',
       ts('Send to This Group'),
-      array('' => ts('- none -')) + CRM_Core_PseudoConstant::group('Mailing')
+      array('' => ts('- none -')) + CRM_Core_PseudoConstant::nestedGroup('Mailing')
     );
     $this->setDefaults($defaults);
 
@@ -172,11 +172,10 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
   /**
    * Form rule to send out a test mailing.
    *
-   * @param $testParams
-   * @param array $files Any files posted to the form
-   * @param array $self an current this object
+   * @param array $params     Array of the form values
+   * @param array $files      Any files posted to the form
+   * @param array $self       an current this object
    *
-   * @internal param array $params Array of the form values
    * @return boolean          true on successful SMTP handoff
    * @access public
    */
@@ -203,7 +202,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       $urlString = 'civicrm/contact/' . $fragment;
     }
     $emails = NULL;
-    if (!empty($testParams['sendtest'])) {
+    if (CRM_Utils_Array::value('sendtest', $testParams)) {
       if (!($testParams['test_group'] || $testParams['test_email'])) {
         CRM_Core_Session::setStatus(ts('You did not provide an email address or select a group.'), ts('Test not sent.'), 'error');
         $error = TRUE;
@@ -229,7 +228,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       }
     }
 
-    if (!empty($testParams['_qf_Test_submit'])) {
+    if (CRM_Utils_Array::value('_qf_Test_submit', $testParams)) {
       //when user perform mailing from search context
       //redirect it to search result CRM-3711.
       if ($ssID && $self->_searchBasedMailing) {
@@ -261,7 +260,7 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       }
     }
 
-    if (!empty($testParams['_qf_Test_next']) &&
+    if (CRM_Utils_Array::value('_qf_Test_next', $testParams) &&
       $self->get('count') <= 0) {
       return array(
         '_qf_default' =>
@@ -269,7 +268,10 @@ class CRM_Mailing_Form_Test extends CRM_Core_Form {
       );
     }
 
-    if (!empty($_POST['_qf_Import_refresh']) || !empty($testParams['_qf_Test_next']) || empty($testParams['sendtest'])) {
+    if (CRM_Utils_Array::value('_qf_Import_refresh', $_POST) ||
+      CRM_Utils_Array::value('_qf_Test_next', $testParams) ||
+      !CRM_Utils_Array::value('sendtest', $testParams)
+    ) {
       $error = TRUE;
       return $error;
     }
@@ -346,7 +348,7 @@ ORDER BY   e.is_bulkmail DESC, e.is_primary DESC
       $isComplete = CRM_Mailing_BAO_MailingJob::runJobs($testParams);
     }
 
-    if (!empty($testParams['sendtest'])) {
+    if (CRM_Utils_Array::value('sendtest', $testParams)) {
       $status = NULL;
       if (CRM_Mailing_Info::workflowEnabled()) {
         if ((

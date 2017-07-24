@@ -5,10 +5,6 @@
  *
  * Modified and improved upon by CiviCRM LLC (c) 2007
  */
-
-/**
- * Class CRM_Widget_Widget
- */
 class CRM_Widget_Widget {
 
   static $_methodTable;

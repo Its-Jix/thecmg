@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -59,7 +59,7 @@ class CRM_Contact_Form_Inline_Demographics extends CRM_Contact_Form_Inline {
     $params = $this->exportValues();
 
     // Process / save demographics
-    if (empty($params['is_deceased'])) {
+    if (!CRM_Utils_Array::value('is_deceased', $params)) {
       $params['is_deceased'] = FALSE;
       $params['deceased_date'] = NULL;
     }

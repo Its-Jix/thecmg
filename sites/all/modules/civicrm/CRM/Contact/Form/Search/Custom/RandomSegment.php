@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,22 +28,21 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_debug = 0;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
-  /**
-   * @param $formValues
-   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
     $this->_columns = array(
-      ts('Contact ID') => 'contact_id',
+      ts('Contact Id') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Email') => 'email',
@@ -73,9 +72,6 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     }
   }
 
-  /**
-   * @param CRM_Core_Form $form
-   */
   function buildForm(&$form) {
     $form->add('text',
       'segmentSize',
@@ -83,28 +79,29 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
       TRUE
     );
 
-    $groups = CRM_Core_PseudoConstant::nestedGroup();
-
-    $select2style = array(
-      'multiple' => TRUE,
-      'style' => 'width: 100%; max-width: 60em;',
-      'class' => 'crm-select2',
-      'placeholder' => ts('- select -'),
+    $groups = CRM_Core_PseudoConstant::group();
+    $inG = &$form->addElement('advmultiselect', 'includeGroups',
+      ts('Include Group(s)') . ' ', $groups,
+      array(
+        'size' => 5,
+        'style' => 'width:240px',
+        'class' => 'advmultiselect',
+      )
     );
 
-    $form->add('select', 'includeGroups',
-      ts('Include Group(s)'),
-      $groups,
-      FALSE,
-      $select2style
+    $outG = &$form->addElement('advmultiselect', 'excludeGroups',
+      ts('Exclude Group(s)') . ' ', $groups,
+      array(
+        'size' => 5,
+        'style' => 'width:240px',
+        'class' => 'advmultiselect',
+      )
     );
 
-    $form->add('select', 'excludeGroups',
-      ts('Exclude Group(s)'),
-      $groups,
-      FALSE,
-      $select2style
-    );
+    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
+    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));
+    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
     $this->setTitle('Create a random segment of contacts');
 
@@ -115,22 +112,10 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     $form->assign('elements', array('segmentSize', 'includeGroups', 'excludeGroups'));
   }
 
-  /**
-   * @return null
-   */
   function summary() {
     return NULL;
   }
 
-  /**
-   * @param int $offset
-   * @param int $rowcount
-   * @param null $sort
-   * @param bool $includeContactIDs
-   * @param bool $justIDs
-   *
-   * @return string
-   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -150,9 +135,6 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     );
   }
 
-  /**
-   * @return string
-   */
   function from() {
     //define table name
     $randomNum = md5(uniqid());
@@ -291,6 +273,7 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
         CRM_Core_DAO::executeQuery($insertGroupNameQuery);
       }
     }
+    $this->buildACLClause('contact_a');
 
     $from = "FROM civicrm_contact contact_a";
 
@@ -324,32 +307,28 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
     $from = "FROM random_{$this->_tableName} random";
 
-    $from .= " INNER JOIN civicrm_contact contact_a ON random.id = contact_a.id";
+    $from .= " INNER JOIN civicrm_contact contact_a ON random.id = contact_a.id {$this->_aclFrom}";
 
     $from .= " $fromTail";
 
     return $from;
+
   }
 
-  /**
-   * @param bool $includeContactIDs
-   *
-   * @return string
-   */
   function where($includeContactIDs = FALSE) {
-    return '(1)';
+    $where = '(1)';
+
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->aclWhere} ";
+    }
+
+    return $where;
   }
 
-  /**
-   * @return string
-   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
-  /**
-   * @param $title
-   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -359,12 +338,6 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
     }
   }
 
-  /**
-   * @return mixed
-   */
-  /**
-   * @return mixed
-   */
   function count() {
     $sql = $this->all();
 
@@ -374,9 +347,16 @@ class CRM_Contact_Form_Search_Custom_RandomSegment extends CRM_Contact_Form_Sear
 
   function __destruct() {
     // the temporary tables are dropped automatically
-    // so we don't do it here
+    // so we dont do it here
     // but let mysql clean up
     return;
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+  
+}

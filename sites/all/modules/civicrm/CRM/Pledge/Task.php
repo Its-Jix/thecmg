@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -67,18 +67,15 @@ class CRM_Pledge_Task {
    */
   static function &tasks() {
     if (!self::$_tasks) {
-      self::$_tasks = array(1 => array(
-        'title' => ts('Delete Pledges'),
+      self::$_tasks = array(1 => array('title' => ts('Delete Pledges'),
           'class' => 'CRM_Pledge_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array(
-          'title' => ts('Print Selected Rows'),
+        2 => array('title' => ts('Print Pledges'),
           'class' => 'CRM_Pledge_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array(
-          'title' => ts('Export Pledges'),
+        3 => array('title' => ts('Export Pledges'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
@@ -108,7 +105,10 @@ class CRM_Pledge_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      $titles[$id] = $value['title'];
+      // skip Print Pledges task
+      if ($id != 2) {
+        $titles[$id] = $value['title'];
+      }
     }
     return $titles;
   }

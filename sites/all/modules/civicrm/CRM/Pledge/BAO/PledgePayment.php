@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -92,11 +92,6 @@ WHERE     pledge_id = %1
     return $paymentDetails;
   }
 
-  /**
-   * @param $params
-   *
-   * @return pledge
-   */
   static function create($params) {
     $transaction = new CRM_Core_Transaction();
     $contributionStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
@@ -169,7 +164,7 @@ WHERE     pledge_id = %1
    * @static
    */
   static function add($params) {
-    if (!empty($params['id'])) {
+    if (CRM_Utils_Array::value('id', $params)) {
       CRM_Utils_Hook::pre('edit', 'PledgePayment', $params['id'], $params);
     }
     else {
@@ -187,7 +182,7 @@ WHERE     pledge_id = %1
 
     $result = $payment->save();
 
-    if (!empty($params['id'])) {
+    if (CRM_Utils_Array::value('id', $params)) {
       CRM_Utils_Hook::post('edit', 'PledgePayment', $payment->id, $payment);
     }
     else {
@@ -225,9 +220,7 @@ WHERE     pledge_id = %1
   /**
    * Delete pledge payment
    *
-   * @param $id
-   *
-   * @internal param array $params associate array of field
+   * @param array $params associate array of field
    *
    * @return pledge payment id
    * @static
@@ -254,9 +247,8 @@ WHERE     pledge_id = %1
   /**
    * Function to delete all pledge payments
    *
-   * @param int $id pledge id
+   * @param int $id  pledge id
    *
-   * @return bool
    * @access public
    * @static
    *
@@ -289,9 +281,8 @@ WHERE     pledge_id = %1
   /**
    * On delete contribution record update associated pledge payment and pledge.
    *
-   * @param int $contributionID contribution id
+   * @param int $contributionID  contribution id
    *
-   * @return bool
    * @access public
    * @static
    */
@@ -327,15 +318,14 @@ WHERE     pledge_id = %1
   /**
    * update Pledge Payment Status
    *
-   * @param int $pledgeID , id of pledge
-   * @param array $paymentIDs , ids of pledge payment(s) to update
-   * @param int $paymentStatusID , payment status to set
-   * @param null $pledgeStatusID
-   * @param float|int $actualAmount , actual amount being paid
-   * @param bool $adjustTotalAmount , is amount being paid different from scheduled amount?
-   * @param bool $isScriptUpdate , is function being called from bin script?
+   * @param int $pledgeID, id of pledge
+   * @param array $paymentIDs, ids of pledge payment(s) to update
+   * @param int $paymentStatusID, payment status to set
+   * @param int $pledgeStatus, pledge status to change (if needed)
+   * @param float $actualAmount, actual amount being paid
+   * @param bool $adjustTotalAmount, is amount being paid different from scheduled amount?
+   * @param bool $isScriptUpdate, is function being called from bin script?
    *
-   * @internal param int $pledgeStatus , pledge status to change (if needed)
    * @return int $newStatus, updated status id (or 0)
    */
   static function updatePledgePaymentStatus(
@@ -614,12 +604,11 @@ WHERE  civicrm_pledge.id = %2
    * Function to update pledge payment table
    *
    * @param int $pledgeId pledge id
-   * @param int $paymentStatusId payment status id to set
    * @param array $paymentIds payment ids to be updated
-   * @param float|int $actualAmount , actual amount being paid
-   * @param int $contributionId , Id of associated contribution when payment is recorded
-   * @param bool $isScriptUpdate , is function being called from bin script?
-   *
+   * @param int $paymentStatusId payment status id to set
+   * @param float $actualAmount, actual amount being paid
+   * @param int $contributionId, Id of associated contribution when payment is recorded
+   * @param bool $isScriptUpdate, is function being called from bin script?
    * @static
    */
   static function updatePledgePayments($pledgeId,
@@ -678,8 +667,6 @@ WHERE  civicrm_pledge_payment.id = {$paymentId}
    *
    * @param int $pledgeID pledge id
    *
-   * @param int $limit
-   *
    * @return array associated array of pledge details
    * @static
    */
@@ -720,14 +707,6 @@ LIMIT 0, %2
     return end($paymentDetails);
   }
 
-  /**
-   * @param $pledgeID
-   * @param $actualAmount
-   * @param $pledgeScheduledAmount
-   * @param null $paymentContributionId
-   * @param null $pPaymentId
-   * @param null $paymentStatusID
-   */
   static function adjustPledgePayment($pledgeID, $actualAmount, $pledgeScheduledAmount, $paymentContributionId = NULL, $pPaymentId = NULL, $paymentStatusID = NULL) {
     $allStatus = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     if ($paymentStatusID == array_search('Cancelled', $allStatus) || $paymentStatusID == array_search('Refunded', $allStatus)) {

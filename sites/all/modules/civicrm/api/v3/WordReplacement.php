@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_WordReplacement
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
@@ -40,7 +40,7 @@
 /**
  * Get CiviCRM Word Replacement details
  * {@getfields word_replacement_create}
- *
+ * 
  */
 function civicrm_api3_word_replacement_get($params) {
   $bao = new CRM_Core_BAO_WordReplacement();
@@ -57,7 +57,7 @@ function civicrm_api3_word_replacement_get($params) {
  * @param array $params
  *
  * @return array
- *
+ * 
  * {@getfields word_replacement_create}
  */
 function civicrm_api3_word_replacement_create($params) {
@@ -71,6 +71,7 @@ function civicrm_api3_word_replacement_create($params) {
  * @param array $params array or parameters determined by getfields
  */
 function _civicrm_api3_word_replacement_create_spec(&$params) {
+  $params['is_active']['api.default'] = 1;
   unset($params['version']);
 }
 
@@ -78,10 +79,11 @@ function _civicrm_api3_word_replacement_create_spec(&$params) {
  * delete an existing word_replacement
  *
  *
- * @param array $params array containing id of the word_replacement
- *  to be deleted
+ * @param array $params  (reference) array containing id of the word_replacement
+ *                       to be deleted
  *
- * @return array api result array
+ * @return array  (referance) returns flag true if successfull, error
+ *                message otherwise
  *
  * @access public
  */

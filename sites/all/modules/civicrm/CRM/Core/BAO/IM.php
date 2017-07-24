@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -77,8 +77,6 @@ class CRM_Core_BAO_IM extends CRM_Core_DAO_IM {
    * Get all the ims for a specified contact_id, with the primary im being first
    *
    * @param int $id the contact id
-   *
-   * @param bool $updateBlankLocInfo
    *
    * @return array  the array of im details
    * @access public

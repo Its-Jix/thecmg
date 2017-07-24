@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,20 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Contact_BAO_SearchCustom {
 
-  /**
-   * @param $csID
-   * @param null $ssID
-   * @param null $gID
-   *
-   * @return array
-   * @throws Exception
-   */
   static function details($csID, $ssID = NULL, $gID = NULL) {
     $error = array(NULL, NULL, NULL);
 
@@ -99,13 +91,6 @@ class CRM_Contact_BAO_SearchCustom {
     return array($customSearchID, $customSearchClass, $formValues);
   }
 
-  /**
-   * @param $csID
-   * @param $ssID
-   *
-   * @return mixed
-   * @throws Exception
-   */
   static function customClass($csID, $ssID) {
     list($customSearchID, $customSearchClass, $formValues) = self::details($csID, $ssID);
 
@@ -119,22 +104,11 @@ class CRM_Contact_BAO_SearchCustom {
     return $customClass;
   }
 
-  /**
-   * @param $csID
-   * @param $ssID
-   *
-   * @return mixed
-   */
   static function contactIDSQL($csID, $ssID) {
     $customClass = self::customClass($csID, $ssID);
     return $customClass->contactIDs();
   }
 
-  /**
-   * @param $args
-   *
-   * @return array
-   */
   static function &buildFormValues($args) {
     $args = trim($args);
 
@@ -149,12 +123,6 @@ class CRM_Contact_BAO_SearchCustom {
     return $formValues;
   }
 
-  /**
-   * @param $csID
-   * @param $ssID
-   *
-   * @return array
-   */
   static function fromWhereEmail($csID, $ssID) {
     $customClass = self::customClass($csID, $ssID);
 

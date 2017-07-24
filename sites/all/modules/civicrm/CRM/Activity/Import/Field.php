@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -84,14 +84,6 @@ class CRM_Activity_Import_Field {
    * @var object
    */
   public $_value;
-
-  /**
-   * @param $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   */
   function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     $this->_name = $name;
     $this->_title = $title;
@@ -114,9 +106,6 @@ class CRM_Activity_Import_Field {
     $this->_value = $value;
   }
 
-  /**
-   * @return bool
-   */
   function validate() {
 
     if (CRM_Utils_System::isNull($this->_value)) {

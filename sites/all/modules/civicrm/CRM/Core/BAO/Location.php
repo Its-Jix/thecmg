@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -46,11 +46,9 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
   /**
    * Function to create various elements of location block
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
-   * @param boolean $fixAddress true if you need to fix (format) address values
+   * @param array    $params       (reference ) an assoc array of name/value pairs
+   * @param boolean  $fixAddress   true if you need to fix (format) address values
    *                               before inserting in db
-   *
-   * @param null $entity
    *
    * @return array   $location
    * @access public
@@ -108,8 +106,8 @@ class CRM_Core_BAO_Location extends CRM_Core_DAO {
 
     foreach (array(
       'phone', 'email', 'im', 'address') as $loc) {
-      $locBlock["{$loc}_id"] = !empty($location["$loc"][0]) ? $location["$loc"][0]->id : NULL;
-      $locBlock["{$loc}_2_id"] = !empty($location["$loc"][1]) ? $location["$loc"][1]->id : NULL;
+      $locBlock["{$loc}_id"] = CRM_Utils_Array::value(0, $location["$loc"]) ? $location["$loc"][0]->id : NULL;
+      $locBlock["{$loc}_2_id"] = CRM_Utils_Array::value(1, $location["$loc"]) ? $location["$loc"][1]->id : NULL;
     }
 
     $countNull = 0;
@@ -236,11 +234,8 @@ WHERE e.id = %1";
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param $entityBlock
-   * @param bool $microformat
-   *
-   * @internal param array $params input parameters to find object
-   * @internal param array $values output values of the object
+   * @param array $params        input parameters to find object
+   * @param array $values        output values of the object
    *
    * @return array   array of objects(CRM_Core_BAO_Location)
    * @access public
@@ -309,12 +304,6 @@ WHERE e.id = %1";
    * @param  int  $locBlockId  location block id.
    * @param  int  $updateLocBlockId update location block id
    * @return int  newly created/updated location block id.
-   */
-  /**
-   * @param $locBlockId
-   * @param null $updateLocBlockId
-   *
-   * @return mixed
    */
   static function copyLocBlock($locBlockId, $updateLocBlockId = NULL) {
     //get the location info.
@@ -396,54 +385,6 @@ WHERE e.id = %1";
         );
       }
     }
-  }
-
-  /**
-   * @param mixed $values
-   * @param string $valueType
-   * @param bool $flatten
-   *
-   * @return array
-   */
-  static function getChainSelectValues($values, $valueType, $flatten = FALSE) {
-    if (!$values) {
-      return array();
-    }
-    $values = array_filter((array) $values);
-    $elements = array();
-    $list = &$elements;
-    $method = $valueType == 'country' ? 'stateProvinceForCountry' : 'countyForState';
-    foreach ($values as $val) {
-      $result = CRM_Core_PseudoConstant::$method($val);
-
-      // Format for quickform
-      if ($flatten) {
-        // Option-groups for multiple categories
-        if ($result && count($values) > 1) {
-          $elements["crm_optgroup_$val"] = CRM_Core_PseudoConstant::$valueType($val, FALSE);
-        }
-        $elements += $result;
-      }
-
-      // Format for js
-      else {
-       // Option-groups for multiple categories
-        if ($result && count($values) > 1) {
-          $elements[] = array(
-            'value' => CRM_Core_PseudoConstant::$valueType($val, FALSE),
-            'children' => array(),
-          );
-          $list = & $elements[count($elements) - 1]['children'];
-        }
-        foreach ($result as $id => $name) {
-          $list[] = array(
-            'value' => $name,
-            'key' => $id,
-          );
-        }
-      }
-    }
-    return $elements;
   }
 }
 

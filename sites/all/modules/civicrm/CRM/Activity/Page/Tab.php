@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
   /**
    * Browse all activities for a particular contact
    *
-   * @return void
+   * @return none
    *
    * @access public
    */
@@ -60,7 +60,6 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     $controller->set('contactId', $this->_contactId);
     $controller->setEmbedded(TRUE);
     $controller->run();
-    $this->ajaxResponse['tabCount'] = CRM_Contact_BAO_Contact::getCountComponent('activity', $this->_contactId);
   }
 
   function edit() {
@@ -135,6 +134,9 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
     // check logged in url permission
     CRM_Contact_Page_View::checkUserPermission($this);
 
+    // set page title
+    CRM_Contact_Page_View::setTitle($this->_contactId);
+
     $this->_action = CRM_Utils_Request::retrieve('action', 'String', $this, FALSE, 'browse');
     $this->assign('action', $this->_action);
 
@@ -164,7 +166,7 @@ class CRM_Activity_Page_Tab extends CRM_Core_Page {
   /**
    * perform actions and display for activities.
    *
-   * @return void
+   * @return none
    *
    * @access public
    */

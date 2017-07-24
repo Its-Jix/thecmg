@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id: $
  *
  */
@@ -40,11 +40,8 @@ class CRM_Utils_Network {
   /**
    * Try connecting to a TCP service; if it fails, retry. Repeat until serverStartupTimeOut elapses.
    *
-   * @param $host
-   * @param $port
    * @param int $serverStartupTimeOut seconds
    * @param float $interval seconds to wait in between pollings
-   *
    * @return bool TRUE if service is online
    */
   public static function waitForServiceStartup($host, $port, $serverStartupTimeOut, $interval = 0.333) {

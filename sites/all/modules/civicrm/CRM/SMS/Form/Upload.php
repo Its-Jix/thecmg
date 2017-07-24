@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -52,7 +52,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -84,18 +84,18 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       $templateId = $this->get('template');
       $this->assign('templateSelected', $templateId ? $templateId : 0);
       if (isset($defaults['msg_template_id']) && !$templateId) {
-        $defaults['SMStemplate'] = $defaults['msg_template_id'];
+        $defaults['template'] = $defaults['msg_template_id'];
         $messageTemplate = new CRM_Core_DAO_MessageTemplate();
         $messageTemplate->id = $defaults['msg_template_id'];
         $messageTemplate->selectAdd();
         $messageTemplate->selectAdd('msg_text');
         $messageTemplate->find(TRUE);
 
-        $defaults['sms_text_message'] = $messageTemplate->msg_text;
+        $defaults['text_message'] = $messageTemplate->msg_text;
       }
 
       if (isset($defaults['body_text'])) {
-        $defaults['sms_text_message'] = $defaults['body_text'];
+        $defaults['text_message'] = $defaults['body_text'];
         $this->set('textFile', $defaults['body_text']);
         $this->set('skipTextFile', TRUE);
       }
@@ -107,8 +107,8 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       if ($textFilePath &&
         file_exists($textFilePath)
       ) {
-        $defaults['sms_text_message'] = file_get_contents($textFilePath);
-        if (strlen($defaults['sms_text_message']) > 0) {
+        $defaults['text_message'] = file_get_contents($textFilePath);
+        if (strlen($defaults['text_message']) > 0) {
           $this->set('skipTextFile', TRUE);
         }
       }
@@ -122,7 +122,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -197,7 +197,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $formValues = $this->controller->exportValues($this->_name);
 
     foreach ($uploadParams as $key) {
-      if (!empty($formValues[$key])) {
+      if (CRM_Utils_Array::value($key, $formValues)) {
         $params[$key] = $formValues[$key];
         $this->set($key, $formValues[$key]);
       }
@@ -219,7 +219,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
     }
     else {
-      $text_message = $formValues['sms_text_message'];
+      $text_message = $formValues['text_message'];
       $params['body_text'] = $text_message;
       $this->set('textFile', $params['body_text']);
       $this->set('text_message', $params['body_text']);
@@ -230,40 +230,38 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     $session = CRM_Core_Session::singleton();
     $params['contact_id'] = $session->get('userID');
     $composeFields = array(
-      'SMStemplate', 'SMSsaveTemplate',
-      'SMSupdateTemplate', 'SMSsaveTemplateName',
+      'template', 'saveTemplate',
+      'updateTemplate', 'saveTemplateName',
     );
     $msgTemplate = NULL;
     //mail template is composed
     if ($formValues['upload_type']) {
       $composeParams = array();
       foreach ($composeFields as $key) {
-        if (!empty($formValues[$key])) {
+        if (CRM_Utils_Array::value($key, $formValues)) {
           $composeParams[$key] = $formValues[$key];
           $this->set($key, $formValues[$key]);
         }
       }
 
-      if (!empty($composeParams['SMSupdateTemplate'])) {
+      if (CRM_Utils_Array::value('updateTemplate', $composeParams)) {
         $templateParams = array(
           'msg_text' => $text_message,
           'is_active' => TRUE,
-          'is_sms' => TRUE,
         );
 
-        $templateParams['id'] = $formValues['SMStemplate'];
+        $templateParams['id'] = $formValues['template'];
 
         $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
       }
 
-      if (!empty($composeParams['SMSsaveTemplate'])) {
+      if (CRM_Utils_Array::value('saveTemplate', $composeParams)) {
         $templateParams = array(
           'msg_text' => $text_message,
           'is_active' => TRUE,
-          'is_sms' => TRUE,
         );
 
-        $templateParams['msg_title'] = $composeParams['SMSsaveTemplateName'];
+        $templateParams['msg_title'] = $composeParams['saveTemplateName'];
 
         $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
       }
@@ -272,7 +270,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
         $params['msg_template_id'] = $msgTemplate->id;
       }
       else {
-        $params['msg_template_id'] = CRM_Utils_Array::value('SMStemplate', $formValues);
+        $params['msg_template_id'] = CRM_Utils_Array::value('template', $formValues);
       }
       $this->set('template', $params['msg_template_id']);
     }
@@ -294,15 +292,12 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
-   * @param $files
-   * @param $self
-   *
    * @return mixed true or array of errors
    * @access public
    * @static
    */
   static function formRule($params, $files, $self) {
-    if (!empty($_POST['_qf_Import_refresh'])) {
+    if (CRM_Utils_Array::value('_qf_Import_refresh', $_POST)) {
       return TRUE;
     }
     $errors = array();
@@ -346,19 +341,19 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
       }
     }
     else {
-      if (empty($params['sms_text_message'])) {
-        $errors['sms_text_message'] = ts('Please provide a Text');
+      if (!CRM_Utils_Array::value('text_message', $params)) {
+        $errors['text_message'] = ts('Please provide a Text');
       }
       else {
-        if (!empty($params['text_message'])) {
+        if (CRM_Utils_Array::value('text_message', $params)) {
           $messageCheck = CRM_Utils_Array::value('text_message', $params);
           if ($messageCheck && (strlen($messageCheck) > CRM_SMS_Provider::MAX_SMS_CHAR)) {
             $errors['text_message'] = ts("You can configure the SMS message body up to %1 characters", array(1 => CRM_SMS_Provider::MAX_SMS_CHAR));
           }
         }
       }
-      if (!empty($params['SMSsaveTemplate']) && empty($params['SMSsaveTemplateName'])) {
-        $errors['SMSsaveTemplateName'] = ts('Please provide a Template Name.');
+      if (CRM_Utils_Array::value('saveTemplate', $params) && !CRM_Utils_Array::value('saveTemplateName', $params)) {
+        $errors['saveTemplateName'] = ts('Please provide a Template Name.');
       }
     }
 
@@ -371,7 +366,7 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
         $name = $files['textFile']['name'];
       }
       else {
-        $str = $params['sms_text_message'];
+        $str = $params['text_message'];
         $name = 'text message';
       }
 
@@ -418,9 +413,10 @@ class CRM_SMS_Form_Upload extends CRM_Core_Form {
     }
 
     $templateName = CRM_Core_BAO_MessageTemplate::getMessageTemplates();
-    if (!empty($params['SMSsaveTemplate']) && in_array(CRM_Utils_Array::value('SMSsaveTemplateName', $params), $templateName)
+    if (CRM_Utils_Array::value('saveTemplate', $params)
+      && in_array(CRM_Utils_Array::value('saveTemplateName', $params), $templateName)
     ) {
-      $errors['SMSsaveTemplate'] = ts('Duplicate Template Name.');
+      $errors['saveTemplate'] = ts('Duplicate Template Name.');
     }
     return empty($errors) ? TRUE : $errors;
   }

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -25,6 +25,7 @@
 *}
 {* View existing membership record. *}
 <div class="crm-block crm-content-block crm-membership-view-form-block">
+    <h3>{ts}View Membership{/ts}</h3>
     <div class="crm-submit-buttons">
         {* Check permissions and make sure this is not an inherited membership (edit and delete not allowed for inherited memberships) *}
         {if ! $owner_contact_id AND call_user_func(array('CRM_Core_Permission','check'), 'edit memberships') }
@@ -64,17 +65,7 @@
     {include file="CRM/Custom/Page/CustomDataView.tpl"}
 
     {if $accessContribution and $rows.0.contribution_id}
-        <div class="crm-accordion-wrapper">
-              <div class="crm-accordion-header">{ts}Related Contributions{/ts}</div>
-              <div class="crm-accordion-body">{include file="CRM/Contribute/Form/Selector.tpl" context="Search"}</div>
-        </div>
-    {/if}
-
-    {if $softCredit}
-        <div class="crm-accordion-wrapper">
-            <div class="crm-accordion-header">{ts}Related Soft Contributions{/ts}</div>
-            <div class="crm-accordion-body">{include file="CRM/Contribute/Page/ContributionSoft.tpl" context="membership"}</div>
-        </div>
+        {include file="CRM/Contribute/Form/Selector.tpl" context="Search"}
     {/if}
 
     {if $has_related}

@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -85,10 +85,10 @@
 {$initHideBlocks}
 {literal}
 <script type="text/Javascript">
-CRM.$(function($) {
+cj(function($) {
 
   showHideStyle();
-  $('#extends_0').change(function() {
+  cj('#extends_0').change(function() {
     showHideStyle();
   });
 
@@ -96,64 +96,62 @@ CRM.$(function($) {
   if (isGroupEmpty) {
     showRange(true);
   }
-  $('#is_multiple').click(function() {
+  cj('#is_multiple').click(function() {
     showRange();
   });
 
   function showHideStyle() {
     var isShow  = false;
-    var extend  = $('#extends_0').val();
+    var extend  = cj('#extends_0').val();
 
     var contactTypes    = {/literal}{$contactTypes}{literal};
     var showStyle       = "{/literal}{$showStyle}{literal}";
     var showMultiple    = "{/literal}{$showMultiple}{literal}";
     var showMaxMultiple = "{/literal}{$showMaxMultiple}{literal}";
 
-    if ($.inArray(extend, contactTypes) >= 0) {
+    if (cj.inArray(extend, contactTypes) >= 0) {
       isShow  = true;
     }
 
     if (isShow) {
-      $("tr#style").show();
-      $("tr#is_multiple").show();
-      if ($('#is_multiple :checked').length) {
-        $("tr#multiple").show();
+      cj("tr#style").show();
+      cj("tr#is_multiple").show();
+      if (cj('#is_multiple :checked').length) {
+        cj("tr#multiple").show();
       }
     }
     else {
-      $("tr#style").hide();
-      $("tr#is_multiple").hide();
-      $("tr#multiple").hide();
+      cj("tr#style").hide();
+      cj("tr#is_multiple").hide();
+      cj("tr#multiple").hide();
     }
 
     if (showStyle) {
-      $("tr#style").show();
+      cj("tr#style").show();
     }
 
     if (showMultiple) {
-      $("tr#style").show();
-      $("tr#is_multiple").show();
+      cj("tr#style").show();
+      cj("tr#is_multiple").show();
     }
 
     if (!showMaxMultiple) {
-      $("tr#multiple").hide();
+      cj("tr#multiple").hide();
     }
-    else if($( '#is_multiple').prop('checked')) {
-      $("tr#multiple").show();
+    else if(cj( '#is_multiple').attr('checked')) {
+      cj("tr#multiple").show();
     }
   }
 
   function showRange(onFormLoad) {
-    if($("#is_multiple :checked").length) {
-      $("tr#multiple").show();
-      $('#collapse_display').prop('checked', '');
-      $("select#style option[value='Tab with table']").prop("selected", true);
+    if(cj("#is_multiple :checked").length) {
+      cj("tr#multiple").show();
+      cj("select#style option[value='Tab']").attr("selected", "selected");
     }
     else {
-      $('#collapse_display').prop('checked', 'checked');
-      $("tr#multiple").hide();
+      cj("tr#multiple").hide();
       if (!onFormLoad) {
-        $("select#style option[value='Inline']").prop("selected", true);
+        cj("select#style option[value='Inline']").attr("selected", "selected");
       }
     }
   }

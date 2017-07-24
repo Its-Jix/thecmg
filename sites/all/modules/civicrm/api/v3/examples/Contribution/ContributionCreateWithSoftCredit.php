@@ -14,13 +14,7 @@ $params = array(
   'net_amount' => '95',
   'source' => 'SSF',
   'contribution_status_id' => 1,
-  'soft_credit' => array(
-      '1' => array(
-          'contact_id' => 2,
-          'amount' => 50,
-          'soft_credit_type_id' => 3,
-        ),
-    ),
+  'soft_credit_to' => 2,
 );
 
 try{
@@ -69,9 +63,11 @@ function contribution_create_expectedresult(){
           'source' => 'SSF',
           'amount_level' => '',
           'contribution_recur_id' => '',
+          'honor_contact_id' => '',
           'is_test' => '',
           'is_pay_later' => '',
           'contribution_status_id' => '1',
+          'honor_type_id' => '',
           'address_id' => '',
           'check_number' => '',
           'campaign_id' => '',

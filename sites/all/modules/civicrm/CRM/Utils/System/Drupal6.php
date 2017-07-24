@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -124,10 +124,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *  @param integer $ufID User ID in CMS
    *  @param string $ufName User name
    */
-  /**
-   * @param $ufID
-   * @param $ufName
-   */
   function updateCMSName($ufID, $ufName) {
     // CRM-5555
     if (function_exists('user_load')) {
@@ -146,10 +142,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @params $errors    array   array of errors
    * @params $emailName string  field label for the 'email'
    *
-   * @param $params
-   * @param $errors
-   * @param string $emailName
-   *
    * @return void
    */
   function checkUserNameEmailExists(&$params, &$errors, $emailName = 'email') {
@@ -161,10 +153,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     _user_edit_validate(NULL, $params);
     $errors = form_get_errors();
     if ($errors) {
-      if (!empty($errors['name'])) {
+      if (CRM_Utils_Array::value('name', $errors)) {
         $errors['cms_name'] = $errors['name'];
       }
-      if (!empty($errors['mail'])) {
+      if (CRM_Utils_Array::value('mail', $errors)) {
         $errors[$emailName] = $errors['mail'];
       }
       // also unset drupal messages to avoid twice display of errors
@@ -214,7 +206,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     }
   }
 
-  /**
+  /*
    * Function to get the drupal destination string. When this is passed in the
    * URL the user will be directed to it after filling in the drupal form
    *
@@ -256,8 +248,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * sets the title of the page
    *
    * @param string $title
-   * @param null $pageTitle
-   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -276,10 +266,8 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   /**
    * Append an additional breadcrumb tag to the existing breadcrumb
    *
-   * @param $breadCrumbs
-   *
-   * @internal param string $title
-   * @internal param string $url
+   * @param string $title
+   * @param string $url
    *
    * @return void
    * @access public
@@ -342,7 +330,19 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @access public
    */
   public function addScriptUrl($url, $region) {
-    // CRM-15450 - D6 doesn't order internal/external links correctly so we can't use drupal_add_js
+    switch ($region) {
+      case 'html-header':
+      case 'page-footer':
+        $scope = substr($region, 5);
+        break;
+      default:
+        return FALSE;
+    }
+    // If the path is within the drupal directory we can add in the normal way
+    if ($this->formatResourceUrl($url)) {
+      drupal_add_js($url, 'module', $scope);
+      return TRUE;
+    }
     return FALSE;
   }
 
@@ -359,8 +359,16 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @access public
    */
   public function addScript($code, $region) {
-    // CRM-15450 - ensure scripts are in correct order
-    return FALSE;
+    switch ($region) {
+      case 'html-header':
+      case 'page-footer':
+        $scope = substr($region, 5);
+        break;
+      default:
+        return FALSE;
+    }
+    drupal_add_js($code, 'inline', $scope);
+    return TRUE;
   }
 
   /**
@@ -489,7 +497,7 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return FALSE;
   }
 
-  /**
+  /*
    * Load user into session
    */
   function loadUser($username) {
@@ -547,9 +555,10 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     drupal_set_message($message);
   }
 
-  /**
-   * @return mixed
-   */
+  function permissionDenied() {
+    drupal_access_denied();
+  }
+
   function logout() {
     module_load_include('inc', 'user', 'user.pages');
     return user_logout();
@@ -592,9 +601,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
     return CRM_Core_I18n_PseudoConstant::longForShort(substr($language->language, 0, 2));
   }
 
-  /**
-   * @return string
-   */
   function getVersion() {
     return defined('VERSION') ? VERSION : 'Unknown';
   }
@@ -606,8 +612,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    * @param boolean $loadUser boolean Require CMS user load.
    * @param boolean $throwError If true, print error on failure and exit.
    * @param boolean|string $realPath path to script
-   *
-   * @return bool
    */
   function loadBootStrap($params = array(), $loadUser = TRUE, $throwError = TRUE, $realPath = NULL) {
     //take the cms root path.
@@ -795,9 +799,6 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
    *
    * @param string $url
    *
-   * @param bool $addLanguagePart
-   * @param bool $removeLanguagePart
-   *
    * @return string $url, formatted url.
    * @static
    */
@@ -941,20 +942,25 @@ class CRM_Utils_System_Drupal6 extends CRM_Utils_System_DrupalBase {
   }
 
   /**
-   * Over-ridable function to get timezone as a string eg.
-   * @return string Timezone e.g. 'America/Los_Angeles'
+   * Get timezone from Drupal
+   * @return boolean|string
    */
-  function getTimeZoneString() {
+  function getTimeZoneOffset(){
     global $user;
     if (variable_get('configurable_timezones', 1) && $user->uid && strlen($user->timezone)) {
       $timezone = $user->timezone;
     } else {
       $timezone = variable_get('date_default_timezone', null);
     }
-    if (!$timezone) {
-      $timezone = parent::getTimeZoneString();
+    if(empty($timezone)){
+      return false;
     }
-    return $timezone;
+    $hour = $user->timezone / 3600;
+    $timeZoneOffset = sprintf("%02d:%02d", $timezone / 3600, abs(($timeZoneOffset/60)%60));
+    if($timeZoneOffset > 0){
+      $timeZoneOffset = '+' . $timeZoneOffset;
+    }
+    return $timeZoneOffset;
   }
 
 

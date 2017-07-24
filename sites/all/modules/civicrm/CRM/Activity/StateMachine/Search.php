@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -72,14 +72,18 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
    *
    * @param CRM_Core_Controller $controller the controller object
    *
-   * @param string $formName
-   *
    * @return string the name of the form that will handle the task
    * @access protected
    */
   function taskName($controller, $formName = 'Search') {
     // total hack, check POST vars and then session to determine stuff
-    $value = CRM_Utils_Array::value('task', $_POST);
+    // fix value if print button is pressed
+    if (CRM_Utils_Array::value('_qf_' . $formName . '_next_print', $_POST)) {
+      $value = CRM_Activity_Task::PRINT_ACTIVITIES;
+    }
+    else {
+      $value = CRM_Utils_Array::value('task', $_POST);
+    }
     if (!isset($value)) {
       $value = $this->_controller->get('task');
     }
@@ -97,18 +101,6 @@ class CRM_Activity_StateMachine_Search extends CRM_Core_StateMachine {
     return CRM_Utils_String::getClassName($this->_task);
   }
 
-  /**
-   * Should the controller reset the session
-   * In some cases, specifically search we want to remember
-   * state across various actions and want to go back to the
-   * beginning from the final state, but retain the same session
-   * values
-   *
-   * @return boolean
-   */
-  /**
-   * @return bool
-   */
   function shouldReset() {
     return FALSE;
   }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * things like going back / stepping forward / process etc
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -79,20 +79,14 @@ class CRM_Core_State {
   /**
    * constructor
    *
-   * @param $name
-   * @param $type
-   * @param $back
-   * @param $next
-   * @param $stateMachine
+   * @param string the internal name of the state
+   * @param int    the state type
+   * @param object the state that precedes this state
+   * @param object the state that follows  this state
+   * @param object the statemachine that this states belongs to
    *
-   * @internal param \the $string internal name of the state
-   * @internal param \the $int state type
-   * @internal param \the $object state that precedes this state
-   * @internal param \the $object state that follows  this state
-   * @internal param \the $object statemachine that this states belongs to
-   *
-   * @return \CRM_Core_State
-  @access public
+   * @return object
+   * @access public
    */
   function __construct($name, $type, $back, $next, &$stateMachine) {
     $this->_name = $name;

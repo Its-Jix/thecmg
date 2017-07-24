@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,7 +37,6 @@
  * This file is used to build the form configuring mailing details
  */
 class CRM_Mailing_Form_Upload extends CRM_Core_Form {
-
   public $_mailingID;
 
   function preProcess() {
@@ -62,7 +61,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     $mailingID = CRM_Utils_Request::retrieve('mid', 'Integer', $this, FALSE, NULL);
@@ -120,7 +119,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       }
 
       //set default from email address.
-      if (!empty($defaults['from_name']) && !empty($defaults['from_email'])) {
+      if (CRM_Utils_Array::value('from_name', $defaults) && CRM_Utils_Array::value('from_email', $defaults)) {
         $defaults['from_email_address'] = array_search('"' . $defaults['from_name'] . '" <' . $defaults['from_email'] . '>',
           CRM_Core_OptionGroup::values('from_email_address')
         );
@@ -133,7 +132,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
         }
       }
 
-      if (!empty($defaults['replyto_email'])) {
+      if (CRM_Utils_Array::value('replyto_email', $defaults)) {
         $replyToEmail = CRM_Core_OptionGroup::values('from_email_address');
         foreach ($replyToEmail as $value) {
           if (strstr($value, $defaults['replyto_email'])) {
@@ -203,7 +202,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -220,7 +219,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     $fromEmailAddress = CRM_Core_OptionGroup::values('from_email_address');
     if (empty($fromEmailAddress)) {
       //redirect user to enter from email address.
-      $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'action=add&reset=1');
+      $url = CRM_Utils_System::url('civicrm/admin/options/from_email_address', 'group=from_email_address&action=add&reset=1');
       $status = ts("There is no valid from email address present. You can add here <a href='%1'>Add From Email Address.</a>", array(1 => $url));
       $session->setStatus($status, ts('Notice'));
     }
@@ -236,12 +235,13 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     );
 
     //Added code to add custom field as Reply-To on form when it is enabled from Mailer settings
-    if (isset($config->replyTo) && !empty($config->replyTo) && empty($options['override_verp'])) {
+    if (isset($config->replyTo) && !empty($config->replyTo) &&
+      ! CRM_Utils_Array::value( 'override_verp', $options ) ) {
       $this->add('select', 'reply_to_address', ts('Reply-To'),
         array('' => '- select -') + $fromEmailAddress
       );
     }
-    elseif (!empty($options['override_verp'])) {
+    elseif (CRM_Utils_Array::value('override_verp', $options)) {
       $trackReplies = TRUE;
       $this->assign('trackReplies', $trackReplies);
     }
@@ -327,7 +327,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     $formValues = $this->controller->exportValues($this->_name);
 
     foreach ($uploadParams as $key) {
-      if (!empty($formValues[$key]) ||
+      if (CRM_Utils_Array::value($key, $formValues) ||
         in_array($key, array('header_id', 'footer_id'))
       ) {
         $params[$key] = $formValues[$key];
@@ -384,13 +384,13 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       $composeParams = array();
 
       foreach ($composeFields as $key) {
-        if (!empty($formValues[$key])) {
+        if (CRM_Utils_Array::value($key, $formValues)) {
           $composeParams[$key] = $formValues[$key];
           $this->set($key, $formValues[$key]);
         }
       }
 
-      if (!empty($composeParams['updateTemplate'])) {
+      if (CRM_Utils_Array::value('updateTemplate', $composeParams)) {
         $templateParams = array(
           'msg_text' => $text_message,
           'msg_html' => $html_message,
@@ -403,7 +403,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
         $msgTemplate = CRM_Core_BAO_MessageTemplate::add($templateParams);
       }
 
-      if (!empty($composeParams['saveTemplate'])) {
+      if (CRM_Utils_Array::value('saveTemplate', $composeParams)) {
         $templateParams = array(
           'msg_text' => $text_message,
           'msg_html' => $html_message,
@@ -444,7 +444,7 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     $params['from_name'] = CRM_Utils_Array::value(1, explode('"', $fromEmailAddress));
 
     //Add Reply-To to headers
-    if (!empty($formValues['reply_to_address'])) {
+    if (CRM_Utils_Array::value('reply_to_address', $formValues)) {
       $replyToEmail = CRM_Core_OptionGroup::values('from_email_address');
       $params['replyto_email'] = CRM_Utils_Array::value($formValues['reply_to_address'], $replyToEmail);
     }
@@ -505,15 +505,12 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
-   * @param $files
-   * @param $self
-   *
    * @return mixed true or array of errors
    * @access public
    * @static
    */
   static function formRule($params, $files, $self) {
-    if (!empty($_POST['_qf_Import_refresh'])) {
+    if (CRM_Utils_Array::value('_qf_Import_refresh', $_POST)) {
       return TRUE;
     }
     $errors = array();
@@ -585,10 +582,10 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
       }
     }
     else {
-      if (empty($params['text_message']) && empty($params['html_message'])) {
+      if (!CRM_Utils_Array::value('text_message', $params) && !CRM_Utils_Array::value('html_message', $params)) {
         $errors['html_message'] = ts('Please provide either a Text or HTML formatted message - or both.');
       }
-      if (!empty($params['saveTemplate']) && empty($params['saveTemplateName'])) {
+      if (CRM_Utils_Array::value('saveTemplate', $params) && !CRM_Utils_Array::value('saveTemplateName', $params)) {
         $errors['saveTemplateName'] = ts('Please provide a Template Name.');
       }
     }
@@ -668,7 +665,8 @@ class CRM_Mailing_Form_Upload extends CRM_Core_Form {
     }
 
     $templateName = CRM_Core_BAO_MessageTemplate::getMessageTemplates();
-    if (!empty($params['saveTemplate']) && in_array(CRM_Utils_Array::value('saveTemplateName', $params), $templateName)
+    if (CRM_Utils_Array::value('saveTemplate', $params)
+      && in_array(CRM_Utils_Array::value('saveTemplateName', $params), $templateName)
     ) {
       $errors['saveTemplate'] = ts('Duplicate Template Name.');
     }

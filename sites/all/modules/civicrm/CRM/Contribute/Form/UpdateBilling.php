@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -126,22 +126,11 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
     CRM_Contribute_BAO_ContributionRecur::setSubscriptionContext();
   }
 
-  /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
-   *
-   * @return array reference to the array of default values
-   *
-   */
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     $this->_defaults = array();
 
     if ($this->_subscriptionDetails->contact_id) {
+      $options = array();
       $fields  = array();
       $names   = array(
         'first_name', 'middle_name', 'last_name', "street_address-{$this->_bltID}", "city-{$this->_bltID}",
@@ -171,11 +160,15 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
       }
     }
 
+
     $config = CRM_Core_Config::singleton();
     // set default country from config if no country set
-    if (empty($this->_defaults["billing_country_id-{$this->_bltID}"])) {
+    if (!CRM_Utils_Array::value("billing_country_id-{$this->_bltID}", $this->_defaults)) {
       $this->_defaults["billing_country_id-{$this->_bltID}"] = $config->defaultContactCountry;
     }
+
+    // now fix all state country selectors
+    CRM_Core_BAO_Address::fixAllStateSelects($this, $this->_defaults);
 
     return $this->_defaults;
   }
@@ -183,7 +176,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -212,11 +205,9 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
   /**
    * global form rule
    *
-   * @param array $fields the input form values
-   * @param array $files the uploaded files if any
-   * @param $self
-   *
-   * @internal param array $options additional user data
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
    *
    * @return true if no errors, else array of errors
    * @access public
@@ -326,7 +317,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       // format new billing name
       $name = $processorParams['first_name'];
-      if (!empty($processorParams['middle_name'])) {
+      if (CRM_Utils_Array::value('middle_name', $processorParams)) {
         $name .= " {$processorParams['middle_name']}";
       }
       $name .= ' ' . $processorParams['last_name'];
@@ -335,7 +326,7 @@ class CRM_Contribute_Form_UpdateBilling extends CRM_Core_Form {
 
       // format old billing name
       $name = $this->_defaults['first_name'];
-      if (!empty($this->_defaults['middle_name'])) {
+      if (CRM_Utils_Array::value('middle_name', $this->_defaults)) {
         $name .= " {$this->_defaults['middle_name']}";
       }
       $name .= ' ' . $this->_defaults['last_name'];

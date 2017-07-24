@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -36,8 +36,6 @@ class CRM_Contact_Form_Location {
 
   /**
    * Function to set variables up before form is built
-   *
-   * @param $form
    *
    * @return void
    */
@@ -76,9 +74,7 @@ class CRM_Contact_Form_Location {
   /**
    * Function to build the form
    *
-   * @param $form
-   *
-   * @return void
+   * @return None
    * @access public
    */
   static function buildQuickForm(&$form) {
@@ -92,10 +88,10 @@ class CRM_Contact_Form_Location {
       $name = strtolower($blockName);
 
       $instances = array(1);
-      if (!empty($_POST[$name]) && is_array($_POST[$name])) {
+      if (CRM_Utils_Array::value($name, $_POST) && is_array($_POST[$name])) {
         $instances = array_keys($_POST[$name]);
       }
-      elseif (property_exists($form, '_values') && !empty($form->_values[$name]) && is_array($form->_values[$name])) {
+      elseif (property_exists($form, '_values') && CRM_Utils_Array::value($name, $form->_values) && is_array($form->_values[$name])) {
         $instances = array_keys($form->_values[$name]);
       }
 

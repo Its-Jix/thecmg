@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -108,13 +108,12 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
    * Function to add the payment-processor type in the db
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   *
-   * @throws Exception
-   * @internal param array $ids the array that holds all the db ids
+   * @param array $ids    the array that holds all the db ids
    *
    * @return object CRM_Financial_DAO_PaymentProcessorType
    * @access public
    * @static
+   *
    */
   static function create(&$params) {
     $paymentProcessorType = new CRM_Financial_DAO_PaymentProcessorType();
@@ -178,9 +177,8 @@ class CRM_Financial_BAO_PaymentProcessorType extends CRM_Financial_DAO_PaymentPr
   /**
    * Function to delete payment processor
    *
-   * @param  int $paymentProcessorTypeId ID of the processor to be deleted.
+   * @param  int  $paymentProcessorTypeId     ID of the processor to be deleted.
    *
-   * @return bool
    * @access public
    * @static
    */
@@ -206,11 +204,6 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
     }
   }
 
-  /**
-   * @param $attr
-   *
-   * @return array
-   */
   static private function getAllPaymentProcessorTypes($attr) {
     $ppt = array();
     $dao = new CRM_Financial_DAO_PaymentProcessorType();
@@ -221,5 +214,27 @@ WHERE pp.payment_processor_type_id = ppt.id AND ppt.id = %1";
     return $ppt;
   }
 
+  /**
+   * Get options for a given field.
+   * @see CRM_Core_DAO::buildOptions
+   *
+   * @param String $fieldName
+   * @param String $context: @see CRM_Core_DAO::buildOptionsContext
+   * @param Array  $props: whatever is known about this dao object
+   */
+  public static function buildOptions($fieldName, $context = NULL, $props = array()) {
+    $params = array();
+    // Special logic for fields whose options depend on context or properties
+    switch ($fieldName) {
+      // These options are not in the db
+      case 'billing_mode':
+        return array(
+          CRM_Core_Payment::BILLING_MODE_FORM => 'form',
+          CRM_Core_Payment::BILLING_MODE_BUTTON => 'button',
+          CRM_Core_Payment::BILLING_MODE_NOTIFY => 'notify',
+        );
+    }
+    return CRM_Core_PseudoConstant::get(__CLASS__, $fieldName, $params, $context);
+  }
 }
 

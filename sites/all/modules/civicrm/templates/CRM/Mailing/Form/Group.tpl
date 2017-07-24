@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -76,5 +76,16 @@
 {/if}
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>
+
+{literal}
+<script type="text/javascript">
+cj(function() {
+   cj().crmAccordions();
+});
+</script>
+{/literal}
+
+{* include jscript to warn if unsaved form field changes *}
+{include file="CRM/common/formNavigate.tpl"}
 </div>
 

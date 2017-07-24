@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   /**
    * Function to for pre-processing
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function preProcess() {
@@ -90,7 +90,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     $defaults = array();
@@ -100,7 +100,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -127,7 +127,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
         break;
 
       case CRM_Core_Action::DISABLE:
-        $buttonName = ts('Disable');
+        $buttonName = 'Disable';
         $title = ts('Disable Extension');
         break;
     }
@@ -169,7 +169,7 @@ class CRM_Admin_Form_Extensions extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     CRM_Utils_System::flushCache();

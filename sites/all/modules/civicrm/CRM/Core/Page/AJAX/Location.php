@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  *
  */
 
@@ -130,21 +130,19 @@ class CRM_Core_Page_AJAX_Location {
         'supplemental_address_2',
         'city',
         'postal_code',
-        'county',
-        'state_province',
         'country',
+        'state_province',
       );
 
       foreach ($addressFields as $field) {
         if (array_key_exists($field, $addressSequence)) {
           $addField = $field;
-          $type = 'Text';
-          if (in_array($field, array('state_province', 'country', 'county'))) {
+          if (in_array($field, array(
+            'state_province', 'country'))) {
             $addField = "{$field}_id";
-            $type = 'Select';
           }
           $elements["onbehalf_{$field}-{$locTypeId}"] = array(
-            'type' => $type,
+            'type' => 'Text',
             'value' =>  isset($location['address'][1]) ? $location['address'][1][$addField] : null,
           );
           unset($profileFields["{$field}-{$locTypeId}"]);
@@ -157,16 +155,17 @@ class CRM_Core_Page_AJAX_Location {
 
       if (!empty($defaults)) {
         foreach ($profileFields as $key => $val) {
+
           if (array_key_exists($key, $defaults)) {
             $htmlType = CRM_Utils_Array::value('html_type', $val);
             if ($htmlType == 'Radio') {
-              $elements["onbehalf_{$key}"]['type'] = $htmlType;
-              $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
+              $elements["onbehalf[{$key}]"]['type'] = $htmlType;
+              $elements["onbehalf[{$key}]"]['value'] = $defaults[$key];
             }
             elseif ($htmlType == 'CheckBox') {
-              $elements["onbehalf_{$key}"]['type'] = $htmlType;
               foreach ($defaults[$key] as $k => $v) {
-                $elements["onbehalf_{$key}"]['value'][$k] = $v;
+                $elements["onbehalf[{$key}][{$k}]"]['type'] = $htmlType;
+                $elements["onbehalf[{$key}][{$k}]"]['value'] = $v;
               }
             }
             elseif ($htmlType == 'Multi-Select') {
@@ -179,11 +178,6 @@ class CRM_Core_Page_AJAX_Location {
               $elements["onbehalf_{$key}"]['type'] = $htmlType;
               $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
               $elements["onbehalf_{$key}"]['id'] = $defaults["{$key}_id"];
-            }
-            elseif ($htmlType == 'Select Date') {
-              $elements["onbehalf_{$key}"]['type'] = $htmlType;
-              $elements["onbehalf_{$key}"]['value'] = $defaults[$key];
-              $elements["onbehalf_{$key}_display"]['value'] = $defaults[$key];
             }
             else {
               $elements["onbehalf_{$key}"]['type'] = $htmlType;
@@ -199,19 +193,68 @@ class CRM_Core_Page_AJAX_Location {
     CRM_Utils_JSON::output($elements);
   }
 
-  static function jqState() {
-    CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'country'));
+  static function jqState($config) {
+    if (
+      !isset($_GET['_value']) ||
+      empty($_GET['_value'])
+    ) {
+      CRM_Utils_System::civiExit();
+    }
+
+    $result = CRM_Core_PseudoConstant::stateProvinceForCountry($_GET['_value']);
+
+    $elements = array(
+      array('name' => ts('- select a state -'),
+        'value' => '',
+      )
+    );
+    foreach ($result as $id => $name) {
+      $elements[] = array(
+        'name' => $name,
+        'value' => $id,
+      );
+    }
+
+    echo json_encode($elements);
+    CRM_Utils_System::civiExit();
   }
 
-  static function jqCounty() {
-    CRM_Utils_JSON::output(CRM_Core_BAO_Location::getChainSelectValues($_GET['_value'], 'stateProvince'));
+  static function jqCounty($config) {
+    if (CRM_Utils_System::isNull($_GET['_value'])) {
+      $elements = array(
+        array('name' => ts('- select state -'), 'value' => '')
+      );
+    }
+    else {
+      $result = CRM_Core_PseudoConstant::countyForState($_GET['_value']);
+
+      $elements = array(
+        array('name' => ts('- select -'), 'value' => '')
+      );
+      foreach ($result as $id => $name) {
+        $elements[] = array(
+          'name' => $name,
+          'value' => $id,
+        );
+      }
+
+      if ($elements == array(
+        array('name' => ts('- select -'), 'value' => ''))) {
+        $elements = array(
+          array('name' => ts('- no counties -'), 'value' => '')
+        );
+      }
+    }
+
+    echo json_encode($elements);
+    CRM_Utils_System::civiExit();
   }
 
   static function getLocBlock() {
     // i wish i could retrieve loc block info based on loc_block_id,
     // Anyway, lets retrieve an event which has loc_block_id set to 'lbid'.
-    if ($_REQUEST['lbid']) {
-      $params = array('1' => array($_REQUEST['lbid'], 'Integer'));
+    if ($_POST['lbid']) {
+      $params = array('1' => array($_POST['lbid'], 'Integer'));
       $eventId = CRM_Core_DAO::singleValueQuery('SELECT id FROM civicrm_event WHERE loc_block_id=%1 LIMIT 1', $params);
     }
     // now lets use the event-id obtained above, to retrieve loc block information.
@@ -257,7 +300,7 @@ class CRM_Core_Page_AJAX_Location {
     }
 
     // set the message if loc block is being used by more than one event.
-    $result['count_loc_used'] = CRM_Event_BAO_Event::countEventsUsingLocBlockId($_REQUEST['lbid']);
+    $result['count_loc_used'] = CRM_Event_BAO_Event::countEventsUsingLocBlockId($_POST['lbid']);
 
     CRM_Utils_JSON::output($result);
   }

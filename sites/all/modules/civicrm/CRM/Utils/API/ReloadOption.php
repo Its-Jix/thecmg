@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,15 +38,11 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  */
 
 require_once 'api/Wrapper.php';
-
-/**
- * Class CRM_Utils_API_ReloadOption
- */
 class CRM_Utils_API_ReloadOption implements API_Wrapper {
 
   /**
@@ -76,7 +72,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
    */
   public function toApiOutput($apiRequest, $result) {
     $reloadMode = NULL;
-    if ($apiRequest['action'] === 'create' && isset($apiRequest['params'], $apiRequest['params']['options']) && is_array($apiRequest['params']['options']) && isset($apiRequest['params']['options']['reload'])) {
+    if ($apiRequest['action'] === 'create' && isset($apiRequest['params'], $apiRequest['params']['options'], $apiRequest['params']['options']['reload'])) {
       if (!CRM_Utils_Array::value('is_error', $result, FALSE)) {
         $reloadMode = $apiRequest['params']['options']['reload'];
       }
@@ -86,7 +82,6 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
       case NULL:
       case '0':
       case 'null':
-      case '':
         return $result;
 
       case '1':
@@ -111,7 +106,7 @@ class CRM_Utils_API_ReloadOption implements API_Wrapper {
         return $result;
 
       default:
-        throw new API_Exception("Unknown reload mode " . $reloadMode);
+        throw new API_Exception("Unknown reload mode");
     }
   }
 

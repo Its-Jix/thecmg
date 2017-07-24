@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -75,20 +75,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
   public $_contactIds;
 
   /**
-   * The array that holds all the mapping contribution and contact ids
-   *
-   * @var array
-   */
-  protected $_contributionContactIds = array();
-
-  /**
-   * The flag to tell if there are soft credits included
-   *
-   * @var boolean
-   */
-  public $_includesSoftCredits = FALSE;
-
-  /**
    * build all the data structures needed to build the form
    *
    * @param
@@ -100,10 +86,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
     self::preProcessCommon($this);
   }
 
-  /**
-   * @param $form
-   * @param bool $useTable
-   */
   static function preProcessCommon(&$form, $useTable = FALSE) {
     $form->_contributionIds = array();
 
@@ -128,25 +110,15 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
         $sortOrder = $form->get( CRM_Utils_Sort::SORT_ORDER );
       }
 
-      $form->_includesSoftCredits = CRM_Contribute_BAO_Query::isSoftCreditOptionEnabled($queryParams);
       $query = new CRM_Contact_BAO_Query($queryParams, NULL, NULL, FALSE, FALSE,
         CRM_Contact_BAO_Query::MODE_CONTRIBUTE
       );
-      if ($form->_includesSoftCredits) {
-        $contactIds = $contributionContactIds = array();
-        $query->_rowCountClause = " count(civicrm_contribution.id)";
-        $query->_groupByComponentClause = " GROUP BY contribution_search_scredit_combined.id, contribution_search_scredit_combined.contact_id, contribution_search_scredit_combined.scredit_id ";
-      } else {
-        $query->_distinctComponentClause = ' civicrm_contribution.id';
-        $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
-      }
+      $query->_distinctComponentClause = ' civicrm_contribution.id';
+      $query->_groupByComponentClause = ' GROUP BY civicrm_contribution.id ';
+
       $result = $query->searchQuery(0, 0, $sortOrder);
       while ($result->fetch()) {
         $ids[] = $result->contribution_id;
-        if ($form->_includesSoftCredits) {
-          $contactIds[$result->contact_id] = $result->contact_id;
-          $contributionContactIds["{$result->contact_id}-{$result->contribution_id}"] = $result->contribution_id;
-        }
       }
       $form->assign('totalSelectedContributions', $form->get('rowCount'));
     }
@@ -155,10 +127,6 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
       $form->_componentClause = ' civicrm_contribution.id IN ( ' . implode(',', $ids) . ' ) ';
 
       $form->assign('totalSelectedContributions', count($ids));
-    }
-    if (!empty($form->_includesSoftCredits) && !empty($contactIds)) {
-      $form->_contactIds = $contactIds;
-      $form->_contributionContactIds = $contributionContactIds;
     }
 
     $form->_contributionIds = $form->_componentIds = $ids;
@@ -188,12 +156,9 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    * since its used for things like send email
    */
   public function setContactIDs() {
-    if (!$this->_includesSoftCredits) {
-      $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent(
-        $this->_contributionIds,
-        'civicrm_contribution'
-      );
-    }
+    $this->_contactIds = &CRM_Core_DAO::getContactIDsFromComponent($this->_contributionIds,
+      'civicrm_contribution'
+    );
   }
 
   /**
@@ -201,11 +166,7 @@ class CRM_Contribute_Form_Task extends CRM_Core_Form {
    * the form with a customized title for the main Submit
    *
    * @param string $title title of the main button
-   * @param string $nextType
-   * @param string $backType
-   * @param bool $submitOnce
-   *
-   * @internal param string $type button type for the form after processing
+   * @param string $type  button type for the form after processing
    *
    * @return void
    * @access public

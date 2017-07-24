@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -34,14 +34,7 @@
 
 require_once '../civicrm.config.php';
 require_once 'CRM/Core/Config.php';
-
-/**
- * Class CRM_ParticipantProcessor
- */
 class CRM_ParticipantProcessor {
-  /**
-   *
-   */
   function __construct() {
     $config = CRM_Core_Config::singleton();
 
@@ -114,7 +107,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       foreach ($participantDetails as $participantId => $values) {
         //process the additional participant at the time of
         //primary participant, don't process separately.
-        if (!empty($values['registered_by_id'])) {
+        if (CRM_Utils_Array::value('registered_by_id', $values)) {
           continue;
         }
 
@@ -163,7 +156,7 @@ LEFT JOIN  civicrm_event event ON ( event.id = participant.event_id )
       foreach ($participantDetails as $participantId => $values) {
         //process the additional participant at the time of
         //primary participant, don't process separately.
-        if (!empty($values['registered_by_id'])) {
+        if (CRM_Utils_Array::value('registered_by_id', $values)) {
           continue;
         }
 

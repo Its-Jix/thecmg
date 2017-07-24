@@ -41,17 +41,16 @@ function option_group_create_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 89,
+  'id' => 86,
   'values' => array(
       '0' => array(
-          'id' => '89',
+          'id' => '86',
           'name' => 'civicrm_event.amount.560',
           'title' => '',
           'description' => '',
           'is_reserved' => '1',
           'is_active' => '1',
-          'is_locked' => '',
-          'api.OptionValue.create' => 764,
+          'api.OptionValue.create' => 727,
         ),
     ),
 );

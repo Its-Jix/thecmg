@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -46,15 +46,15 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    $cid = CRM_Utils_Request::retrieve('cid', 'Positive', $this, TRUE);
-    CRM_Utils_Request::retrieve('id', 'Positive', $this, TRUE);
-    $context = CRM_Utils_Request::retrieve('context', 'String', $this);
+    $this->_contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $this);
+    $this->_caseId    = CRM_Utils_Request::retrieve('id', 'Positive', $this);
+    $context          = CRM_Utils_Request::retrieve('context', 'String', $this);
 
     //get current client name.
-    $this->assign('currentClientName', CRM_Contact_BAO_Contact::displayName($cid));
+    $this->assign('currentClientName', CRM_Contact_BAO_Contact::displayName($this->_contactId));
 
     //set the context.
-    $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$cid}&selectedChild=case");
+    $url = CRM_Utils_System::url('civicrm/contact/view', "reset=1&force=1&cid={$this->_contactId}&selectedChild=case");
     if ($context == 'search') {
       $qfKey = CRM_Utils_Request::retrieve('key', 'String', $this);
       //validate the qfKey
@@ -78,44 +78,28 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
-    $this->addEntityRef('reassign_contact_id', ts('Select Contact'), array('create' => TRUE), TRUE);
-    $this->addButtons(array(
+    $this->add('text', 'change_client_id', ts('Select Contact'));
+    $this->add('hidden', 'contact_id', '', array('id' => 'contact_id'));
+    $this->addElement('submit',
+      $this->getButtonName('next', 'edit_client'),
+      ts('Reassign Case'),
       array(
-        'type' => 'done',
-        'name' => ts('Reassign Case'),
-      ),
-      array(
-        'type' => 'cancel',
-        'name' => ts('Cancel'),
-      ),
-    ));
+        'class' => 'form-submit-inline',
+        'onclick' => "return checkSelection( this );",
+      )
+    );
 
-    // This form may change the url structure so should not submit via ajax
-    $this->preventAjaxSubmit();
-  }
+    $this->addElement('submit',
+      $this->getButtonName('cancel', 'edit_client'),
+      ts('Cancel'),
+      array('class' => 'form-submit-inline')
+    );
 
-
-  function addRules() {
-    $this->addFormRule(array(get_class($this), 'formRule'), $this);
-  }
-
-  /**
-   * @param $vals
-   * @param $rule
-   * @param $form
-   *
-   * @return array
-   */
-  static function formRule($vals, $rule, $form) {
-    $errors = array();
-    if (empty($vals['reassign_contact_id']) || $vals['reassign_contact_id'] == $form->get('cid')) {
-      $errors['reassign_contact_id'] = ts("Please select a different contact.");
-    }
-    return $errors;
+    $this->assign('contactId', $this->_contactId);
   }
 
   /**
@@ -128,13 +112,14 @@ class CRM_Case_Form_EditClient extends CRM_Core_Form {
     $params = $this->controller->exportValues($this->_name);
 
     //assign case to another client.
-    $mainCaseId = CRM_Case_BAO_Case::mergeCases($params['reassign_contact_id'], $this->get('id'), $this->get('cid'), NULL, TRUE);
+    $mainCaseId = CRM_Case_BAO_Case::mergeCases($params['contact_id'], $this->_caseId, $this->_contactId, NULL, TRUE);
 
     // user context
     $url = CRM_Utils_System::url('civicrm/contact/view/case',
-      "reset=1&action=view&cid={$params['reassign_contact_id']}&id={$mainCaseId[0]}&show=1"
+      "reset=1&action=view&cid={$params['contact_id']}&id={$mainCaseId[0]}&show=1"
     );
-    CRM_Core_Session::singleton()->pushUserContext($url);
+    $session = CRM_Core_Session::singleton();
+    $session->pushUserContext($url);
   }
 }
 

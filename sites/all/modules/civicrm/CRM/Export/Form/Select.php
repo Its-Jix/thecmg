@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -302,8 +302,7 @@ FROM   {$this->_componentTable}
       $this->addGroup($postalMailing, 'postal_mailing_export', ts('Postal Mailing Export'), '<br/>');
 
       $this->addElement('select', 'additional_group', ts('Additional Group for Export'),
-        array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup(),
-        array('class' => 'crm-select2 huge')
+        array('' => ts('- select group -')) + CRM_Core_PseudoConstant::nestedGroup()
       );
     }
 
@@ -336,9 +335,6 @@ FROM   {$this->_componentTable}
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
-   * @param $files
-   * @param $self
-   *
    * @return mixed true or array of errors
    * @access public
    * @static
@@ -357,7 +353,9 @@ FROM   {$this->_componentTable}
       foreach ($greetings as $key => $value) {
         $otherOption = CRM_Utils_Array::value($key, $params);
 
-        if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) && empty($params[$value])) {
+        if ((CRM_Utils_Array::value($otherOption, $self->_greetingOptions[$key]) == ts('Other')) &&
+          !CRM_Utils_Array::value($value, $params)
+        ) {
 
           $label = ucwords(str_replace('_', ' ', $key));
           $errors[$value] = ts('Please enter a value for %1 (merging > 2 contacts), or select a pre-configured option from the list.', array(1 => $label));
@@ -492,9 +490,6 @@ FROM   {$this->_componentTable}
     }
   }
 
-  /**
-   * @return array
-   */
   static function getGreetingOptions() {
     $options = array();
     $greetings = array(

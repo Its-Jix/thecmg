@@ -35,10 +35,6 @@
 
 
 define('GOOGLE_DEBUG_PP', 0);
-
-/**
- * Class CRM_Core_Payment_GoogleIPN
- */
 class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
 
   /**
@@ -57,14 +53,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    */
   protected $_mode = NULL;
 
-  /**
-   * @param $name
-   * @param $type
-   * @param $object
-   * @param bool $abort
-   *
-   * @return mixed
-   */
   static function retrieve($name, $type, $object, $abort = TRUE) {
     $value = CRM_Utils_Array::value($name, $object);
     if ($abort && $value === NULL) {
@@ -89,9 +77,7 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_GoogleIPN
+   * @return void
    */
   function __construct($mode, &$paymentProcessor) {
     parent::__construct();
@@ -103,12 +89,11 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when a new order takes place.
    *
-   * @param xml $dataRoot response send by google in xml format
+   * @param xml   $dataRoot    response send by google in xml format
    * @param array $privateData contains the name value pair of <merchant-private-data>
    *
-   * @param $component
-   *
    * @return void
+   *
    */
   function newOrderNotify($dataRoot, $privateData, $component) {
     $ids = $input = $params = array();
@@ -183,6 +168,8 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
           $contribution->invoice_id = $input['invoice'];
           $contribution->total_amount = $dataRoot['order-total']['VALUE'];
           $contribution->contribution_status_id = 2;
+          $contribution->honor_contact_id = $objects['contribution']->honor_contact_id;
+          $contribution->honor_type_id = $objects['contribution']->honor_type_id;
           $contribution->campaign_id = $objects['contribution']->campaign_id;
 
           $objects['contribution'] = $contribution;
@@ -226,10 +213,10 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
              * lets make use of it by passing the eventID/membershipTypeID to next level.
              * And change trxn_id to google-order-number before finishing db update */
 
-      if (!empty($ids['event'])) {
+      if (CRM_Utils_Array::value('event', $ids)) {
         $contribution->trxn_id = $ids['event'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['participant'];
       }
-      elseif (!empty($ids['membership'])) {
+      elseif (CRM_Utils_Array::value('membership', $ids)) {
         $contribution->trxn_id = $ids['membership'][0] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['related_contact'] . CRM_Core_DAO::VALUE_SEPARATOR . $ids['onbehalf_dupe_alert'];
       }
     }
@@ -244,13 +231,11 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
   /**
    * The function gets called when the state(CHARGED, CANCELLED..) changes for an order
    *
-   * @param string $status status of the transaction send by google
-   * @param $dataRoot
-   * @param array $privateData contains the name value pair of <merchant-private-data>
-   *
-   * @param $component
+   * @param string $status      status of the transaction send by google
+   * @param array  $privateData contains the name value pair of <merchant-private-data>
    *
    * @return void
+   *
    */
   function orderStateChange($status, $dataRoot, $privateData, $component) {
     $input = $objects = $ids = array();
@@ -340,11 +325,6 @@ class CRM_Core_Payment_GoogleIPN extends CRM_Core_Payment_BaseIPN {
     $this->completeRecur($input, $ids, $objects);
   }
 
-  /**
-   * @param $input
-   * @param $ids
-   * @param $objects
-   */
   function completeRecur($input, $ids, $objects) {
     if ($ids['contributionRecur']) {
       $recur               = &$objects['contributionRecur'];
@@ -398,9 +378,6 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param $component
-   * @param $paymentProcessor
-   *
    * @return object
    * @static
    */
@@ -433,13 +410,11 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
   /**
    * The function returns the component(Event/Contribute..), given the google-order-no and merchant-private-data
    *
-   * @param array $privateData contains the name value pair of <merchant-private-data>
-   * @param int $orderNo <order-total> send by google
-   * @param string $root root of xml-response
+   * @param xml     $xml_response   response send by google in xml format
+   * @param array   $privateData    contains the name value pair of <merchant-private-data>
+   * @param int     $orderNo        <order-total> send by google
+   * @param string  $root           root of xml-response
    *
-   * @param $response
-   * @param $serial
-   * @internal param \xml $xml_response response send by google in xml format
    * @return array context of this call (test, module, payment processor id)
    * @static
    */
@@ -649,13 +624,6 @@ WHERE  contribution_recur_id = {$ids['contributionRecur']}
     }
   }
 
-  /**
-   * @param $input
-   * @param $ids
-   * @param $dataRoot
-   *
-   * @return bool
-   */
   function getInput(&$input, &$ids, $dataRoot) {
     if (!$this->getBillingID($ids)) {
       return FALSE;

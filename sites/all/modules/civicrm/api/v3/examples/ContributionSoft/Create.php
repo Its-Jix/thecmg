@@ -9,7 +9,6 @@ $params = array(
   'contact_id' => 2,
   'amount' => '10',
   'currency' => 'USD',
-  'soft_credit_type_id' => 5,
 );
 
 try{
@@ -47,7 +46,6 @@ function contribution_soft_create_expectedresult(){
           'pcp_display_in_roll' => '',
           'pcp_roll_nickname' => '',
           'pcp_personal_note' => '',
-          'soft_credit_type_id' => '5',
         ),
     ),
 );

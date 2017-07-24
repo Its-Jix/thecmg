@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,8 +37,6 @@
  * Page for displaying list of Premiums
  */
 class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
-
-  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -79,12 +77,14 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ManagePremiums' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable Premium'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Contribute_BAO_ManagePremiums' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable Premium'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -165,12 +165,7 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
       $premiums[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(),
         $action,
-        array('id' => $dao->id),
-        ts('more'),
-        FALSE,
-        'premium.manage.row',
-        'Premium',
-        $dao->id
+        array('id' => $dao->id)
       );
            //Financial Type
                 if( !empty( $dao->financial_type_id )  ){
@@ -201,8 +196,6 @@ class CRM_Contribute_Page_ManagePremiums extends CRM_Core_Page_Basic {
 
   /**
    * Get user context.
-   *
-   * @param null $mode
    *
    * @return string user context.
    */

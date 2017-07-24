@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -50,7 +50,7 @@
   </div>
 </div>
 <div class="form-layout-compressed">{$form.batch_update.html}&nbsp;{$form.submit.html}</div><br/>
-<table id="crm-batch-selector-{$batchStatus}" class="row-highlight">
+<table id="crm-batch-selector" class="row-highlight">
   <thead>
     <tr>
       <th class="crm-batch-checkbox">{$form.toggleSelect.html}</th>
@@ -67,31 +67,31 @@
 {include file="CRM/Form/validate.tpl"}
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
+cj(function($) {
   var batchSelector;
   buildBatchSelector();
-  $("#batch_update").prop('disabled', false);
+  $("#batch_update").removeAttr('disabled');
 
-  $('#financial-search-form :input')
-    .change(function() {
-      if (!$(this).hasClass('crm-inline-error')) {
-        batchSelector.fnDraw();
-      }
-    })
-    .keypress(function(event) {
-      if (event.which == 13) {
-        event.preventDefault();
-        $(this).change();
-        return false;
-      }
-    });
+  $('#financial-search-form :input').change(function() {
+    if (!$(this).hasClass('crm-inline-error')) {
+      batchSelector.fnDraw();
+    }
+  });
+
+  $('#financial-search-form :input').keypress(function(event) {
+    if (event.which == 13) {
+      event.preventDefault();
+      $(this).change();
+      return false;
+    }
+  });
 
   var checkedRows = [];
   function buildBatchSelector() {
     var ZeroRecordText = {/literal}'<div class="status messages">{ts escape="js"}No Accounting Batches match your search criteria.{/ts}</div>'{literal};
     var sourceUrl = {/literal}'{crmURL p="civicrm/ajax/batchlist" h=0 q="snippet=4&context=financialBatch"}'{literal};
 
-    batchSelector = $('#crm-batch-selector-{/literal}{$batchStatus}{literal}').dataTable({
+    batchSelector = $('#crm-batch-selector').dataTable({
       "bFilter" : false,
       "bAutoWidth" : false,
       "aaSorting" : [],
@@ -137,7 +137,7 @@ CRM.$(function($) {
           }
         });
         checkedRows = [];
-        $("#crm-batch-selector-{/literal}{$batchStatus}{literal} input.select-row:checked").each(function() {
+        $("#crm-batch-selector input.select-row:checked").each(function() {
           checkedRows.push('#' + $(this).attr('id'));
         });
       },
@@ -149,7 +149,7 @@ CRM.$(function($) {
         return nRow;
       },
       "fnDrawCallback": function(oSettings) {
-        $('.crm-editable', '#crm-batch-selector-{/literal}{$batchStatus}{literal}').crmEditable();
+        $('.crm-editable', '#crm-batch-selector').crmEditable();
         $("#toggleSelect").prop('checked', false);
         if (checkedRows.length) {
           $(checkedRows.join(',')).prop('checked', true).change();
@@ -164,6 +164,12 @@ CRM.$(function($) {
       $("#enableDisableStatusMsg").dialog({
         title: {/literal}'{ts escape="js"}Confirm Changes{/ts}'{literal},
         modal: true,
+        bgiframe: true,
+        position: "center",
+        overlay: {
+          opacity: 0.5,
+          background: "black"
+        },
         open:function() {
           switch (op) {{/literal}
             case 'reopen':

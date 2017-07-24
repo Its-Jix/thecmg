@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -62,7 +62,8 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $customGroup = $this->get('customProfile');
     $this->assign('customProfile', $customGroup);
 
-    CRM_Event_Form_Registration_Confirm::assignProfiles($this);
+    $this->assign('primaryParticipantProfile', $this->get('primaryParticipantProfile'));
+    $this->assign('addParticipantProfile', $this->get('addParticipantProfile'));
 
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values['event']));
   }
@@ -86,7 +87,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -160,7 +161,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
     $params['entity_table'] = 'civicrm_event';
     $data = array();
     CRM_Friend_BAO_Friend::retrieve($params, $data);
-    if (!empty($data['is_active'])) {
+    if (CRM_Utils_Array::value('is_active', $data)) {
       $friendText = $data['title'];
       $this->assign('friendText', $friendText);
       if ($this->_action & CRM_Core_Action::PREVIEW) {
@@ -213,7 +214,7 @@ class CRM_Event_Form_Registration_ThankYou extends CRM_Event_Form_Registration {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {}
   //end of function

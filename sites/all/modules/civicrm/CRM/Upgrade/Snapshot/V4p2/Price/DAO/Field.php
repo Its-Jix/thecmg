@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.4                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
+| Copyright CiviCRM LLC (c) 2004-2013                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -27,16 +27,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 require_once 'CRM/Core/DAO.php';
 require_once 'CRM/Utils/Type.php';
-
-/**
- * Class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
- */
 class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
 {
     /**
@@ -185,13 +181,12 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
      * @var int unsigned
      */
     public $visibility_id;
-
-  /**
-   * class constructor
-   *
-   * @access public
-   * @return \CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field
-   */
+    /**
+     * class constructor
+     *
+     * @access public
+     * @return civicrm_price_field
+     */
     function __construct()
     {
         $this->__table = 'civicrm_price_field';
@@ -363,7 +358,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
             self::$_import = array();
             $fields = self::fields();
             foreach($fields as $name => $field) {
-                if (!empty($field['import'])) {
+                if (CRM_Utils_Array::value('import', $field)) {
                     if ($prefix) {
                         self::$_import['price_field'] = & $fields[$name];
                     } else {
@@ -387,7 +382,7 @@ class CRM_Upgrade_Snapshot_V4p2_Price_DAO_Field extends CRM_Core_DAO
             self::$_export = array();
             $fields = self::fields();
             foreach($fields as $name => $field) {
-                if (!empty($field['export'])) {
+                if (CRM_Utils_Array::value('export', $field)) {
                     if ($prefix) {
                         self::$_export['price_field'] = & $fields[$name];
                     } else {

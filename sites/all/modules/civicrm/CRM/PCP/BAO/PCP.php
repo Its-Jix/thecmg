@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,9 +42,6 @@ class CRM_PCP_BAO_PCP extends CRM_PCP_DAO_PCP {
    */
   static $_pcpLinks = NULL;
 
-  /**
-   *
-   */
   function __construct() {
     parent::__construct();
   }
@@ -111,8 +108,6 @@ WHERE  civicrm_pcp.contact_id = civicrm_contact.id
   /**
    * Function to return PCP  Block info for dashboard
    *
-   * @param $contactId
-   *
    * @return array     array of Pcp if found
    * @access public
    * @static
@@ -164,8 +159,7 @@ ORDER BY page_type, page_id";
       else {
         $mask -= CRM_Core_Action::DISABLE;
       }
-      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
-        FALSE, 'pcp.dashboard.active', 'PCP', $pcpInfoDao->id);
+      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace);
       $component = $pcpInfoDao->page_type;
       $pageTitle = CRM_Utils_Array::value($pcpInfoDao->page_id, $$component);
 
@@ -212,8 +206,7 @@ ORDER BY target_entity_type, target_entity_id
         );
       }
       $pcpLink = $links['add'];
-      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace, ts('more'),
-        FALSE, 'pcp.dashboard.other', "{$pcpBlockDao->target_entity_type}_PCP", $pcpBlockDao->target_entity_id);
+      $action = CRM_Core_Action::formLink($pcpLink, $mask, $replace);
       $component = $pcpBlockDao->target_entity_type;
       $pageTitle = CRM_Utils_Array::value($pcpBlockDao->target_entity_id, $$component);
       $pcpBlock[] = array(
@@ -291,7 +284,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       self::$_pcpLinks['add'] = array(
         CRM_Core_Action::ADD => array(
           'name' => ts('Create a Personal Campaign Page'),
-          'class' => 'no-popup',
           'url' => 'civicrm/contribute/campaign',
           'qs' => 'action=add&reset=1&pageId=%%pageId%%&component=%%pageComponent%%',
           'title' => ts('Configure'),
@@ -310,12 +302,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
           'url' => 'civicrm/friend',
           'qs' => 'eid=%%pcpId%%&blockId=%%pcpBlock%%&reset=1&pcomponent=pcp&component=%%pageComponent%%',
           'title' => ts('Tell Friends'),
-        ),
-        CRM_Core_Action::VIEW => array(
-          'name' => ts('URL for this Page'),
-          'url' => 'civicrm/pcp/info',
-          'qs' => 'reset=1&id=%%pcpId%%&component=%%pageComponent%%',
-          'title' => ts('URL for this Page'),
         ),
         CRM_Core_Action::BROWSE => array(
           'name' => ts('Update Contact Information'),
@@ -377,7 +363,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param object $form form object
    *
-   * @return void
+   * @return None
    * @access public
    */
   public static function buildPCPForm($form) {
@@ -428,11 +414,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /*
    * Add PCP form elements to a form
    */
-  /**
-   * @param $pcpId
-   * @param $page
-   * @param null $elements
-   */
   function buildPcp($pcpId, &$page, &$elements = NULL) {
 
     $prms = array('id' => $pcpId);
@@ -452,7 +433,7 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
           $pcp_supporter_text .= "You can support it as well - once you complete the donation, you will be able to create your own Personal Campaign Page!";
         }
       }
-
+      
       $page->assign('pcpSupporterText', $pcp_supporter_text);
     }
     $page->assign('pcp', TRUE);
@@ -480,13 +461,6 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
 
   /*
    * Process a PCP contribution/
-   */
-  /**
-   * @param $pcpId
-   * @param $component
-   * @param $entity
-   *
-   * @return array
    */
   public static function handlePcp($pcpId, $component, $entity) {
 
@@ -535,11 +509,11 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
       $statusMessage = ts('The Personal Campaign Page you have just visited is currently %1. However you can still support the campaign here.', array(1 => $pcpStatus[$pcpInfo['status_id']]));
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
-    elseif (empty($pcpBlock['is_active'])) {
+    elseif (!CRM_Utils_Array::value('is_active', $pcpBlock)) {
       $statusMessage = ts('Personal Campaign Pages are currently not enabled for this contribution page. However you can still support the campaign here.');
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
-    elseif (empty($pcpInfo['is_active'])) {
+    elseif (!CRM_Utils_Array::value('is_active', $pcpInfo)) {
       $statusMessage = ts('The Personal Campaign Page you have just visited is currently inactive. However you can still support the campaign here.');
       CRM_Core_Error::statusBounce($statusMessage, $url);
     }
@@ -586,11 +560,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param int $id campaign page id
    *
-   * @param $is_active
-   *
    * @return null
    * @access public
    * @static
+   *
    */
   static function setIsActive($id, $is_active) {
     switch ($is_active) {
@@ -629,13 +602,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    * 1. when their PCP status is changed by site admin.
    * 2. when supporter initially creates a Personal Campaign Page ($isInitial set to true).
    *
-   * @param int $pcpId campaign page id
-   * @param int $newStatus pcp status id
-   * @param bool|int $isInitial is it the first time, campaign page has been created by the user
+   * @param int $pcpId      campaign page id
+   * @param int $newStatus  pcp status id
+   * @param int $isInitial  is it the first time, campaign page has been created by the user
    *
-   * @param string $component
-   *
-   * @throws Exception
    * @return null
    * @access public
    * @static
@@ -728,10 +698,10 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
    *
    * @param int $id campaign page id
    *
-   * @param $is_active
    * @return null
    * @access public
    * @static
+   *
    */
   static function setDisable($id, $is_active) {
     return CRM_Core_DAO::setFieldValue('CRM_PCP_DAO_PCP', $id, 'is_active', $is_active);
@@ -740,13 +710,12 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is active
    *
-   * @param $pcpId
-   * @param $component
-   * @internal param int $id campaign page id
+   * @param int $id campaign page id
    *
    * @return int
    * @access public
    * @static
+   *
    */
   static function getStatus($pcpId, $component) {
     $query = "
@@ -765,13 +734,12 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get pcp block is enabled for component page
    *
-   * @param $pageId
-   * @param $component
-   * @internal param int $id contribution page id
+   * @param int $id contribution page id
    *
    * @return String
    * @access public
    * @static
+   *
    */
   static function getPcpBlockStatus($pageId, $component) {
     $query = "
@@ -811,13 +779,12 @@ WHERE pcp.id = %1 AND cc.contribution_status_id =1 AND cc.is_test = 0";
   /**
    * Function to get email is enabled for supporter's profile
    *
-   * @param $profileId
-   *
-   * @internal param int $id supporter's profile id
+   * @param int $id supporter's profile id
    *
    * @return boolean
    * @access public
    * @static
+   *
    */
   static function checkEmailProfile($profileId) {
     $query = "
@@ -836,14 +803,12 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to obtain the title of page associated with a pcp
    *
-   * @param $pcpId
-   * @param $component
-   *
-   * @internal param int $id campaign page id
+   * @param int $id campaign page id
    *
    * @return int
    * @access public
    * @static
+   *
    */
   static function getPcpPageTitle($pcpId, $component) {
     if ($component == 'contribute') {
@@ -868,14 +833,12 @@ WHERE field_name like 'email%' And is_active = 1 And uf_group_id = %1";
   /**
    * Function to get pcp block & entity id given pcp id
    *
-   * @param $pcpId
-   * @param $component
-   *
-   * @internal param int $id campaign page id
+   * @param int $id campaign page id
    *
    * @return String
    * @access public
    * @static
+   *
    */
   static function getPcpBlockEntityId($pcpId, $component) {
     $entity_table = self::getPcpEntityTable($component);
@@ -898,13 +861,12 @@ WHERE pcp.id = %1";
   /**
    * Function to get pcp entity table given a component.
    *
-   * @param $component
-   *
-   * @internal param int $id campaign page id
+   * @param int $id campaign page id
    *
    * @return String
    * @access public
    * @static
+   *
    */
   static function getPcpEntityTable($component) {
     $entity_table_map = array(
@@ -919,10 +881,7 @@ WHERE pcp.id = %1";
   /**
    * Function to get supporter profile id
    *
-   * @param $component_id
-   * @param string $component
-   *
-   * @internal param int $contributionPageId contribution page id
+   * @param int $contributionPageId contribution page id
    *
    * @return int
    * @access public

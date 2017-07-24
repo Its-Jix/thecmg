@@ -36,13 +36,13 @@ function activity_type_create_expectedresult(){
   'is_error' => 0,
   'version' => 3,
   'count' => 1,
-  'id' => 764,
+  'id' => 727,
   'values' => array(
-      '764' => array(
-          'id' => '764',
+      '727' => array(
+          'id' => '727',
           'option_group_id' => '2',
           'label' => 'send out letters',
-          'value' => '49',
+          'value' => '46',
           'name' => 'send out letters',
           'grouping' => '',
           'filter' => 0,

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_ActionSchedule
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  *
  */
 
@@ -83,11 +83,6 @@ function _civicrm_api3_dashboard_contact_create_spec(&$params) {
   unset($params['version']);
 }
 
-/**
- * @param $params
- *
- * @return array|null
- */
 function _civicrm_api3_dashboard_contact_check_params(&$params) {
   $dashboard_id = CRM_Utils_Array::value('dashboard_id', $params);
   if ($dashboard_id) {
@@ -97,17 +92,4 @@ function _civicrm_api3_dashboard_contact_check_params(&$params) {
     }
   }
   return NULL;
-}
-
-/**
- * Delete an existing dashboard-contact
- *
- * This method is used to delete any existing dashboard-board. the id of the dashboard-contact
- * is required field in $params array
- *
- * {@getfields dashboard_contact_delete}
- * @access public
- */
-function civicrm_api3_dashboard_contact_delete($params) {
-  return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }

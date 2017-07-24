@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -41,11 +41,6 @@ class CRM_Mailing_BAO_Recipients extends CRM_Mailing_DAO_Recipients {
     parent::__construct();
   }
 
-  /**
-   * @param $mailingID
-   *
-   * @return null|string
-   */
   static function mailingSize($mailingID) {
     $sql = "
 SELECT count(*) as count
@@ -56,13 +51,6 @@ WHERE  mailing_id = %1
     return CRM_Core_DAO::singleValueQuery($sql, $params);
   }
 
-  /**
-   * @param $mailingID
-   * @param null $offset
-   * @param null $limit
-   *
-   * @return Object
-   */
   static function mailingQuery($mailingID,
     $offset = NULL, $limit = NULL
   ) {

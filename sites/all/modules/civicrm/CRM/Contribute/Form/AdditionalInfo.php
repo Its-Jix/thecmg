@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -38,8 +38,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    * Function to build the form for Premium Information.
    *
    * @access public
-   *
-   * @param $form
    *
    * @return void
    */
@@ -89,8 +87,6 @@ class CRM_Contribute_Form_AdditionalInfo {
    * Function to build the form for Additional Details.
    *
    * @access public
-   *
-   * @param $form
    *
    * @return void
    */
@@ -159,15 +155,37 @@ class CRM_Contribute_Form_AdditionalInfo {
   }
 
   /**
+   * Function to build the form for Honoree Information.
+   *
+   * @access public
+   *
+   * @return None
+   */
+  static function buildHonoree(&$form) {
+    //Honoree section
+    $form->add('hidden', 'hidden_Honoree', 1);
+    $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
+    $extraOption = array('onclick' => "return enableHonorType();");
+    foreach ($honor as $key => $var) {
+      $honorTypes[$key] = $form->createElement('radio', NULL, NULL, $var, $key, $extraOption);
+    }
+    $form->addGroup($honorTypes, 'honor_type_id', NULL);
+    $form->add('select', 'honor_prefix_id', ts('Prefix'), array('' => ts('- prefix -')) + CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id'));
+    $form->add('text', 'honor_first_name', ts('First Name'));
+    $form->add('text', 'honor_last_name', ts('Last Name'));
+    $form->add('text', 'honor_email', ts('Email'));
+    $form->addRule("honor_email", ts('Email is not valid.'), 'email');
+  }
+
+  /**
    * This function is used by  CRM/Pledge/Form/Pledge.php
    *
    * Function to build the form for PaymentReminders Information.
    *
    * @access public
    *
-   * @param $form
-   *
    * @return void
+   *
    */
   static function buildPaymentReminders(&$form) {
     //PaymentReminders section
@@ -185,11 +203,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @param $params
-   * @param $contributionID
-   * @param null $premiumID
-   * @param null $options
-   * @return void
+   * @return None
    */
   static function processPremium(&$params, $contributionID, $premiumID = NULL, &$options = NULL) {
     $dao = new CRM_Contribute_DAO_ContributionProduct();
@@ -204,7 +218,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     $productDetails = array();
     CRM_Contribute_BAO_ManagePremiums::retrieve($premiumParams, $productDetails);
     $dao->financial_type_id = CRM_Utils_Array::value('financial_type_id', $productDetails);
-    if (!empty($options[$params['product_name'][0]])) {
+    if (CRM_Utils_Array::value($params['product_name'][0], $options)) {
       $dao->product_option = $options[$params['product_name'][0]][$params['product_name'][1]];
     }
     if ($premiumID) {
@@ -245,12 +259,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @param $params
-   * @param $contactID
-   * @param $contributionID
-   * @param null $contributionNoteID
-   *
-   * @return void
+   * @return None
    */
   static function processNote(&$params, $contactID, $contributionID, $contributionNoteID = NULL) {
     //process note
@@ -273,10 +282,7 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @access public
    *
-   * @param $params
-   * @param $formatted
-   * @param $form
-   * @return void
+   * @return None
    */
   static function postProcessCommon(&$params, &$formatted, &$form) {
     $fields = array(
@@ -287,21 +293,35 @@ class CRM_Contribute_Form_AdditionalInfo {
       'trxn_id',
       'invoice_id',
       'campaign_id',
+      'honor_type_id',
       'contribution_page_id',
     );
     foreach ($fields as $f) {
       $formatted[$f] = CRM_Utils_Array::value($f, $params);
     }
 
-    if (!empty($params['thankyou_date']) && !CRM_Utils_System::isNull($params['thankyou_date'])) {
+    if (CRM_Utils_Array::value('thankyou_date', $params) && !CRM_Utils_System::isNull($params['thankyou_date'])) {
       $formatted['thankyou_date'] = CRM_Utils_Date::processDate($params['thankyou_date'], $params['thankyou_date_time']);
     }
     else {
       $formatted['thankyou_date'] = 'null';
     }
 
-    if (!empty($params['is_email_receipt'])) {
+    if (CRM_Utils_Array::value('is_email_receipt', $params)) {
       $params['receipt_date'] = $formatted['receipt_date'] = date('YmdHis');
+    }
+
+    if (CRM_Utils_Array::value('honor_type_id', $params)) {
+      if ($form->_honorID) {
+        $honorId = CRM_Contribute_BAO_Contribution::createHonorContact($params, $form->_honorID);
+      }
+      else {
+        $honorId = CRM_Contribute_BAO_Contribution::createHonorContact($params);
+      }
+      $formatted["honor_contact_id"] = $honorId;
+    }
+    else {
+      $formatted["honor_contact_id"] = 'null';
     }
 
     //special case to handle if all checkboxes are unchecked
@@ -324,41 +344,41 @@ class CRM_Contribute_Form_AdditionalInfo {
    *
    * @form object  of Contribution form.
    *
-   * @param $form
-   * @param array $params (reference ) an assoc array of name/value pairs.
+   * @param array  $params (reference ) an assoc array of name/value pairs.
    * @$ccContribution boolen,  is it credit card contribution.
-   * @param bool $ccContribution
    * @access public.
    *
-   * @return array
+   * @return None.
    */
   static function emailReceipt(&$form, &$params, $ccContribution = FALSE) {
     $form->assign('receiptType', 'contribution');
     // Retrieve Financial Type Name from financial_type_id
     $params['contributionType_name'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialType',
       $params['financial_type_id']);
-    if (!empty($params['payment_instrument_id'])) {
+    if (CRM_Utils_Array::value('payment_instrument_id', $params)) {
       $paymentInstrument = CRM_Contribute_PseudoConstant::paymentInstrument();
       $params['paidBy'] = $paymentInstrument[$params['payment_instrument_id']];
     }
 
     // retrieve individual prefix value for honoree
-    if (isset($params['soft_credit'])) {
-      $softCreditTypes = $softCredits = array();
-      foreach ($params['soft_credit'] as $key => $softCredit) {
-        $softCredits[$key] = array(
-          'Name' => $softCredit['contact_name'],
-          'Amount' => CRM_Utils_Money::format($softCredit['amount'], $softCredit['currency'])
-        );
-        $softCreditTypes[$key] = $softCredit['soft_credit_type_label'];
-      }
-      $form->assign('softCreditTypes', $softCreditTypes);
-      $form->assign('softCredits', $softCredits);
+    if (CRM_Utils_Array::value('hidden_Honoree', $params)) {
+      $individualPrefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
+      $params['honor_prefix'] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_prefix_id',
+          $params
+        ),
+        $individualPrefix
+      );
+      $params["honor_type"] = CRM_Utils_Array::value(CRM_Utils_Array::value('honor_type_id',
+          $params
+        ),
+        $honor
+      );
     }
 
     // retrieve premium product name and assigned fulfilled
     // date to template
-    if (!empty($params['hidden_Premium'])) {
+    if (CRM_Utils_Array::value('hidden_Premium', $params)) {
       if (isset($params['product_name']) &&
         is_array($params['product_name']) &&
         !empty($params['product_name'])
@@ -369,13 +389,16 @@ class CRM_Contribute_Form_AdditionalInfo {
         $params['product_name'] = $productDAO->name;
         $params['product_sku'] = $productDAO->sku;
 
-        if (empty($params['product_option']) && !empty($form->_options
-[$params['product_name'][0]])) {
+        if (!CRM_Utils_Array::value('product_option', $params) &&
+          CRM_Utils_Array::value($params['product_name'][0],
+            $form->_options
+          )
+        ) {
           $params['product_option'] = $form->_options[$params['product_name'][0]][$params['product_name'][1]];
         }
       }
 
-      if (!empty($params['fulfilled_date'])) {
+      if (CRM_Utils_Array::value('fulfilled_date', $params)) {
         $form->assign('fulfilled_date', CRM_Utils_Date::processDate($params['fulfilled_date']));
       }
     }
@@ -384,7 +407,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     if ($ccContribution) {
       //build the name.
       $name = CRM_Utils_Array::value('billing_first_name', $params);
-      if (!empty($params['billing_middle_name'])) {
+      if (CRM_Utils_Array::value('billing_middle_name', $params)) {
         $name .= " {$params['billing_middle_name']}";
       }
       $name .= ' ' . CRM_Utils_Array::value('billing_last_name', $params);
@@ -419,10 +442,10 @@ class CRM_Contribute_Form_AdditionalInfo {
       // assigned various dates to the templates
       $form->assign('receipt_date', CRM_Utils_Date::processDate($params['receipt_date']));
 
-      if (!empty($params['cancel_date'])) {
+      if (CRM_Utils_Array::value('cancel_date', $params)) {
         $form->assign('cancel_date', CRM_Utils_Date::processDate($params['cancel_date']));
       }
-      if (!empty($params['thankyou_date'])) {
+      if (CRM_Utils_Array::value('thankyou_date', $params)) {
         $form->assign('thankyou_date', CRM_Utils_Date::processDate($params['thankyou_date']));
       }
       if ($form->_action & CRM_Core_Action::UPDATE) {
@@ -431,7 +454,7 @@ class CRM_Contribute_Form_AdditionalInfo {
     }
 
     //handle custom data
-    if (!empty($params['hidden_custom'])) {
+    if (CRM_Utils_Array::value('hidden_custom', $params)) {
       $contribParams = array(array('contribution_id', '=', $params['contribution_id'], 0, 0));
       if ($form->_mode == 'test') {
         $contribParams[] = array('contribution_test', '=', 1, 0, 0);
@@ -465,11 +488,11 @@ class CRM_Contribute_Form_AdditionalInfo {
     $form->assign('contactID', $params['contact_id']);
     $form->assign('contributionID', $params['contribution_id']);
 
-    if (!empty($params['currency'])) {
+    if (CRM_Utils_Array::value('currency', $params)) {
       $form->assign('currency', $params['currency']);
     }
 
-    if (!empty($params['receive_date'])) {
+    if (CRM_Utils_Array::value('receive_date', $params)) {
       $form->assign('receive_date', CRM_Utils_Date::processDate($params['receive_date']));
     }
 

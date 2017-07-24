@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -38,17 +38,12 @@
  */
 class CRM_Core_Permission_Base {
 
-  // permission mapping to stub check() calls
-  public $permissions = NULL;
-
   /**
    * Translate permission
    *
-   * @param $perm
+   * @param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
    * @param string $nativePrefix
    * @param array $map array($portableName => $nativeName)
-   *
-   * @internal param string $name e.g. "administer CiviCRM", "cms:access user record", "Drupal:administer content", "Joomla:action:com_asset"
    * @return NULL|string a permission name
    */
   public function translatePermission($perm, $nativePrefix, $map) {
@@ -101,17 +96,17 @@ class CRM_Core_Permission_Base {
     $this->group();
     return $this->groupClause($type, $tables, $whereTables);
   }
-
   /**
    * Get all groups from database, filtered by permissions
    * for this user
    *
-   * @param string $groupType type of group(Access/Mailing)
-   * @param bool|\boolen $excludeHidden exclude hidden groups.
+   * @param string $groupType     type of group(Access/Mailing)
+   * @param boolen $excludeHidden exclude hidden groups.
    *
    * @access public
    *
    * @return array - array reference of all groups.
+   *
    */
   public function group($groupType = NULL, $excludeHidden = TRUE) {
     return CRM_Core_PseudoConstant::allGroup($groupType, $excludeHidden);
@@ -197,8 +192,6 @@ class CRM_Core_Permission_Base {
    * version has removed permission that were defined in the older version.
    *
    * @param array $permissions same format as CRM_Core_Permission::getCorePermissions().
-   *
-   * @throws CRM_Core_Exception
    * @see CRM_Core_Permission::getCorePermissions
    */
   function upgradePermissions($permissions) {
@@ -211,8 +204,6 @@ class CRM_Core_Permission_Base {
    *
    * Note: At time of writing, this is only used with native extension-modules, so
    * there's one, predictable calling convention (regardless of CMS).
-   *
-   * @param $module
    *
    * @return Array of permissions, in the same format as CRM_Core_Permission::getCorePermissions().
    * @see CRM_Core_Permission::getCorePermissions

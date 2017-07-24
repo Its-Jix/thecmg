@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -58,7 +58,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function buildQuickForm() {
 
@@ -92,8 +92,8 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
     $this->assign('searchCount', $searchCount);
     $this->assign('searchDone', $this->get('searchDone'));
     $this->assign('contact_type_display', ts('Household'));
-    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'crm-form-submit'));
-    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'crm-form-submit'));
+    $this->addElement('submit', $this->getButtonName('refresh'), ts('Search'), array('class' => 'form-submit'));
+    $this->addElement('submit', $this->getButtonName('cancel'), ts('Cancel'), array('class' => 'form-submit'));
 
     $this->addButtons(array(
         array(
@@ -114,7 +114,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
 
@@ -122,7 +122,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
     $params = $this->controller->exportValues($this->_name);
 
     $this->set('searchDone', 0);
-    if (!empty($_POST['_qf_AddToHousehold_refresh'])) {
+    if (CRM_Utils_Array::value('_qf_AddToHousehold_refresh', $_POST)) {
       $searchParams['contact_type'] = array('Household' => 'Household');
       $searchParams['rel_contact'] = $params['name'];
       self::search($this, $searchParams);
@@ -178,17 +178,17 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
   /**
    * This function is to get the result of the search for Add to * forms
    *
-   * @param $form
-   * @param  array $params This contains elements for search criteria
+   * @param  array $params  This contains elements for search criteria
    *
    * @access public
    *
-   * @return void
+   * @return None
+   *
    */
   function search(&$form, &$params) {
     //max records that will be listed
     $searchValues = array();
-    if (!empty($params['rel_contact'])) {
+    if (CRM_Utils_Array::value('rel_contact', $params)) {
       if (isset($params['rel_contact_id']) &&
         is_numeric($params['rel_contact_id'])
       ) {
@@ -205,7 +205,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
       $excludedContactIds[] = $form->_contactId;
     }
 
-    if (!empty($params['relationship_type_id'])) {
+    if (CRM_Utils_Array::value('relationship_type_id', $params)) {
       $relationshipType = new CRM_Contact_DAO_RelationshipType();
       list($rid, $direction) = explode('_', $params['relationship_type_id'], 2);
 
@@ -233,7 +233,7 @@ class CRM_Contact_Form_Task_AddToHousehold extends CRM_Contact_Form_Task {
       }
     }
 
-    if (!$contactTypeAdded && !empty($params['contact_type'])) {
+    if (!$contactTypeAdded && CRM_Utils_Array::value('contact_type', $params)) {
       $searchValues[] = array('contact_type', '=', $params['contact_type'], 0, 0);
     }
 

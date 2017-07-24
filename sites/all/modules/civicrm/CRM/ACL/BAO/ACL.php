@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -43,9 +43,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
 
   static $_fieldKeys = NULL;
 
-  /**
-   * @return array|null
-   */
   static function entityTable() {
     if (!self::$_entityTable) {
       self::$_entityTable = array(
@@ -56,9 +53,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     return self::$_entityTable;
   }
 
-  /**
-   * @return array|null
-   */
   static function objectTable() {
     if (!self::$_objectTable) {
       self::$_objectTable = array(
@@ -72,9 +66,6 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
     return self::$_objectTable;
   }
 
-  /**
-   * @return array|null
-   */
   static function operation() {
     if (!self::$_operation) {
       self::$_operation = array(
@@ -92,14 +83,13 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct a WHERE clause to handle permissions to $object_*
    *
-   * @param $tables
+   * @param array ref $tables -   Any tables that may be needed in the FROM
    * @param string $operation -   The operation being attempted
    * @param string $object_table -    The table of the object in question
-   * @param int $object_id -   The ID of the object in question
-   * @param int $acl_id -       If it's a grant/revoke operation, the ACL ID
+   * @param int $object_id    -   The ID of the object in question
+   * @param int $acl_id   -       If it's a grant/revoke operation, the ACL ID
    * @param boolean $acl_role -  For grant operations, this flag determines if we're granting a single acl (false) or an entire group.
    *
-   * @internal param \ref $array $tables -   Any tables that may be needed in the FROM
    * @return string           -   The WHERE clause, or 0 on failure
    * @access public
    * @static
@@ -329,13 +319,11 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
    * Given a table and id pair, return the filter clause
    *
    * @param string $table -   The table owning the object
-   * @param int $id -       The ID of the object
-   * @param $tables
-   *
-   * @internal param \ref $array $tables - Tables that will be needed in the FROM
+   * @param int $id   -       The ID of the object
+   * @param array ref $tables - Tables that will be needed in the FROM
    *
    * @return string|null  -   WHERE-style clause to filter results,
-   * or null if $table or $id is null
+   or null if $table or $id is null
    * @access public
    * @static
    */
@@ -362,8 +350,8 @@ class CRM_ACL_BAO_ACL extends CRM_ACL_DAO_ACL {
   /**
    * Construct an associative array of an ACL rule's properties
    *
-   * @param   string $format sprintf format for array
-   * @param   bool $hideEmpty only return elements that have a value set.
+   * @param   string  sprintf format for array
+   * @param   bool    empty only return elemnts that have a value set.
    *
    * @return array    - Assoc. array of the ACL rule's properties
    * @access public
@@ -656,22 +644,12 @@ SELECT $acl.*
     return $result;
   }
 
-  /**
-   * @param $params
-   *
-   * @return CRM_ACL_DAO_ACL
-   */
   static function create(&$params) {
     $dao = new CRM_ACL_DAO_ACL();
     $dao->copyValues($params);
     $dao->save();
-    return $dao;
   }
 
-  /**
-   * @param $params
-   * @param $defaults
-   */
   static function retrieve(&$params, &$defaults) {
     CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_ACL', $params, $defaults);
   }
@@ -692,12 +670,6 @@ SELECT $acl.*
     return CRM_Core_DAO::setFieldValue('CRM_ACL_DAO_ACL', $id, 'is_active', $is_active);
   }
 
-  /**
-   * @param $str
-   * @param $contactID
-   *
-   * @return bool
-   */
   static function check($str, $contactID) {
 
     $acls = CRM_ACL_BAO_Cache::build($contactID);
@@ -724,14 +696,6 @@ SELECT count( a.id )
     return ($count) ? TRUE : FALSE;
   }
 
-  /**
-   * @param $type
-   * @param $tables
-   * @param $whereTables
-   * @param null $contactID
-   *
-   * @return null|string
-   */
   public static function whereClause($type, &$tables, &$whereTables, $contactID = NULL) {
     $acls = CRM_ACL_BAO_Cache::build($contactID);
     //CRM_Core_Error::debug( "a: $contactID", $acls );
@@ -849,15 +813,6 @@ SELECT g.*
     return $whereClause;
   }
 
-  /**
-   * @param $type
-   * @param null $contactID
-   * @param string $tableName
-   * @param null $allGroups
-   * @param null $includedGroups
-   *
-   * @return array
-   */
   public static function group($type,
     $contactID      = NULL,
     $tableName      = 'civicrm_saved_search',
@@ -920,12 +875,6 @@ ORDER BY a.object_id
     return $ids;
   }
 
-  /**
-   * @param $type
-   * @param $operation
-   *
-   * @return bool
-   */
   static function matchType($type, $operation) {
     $typeCheck = FALSE;
     switch ($operation) {

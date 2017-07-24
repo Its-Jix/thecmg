@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -60,8 +60,6 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
     }
 
     $this->_id = CRM_Utils_Request::retrieve('ppId', 'Positive', $this);
-
-    CRM_Utils_System::setTitle(ts('Edit Scheduled Pledge Payment'));
   }
 
   /**
@@ -70,7 +68,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     $defaults = array();
@@ -91,7 +89,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -140,7 +138,7 @@ class CRM_Pledge_Form_Payment extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     //get the submitted form values.

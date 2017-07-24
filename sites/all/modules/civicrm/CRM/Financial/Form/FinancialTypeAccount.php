@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -123,16 +123,27 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
-    parent::buildQuickForm();
-    $this->setPageTitle(ts('Financial Type Account'));
-
     if ($this->_action & CRM_Core_Action::DELETE) {
+      $this->addButtons(array(
+        array(
+          'type' => 'next',
+          'name' => ts('Delete Financial Account Type'),
+          'spacing' => '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;',
+          'isDefault' => TRUE
+        ),
+        array(
+          'type' => 'cancel',
+          'name' => ts('Cancel'))
+        )
+      );
       return;
     }
+
+    parent::buildQuickForm();
 
     if (isset($this->_id)) {
       $params = array('id' => $this->_id);
@@ -166,7 +177,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     }
 
     if ($this->_action == CRM_Core_Action::ADD) {
-      if (!empty($this->_submitValues['account_relationship']) || !empty($this->_submitValues['financial_account_id'])) {
+      if (CRM_Utils_Array::value('account_relationship', $this->_submitValues) || CRM_Utils_Array::value('financial_account_id', $this->_submitValues)) {
         $financialAccountType = array(
            '5' => 5, //expense
            '3' => 1, //AR relation
@@ -234,11 +245,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
   /**
    * global validation rules for the form
    *
-   * @param $values
-   * @param $files
-   * @param $self
-   *
-   * @internal param array $fields posted values of the form
+   * @param array $fields posted values of the form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -265,7 +272,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
     if (CRM_Utils_Array::value('financial_account_id', $values) == 'select') {
       $errorMsg['financial_account_id'] = 'Financial Account is a required field.';
     }
-    if (!empty($values['account_relationship']) && !empty($values['financial_account_id'])) {
+    if (CRM_Utils_Array::value('account_relationship', $values) && CRM_Utils_Array::value('financial_account_id', $values)) {
       $params = array(
         'account_relationship' => $values['account_relationship'],
         'entity_id'            => $self->_aid
@@ -301,7 +308,7 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
    * Function to process the form
    *
    * @access public
-   * @return void
+   * @return None
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -340,7 +347,6 @@ class CRM_Financial_Form_FinancialTypeAccount extends CRM_Contribute_Form {
         "reset=1&action=browse&aid={$this->_aid}"));
     }
   }
-
 }
 
 

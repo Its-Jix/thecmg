@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -45,13 +45,10 @@ class CRM_Contact_Form_Search_Custom_Group
   protected $_aclFrom = NULL;
   protected $_aclWhere = NULL;
 
-  /**
-   * @param $formValues
-   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_columns = array(
-      ts('Contact ID') => 'contact_id',
+      ts('Contact Id') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Group Name') => 'gname',
@@ -85,14 +82,11 @@ class CRM_Contact_Form_Search_Custom_Group
   }
 
   function __destruct() {
-    // mysql drops the tables when connectiomn is terminated
+    // mysql drops the tables when connection is terminated
     // cannot drop tables here, since the search might be used
     // in other parts after the object is destroyed
   }
 
-  /**
-   * @param CRM_Core_Form $form
-   */
   function buildForm(&$form) {
 
     $this->setTitle(ts('Include / Exclude Search'));
@@ -106,25 +100,22 @@ class CRM_Contact_Form_Search_Custom_Group
       CRM_Utils_System::redirect($url);
     }
 
-    $select2style = array(
-      'multiple' => TRUE,
-      'style' => 'width: 100%; max-width: 60em;',
-      'class' => 'crm-select2',
-      'placeholder' => ts('- select -'),
+    $inG = &$form->addElement('advmultiselect', 'includeGroups',
+      ts('Include Group(s)') . ' ', $groups,
+      array(
+        'size' => 5,
+        'style' => 'width:240px',
+        'class' => 'advmultiselect',
+      )
     );
 
-    $form->add('select', 'includeGroups',
-      ts('Include Group(s)'),
-      $groups,
-      FALSE,
-      $select2style
-    );
-
-    $form->add('select', 'excludeGroups',
-      ts('Exclude Group(s)'),
-      $groups,
-      FALSE,
-      $select2style
+    $outG = &$form->addElement('advmultiselect', 'excludeGroups',
+      ts('Exclude Group(s)') . ' ', $groups,
+      array(
+        'size' => 5,
+        'style' => 'width:240px',
+        'class' => 'advmultiselect',
+      )
     );
 
     $andOr = array(
@@ -133,19 +124,35 @@ class CRM_Contact_Form_Search_Custom_Group
     );
     $form->addRadio('andOr', ts('AND/OR'), $andOr, NULL, '<br />', TRUE);
 
-    $form->add('select', 'includeTags',
-      ts('Include Tag(s)'),
-      $tags,
-      FALSE,
-      $select2style
+    $int = &$form->addElement('advmultiselect', 'includeTags',
+      ts('Include Tag(s)') . ' ', $tags,
+      array(
+        'size' => 5,
+        'style' => 'width:240px',
+        'class' => 'advmultiselect',
+      )
     );
 
-    $form->add('select', 'excludeTags',
-      ts('Exclude Tag(s)'),
-      $tags,
-      FALSE,
-      $select2style
+    $outt = &$form->addElement('advmultiselect', 'excludeTags',
+      ts('Exclude Tag(s)') . ' ', $tags,
+      array(
+        'size' => 5,
+        'style' => 'width:240px',
+        'class' => 'advmultiselect',
+      )
     );
+
+    //add/remove buttons for groups
+    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));;
+    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));;
+    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));;
+    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));;
+
+    //add/remove buttons for tags
+    $int->setButtonAttributes('add', array('value' => ts('Add >>')));;
+    $outt->setButtonAttributes('add', array('value' => ts('Add >>')));;
+    $int->setButtonAttributes('remove', array('value' => ts('<< Remove')));;
+    $outt->setButtonAttributes('remove', array('value' => ts('<< Remove')));;
 
     /**
      * if you are using the standard template, this array tells the template what elements
@@ -157,9 +164,6 @@ class CRM_Contact_Form_Search_Custom_Group
   /*
    * Set search form field defaults here.
    */
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     $defaults = array( 'andOr' => '1' );
 
@@ -168,23 +172,11 @@ class CRM_Contact_Form_Search_Custom_Group
 
       $defaults['includeGroups'] = CRM_Utils_Array::value('includeGroups', $this->_formValues);
       $defaults['excludeGroups'] = CRM_Utils_Array::value('excludeGroups', $this->_formValues);
-
-      $defaults['includeTags'] = CRM_Utils_Array::value('includeTags', $this->_formValues);
-      $defaults['excludeTags'] = CRM_Utils_Array::value('excludeTags', $this->_formValues);
     }
 
     return $defaults;
   }
 
-  /**
-   * @param int $offset
-   * @param int $rowcount
-   * @param null $sort
-   * @param bool $includeContactIDs
-   * @param bool $justIDs
-   *
-   * @return string
-   */
   function all(
     $offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
@@ -249,9 +241,6 @@ class CRM_Contact_Form_Search_Custom_Group
         $sql .= " ORDER BY contact_id ASC";
       }
     }
-    else {
-      $sql .= " ORDER BY contact_a.id ASC";
-    }
 
     if ($offset >= 0 && $rowcount > 0) {
       $sql .= " LIMIT $offset, $rowcount ";
@@ -260,10 +249,6 @@ class CRM_Contact_Form_Search_Custom_Group
     return $sql;
   }
 
-  /**
-   * @return string
-   * @throws Exception
-   */
   function from() {
 
     $iGroups = $xGroups = $iTags = $xTags = 0;
@@ -510,11 +495,15 @@ WHERE  gcc.group_id = {$ssGroup->id}
      */
 
     /*
-     * check the situation and set booleans
-     */
+         * check the situation and set booleans
+         */
+
     $Ig = ($iGroups != 0);
+
     $It = ($iTags != 0);
+
     $Xg = ($xGroups != 0);
+
     $Xt = ($xTags != 0);
 
     //PICK UP FROM HERE
@@ -523,8 +512,8 @@ WHERE  gcc.group_id = {$ssGroup->id}
     }
 
     /*
-     * Set from statement depending on array sel
-     */
+         * Set from statement depending on array sel
+         */
     $whereitems = array();
     foreach (array('Ig', 'It') as $inc) {
       if ($this->_andOr == 1) {
@@ -562,11 +551,6 @@ WHERE  gcc.group_id = {$ssGroup->id}
     return $from;
   }
 
-  /**
-   * @param bool $includeContactIDs
-   *
-   * @return string
-   */
   function where($includeContactIDs = FALSE) {
     if ($includeContactIDs) {
       $contactIDs = array();
@@ -595,9 +579,6 @@ WHERE  gcc.group_id = {$ssGroup->id}
   /*
      * Functions below generally don't need to be modified
      */
-  /**
-   * @return mixed
-   */
   function count() {
     $sql = $this->all();
 
@@ -605,42 +586,22 @@ WHERE  gcc.group_id = {$ssGroup->id}
     return $dao->N;
   }
 
-  /**
-   * @param int $offset
-   * @param int $rowcount
-   * @param null $sort
-   * @param bool $returnSQL
-   *
-   * @return string
-   */
   function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
-  /**
-   * @return array
-   */
   function &columns() {
     return $this->_columns;
   }
 
-  /**
-   * @return null
-   */
   function summary() {
     return NULL;
   }
 
-  /**
-   * @return string
-   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
-  /**
-   * @param $title
-   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -650,9 +611,6 @@ WHERE  gcc.group_id = {$ssGroup->id}
     }
   }
 
-  /**
-   * @param string $tableAlias
-   */
   function buildACLClause($tableAlias = 'contact') {
     list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
   }

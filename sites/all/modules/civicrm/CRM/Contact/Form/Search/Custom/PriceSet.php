@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,20 +28,18 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_PriceSet extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_eventID = NULL;
-
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
   protected $_tableName = NULL;
   public $_permissionedComponent;
 
-  /**
-   * @param $formValues
-   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -154,11 +152,6 @@ WHERE participant_id = $participantID;
     }
   }
 
-  /**
-   * @param null $eventID
-   *
-   * @return Object
-   */
   function priceSetDAO($eventID = NULL) {
 
     // get all the events that have a price set associated with it
@@ -185,11 +178,6 @@ AND    p.entity_id    = e.id
     return $dao;
   }
 
-  /**
-   * @param $form
-   *
-   * @throws Exception
-   */
   function buildForm(&$form) {
     $dao = $this->priceSetDAO();
 
@@ -223,7 +211,7 @@ AND    p.entity_id    = e.id
 
   function setColumns() {
     $this->_columns = array(
-      ts('Contact ID') => 'contact_id',
+      ts('Contact Id') => 'contact_id',
       ts('Participant Id') => 'participant_id',
       ts('Name') => 'display_name',
     );
@@ -260,22 +248,10 @@ AND    p.entity_id    = e.id
     }
   }
 
-  /**
-   * @return null
-   */
   function summary() {
     return NULL;
   }
 
-  /**
-   * @param int $offset
-   * @param int $rowcount
-   * @param null $sort
-   * @param bool $includeContactIDs
-   * @param bool $justIDs
-   *
-   * @return string
-   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -304,47 +280,33 @@ contact_a.display_name   as display_name";
     );
   }
 
-  /**
-   * @return string
-   */
   function from() {
-    return "
+    $this->buildACLClause('contact_a');
+    $from = "
 FROM       civicrm_contact contact_a
-INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id )
+INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.id ) {$this->_aclFrom}
 ";
+    return $from;
   }
 
-  /**
-   * @param bool $includeContactIDs
-   *
-   * @return string
-   */
   function where($includeContactIDs = FALSE) {
-    return ' ( 1 ) ';
+    $where = ' ( 1 ) ';
+    if ($this->_aclWhere) {
+      $where .= " AND {$this->_aclWhere} ";
+    }
+    return $where;
   }
 
-  /**
-   * @return string
-   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     return array();
   }
 
-  /**
-   * @param $row
-   */
   function alterRow(&$row) {}
 
-  /**
-   * @param $title
-   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -353,5 +315,12 @@ INNER JOIN {$this->_tableName} tempTable ON ( tempTable.contact_id = contact_a.i
       CRM_Utils_System::setTitle(ts('Export Price Set Info for an Event'));
     }
   }
-}
 
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
+}

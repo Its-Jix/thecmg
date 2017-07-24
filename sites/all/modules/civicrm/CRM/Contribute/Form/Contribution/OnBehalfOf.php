@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -36,8 +36,6 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
 
   /**
    * Function to set variables up before form is built
-   *
-   * @param $form
    *
    * @return void
    * @access public
@@ -97,9 +95,7 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
         $form->assign('locDataURL', $locDataURL);
 
         if (!empty($form->_submitValues['onbehalf'])) {
-          if (!empty($form->_submitValues['onbehalfof_id'])) {
-            $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
-          }
+          $form->assign('submittedOnBehalf', $form->_submitValues['onbehalfof_id']);
           $form->assign('submittedOnBehalfInfo', json_encode($form->_submitValues['onbehalf']));
         }
       }
@@ -126,9 +122,8 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
    * Function to build form for related contacts / on behalf of organization.
    *
    * @param $form              object  invoking Object
-   *
-   * @internal param string $contactType contact type
-   * @internal param string $title fieldset title
+   * @param $contactType       string  contact type
+   * @param $title             string  fieldset title
    *
    * @static
    */
@@ -168,15 +163,34 @@ class CRM_Contribute_Form_Contribution_OnBehalfOf {
       $fieldTypes = array_merge($fieldTypes, array('Contribution'));
     }
 
+    $stateCountryMap = array();
     foreach ($profileFields as $name => $field) {
       if (in_array($field['field_type'], $fieldTypes)) {
         list($prefixName, $index) = CRM_Utils_System::explode('-', $name, 2);
-        if (in_array($prefixName, array('organization_name', 'email')) && empty($field['is_required'])) {
+        if (in_array($prefixName, array(
+          'state_province', 'country', 'county'))) {
+          if (!array_key_exists($index, $stateCountryMap)) {
+            $stateCountryMap[$index] = array();
+          }
+
+          $stateCountryMap[$index][$prefixName] = 'onbehalf[' . $name . ']';
+        }
+        elseif (in_array($prefixName, array(
+          'organization_name', 'email')) &&
+          !CRM_Utils_Array::value('is_required', $field)
+        ) {
           $field['is_required'] = 1;
         }
 
         CRM_Core_BAO_UFGroup::buildProfile($form, $field, NULL, NULL, FALSE, TRUE);
       }
+    }
+
+    if (!empty($stateCountryMap)) {
+      CRM_Core_BAO_Address::addStateCountryMap($stateCountryMap);
+
+      // now fix all state country selectors
+      CRM_Core_BAO_Address::fixAllStateSelects($form, CRM_Core_DAO::$_nullArray);
     }
 
     $form->assign('onBehalfOfFields', $profileFields);

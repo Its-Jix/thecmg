@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -86,11 +86,9 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to delete financial Types
+     * Function to delete financial Types
    *
-   * @param $premiumID
-   *
-   * @internal param int $contributionTypeId
+   * @param int $contributionTypeId
    * @static
    */
   static function del($premiumID) {
@@ -105,13 +103,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Function to build Premium Block im Contribution Pages
    *
-   * @param $form CRM_Core_Form
-   * @param $pageID
-   * @param bool $formItems
-   * @param null $selectedProductID
-   * @param null $selectedOption
-   *
-   * @internal param int $pageId
+   * @param int $pageId
    * @static
    */
   static function buildPremiumBlock(&$form, $pageID, $formItems = FALSE, $selectedProductID = NULL, $selectedOption = NULL) {
@@ -175,11 +167,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Function to build Premium B im Contribution Pages
    *
-   * @param $form CRM_Core_Form
-   * @param $productID
-   * @param null $premiumProductID
-   *
-   * @internal param int $pageId
+   * @param int $pageId
    * @static
    */
   function buildPremiumPreviewBlock($form, $productID, $premiumProductID = NULL) {
@@ -217,9 +205,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   /**
    * Function to delete premium associated w/ contribution page.
    *
-   * @param $contributionPageID
-   *
-   * @internal param int $contribution page id
+   * @param int $contribution page id
    * @static
    */
   static function deletePremium($contributionPageID) {
@@ -250,7 +236,7 @@ class CRM_Contribute_BAO_Premium extends CRM_Contribute_DAO_Premium {
   }
 
   /**
-   * Function to retrieve premium product and their options
+   * Funtion to retrieve premium product and their options
    *
    * @return array product and option arrays
    * @static

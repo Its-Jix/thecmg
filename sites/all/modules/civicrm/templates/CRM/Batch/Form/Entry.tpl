@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -57,12 +57,10 @@
       {/if}
       {foreach from=$fields item=field key=fieldName}
         <div class="crm-grid-cell">
-          {if $field.name|substr:0:11 ne 'soft_credit'}
           <img src="{$config->resourceBase}i/copy.png"
                alt="{ts 1=$field.title}Click to copy %1 from row one to all rows.{/ts}"
                fname="{$field.name}" class="action-icon"
-               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>
-          {/if}{$field.title}
+               title="{ts}Click here to copy the value in row one to ALL rows.{/ts}"/>{$field.title}
         </div>
       {/foreach}
     </div>
@@ -73,7 +71,7 @@
         <div class="compressed crm-grid-cell"><span class="batch-edit"></span></div>
         {* contact select/create option*}
         <div class="compressed crm-grid-cell">
-          {$form.primary_contact_id.$rowNumber.html|crmAddClass:big}
+          {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="primary_" newContactCallback="updateContactInfo($rowNumber, 'primary_')"}
         </div>
 
         {if $batchType eq 2 }
@@ -90,10 +88,9 @@
             </div>
           {elseif $n eq 'soft_credit'}
             <div class="compressed crm-grid-cell">
-              {$form.soft_credit_contact_id.$rowNumber.html|crmAddClass:big}
+              {include file="CRM/Contact/Form/NewContact.tpl" blockNo = $rowNumber noLabel=true prefix="soft_credit_"}
               {$form.soft_credit_amount.$rowNumber.label}&nbsp;{$form.soft_credit_amount.$rowNumber.html|crmAddClass:eight}
             </div>
-            <div class="compressed crm-grid-cell">{$form.soft_credit_type.$rowNumber.html}</div>
           {elseif in_array( $fields.$n.html_type, array('Radio', 'CheckBox'))}
             <div class="compressed crm-grid-cell">&nbsp;{$form.field.$rowNumber.$n.html}</div>
           {else}
@@ -107,27 +104,18 @@
 </div>
 {literal}
 <script type="text/javascript">
-CRM.$(function($) {
-  var $form = $('form.{/literal}{$form.formClass}{literal}');
-  $('.selector-rows').change(function () {
+cj(function () {
+  cj('.selector-rows').change(function () {
     var options = {
       'url': {/literal}"{crmURL p='civicrm/ajax/batch' h=0}"{literal}
     };
 
-    $($form).ajaxSubmit(options);
+    cj("#Entry").ajaxSubmit(options);
   });
 
-  cj('input[id*="primary_contact_id_"]').change(function() {
-    var temp = this.id.split('_');
-    var ROWID = temp[3];
-    if (cj(this).val()) {
-      updateContactInfo(ROWID,'primary_');
-    }
-  });
-
-  $('#crm-container').on('keyup change', '*.selector-rows', function () {
+  cj('#crm-container').on('keyup change', '*.selector-rows', function () {
     // validate rows
-    checkColumns($(this));
+    checkColumns(cj(this));
   });
 
   // validate rows
@@ -136,7 +124,7 @@ CRM.$(function($) {
   //calculate the actual total for the batch
   calculateActualTotal();
 
-  $('input[id*="_total_amount"]').bind('keyup change', function () {
+  cj('input[id*="_total_amount"]').bind('keyup change', function () {
     calculateActualTotal();
   });
 
@@ -145,34 +133,34 @@ CRM.$(function($) {
   hideSendReceipt();
 
   // hide the receipt date if send receipt is checked
-  $('input[id*="][send_receipt]"]').change(function () {
-    showHideReceipt($(this));
+  cj('input[id*="][send_receipt]"]').change(function () {
+    showHideReceipt(cj(this));
   });
 
   {/literal}{else}{literal}
-  $('select[id^="member_option_"]').each(function () {
-    if ($(this).val() == 1) {
-      $(this).prop('disabled', true);
+  cj('select[id^="member_option_"]').each(function () {
+    if (cj(this).val() == 1) {
+      cj(this).attr('disabled', true);
     }
   });
 
   // set payment info accord to membership type
-  $('select[id*="_membership_type_0"]').change(function () {
-    setPaymentBlock($(this), null);
+  cj('select[id*="_membership_type_0"]').change(function () {
+    setPaymentBlock(cj(this), null);
   });
 
-  $('select[id*="_membership_type_1"]').change(function () {
-    setPaymentBlock($(this), $(this).val());
+  cj('select[id*="_membership_type_1"]').change(function () {
+    setPaymentBlock(cj(this), cj(this).val());
   });
 
   {/literal}{/if}{literal}
 
   // line breaks between radio buttons and checkboxes
-  $('input.form-radio').next().after('<br />');
-  $('input.form-checkbox').next().after('<br />');
+  cj('input.form-radio').next().after('<br />');
+  cj('input.form-checkbox').next().after('<br />');
 
   //set the focus on first element
-  $('#primary_contact_1').focus();
+  cj('#primary_contact_1').focus();
 
 });
 
@@ -296,11 +284,11 @@ function formatMoney(amount) {
 }
 
 function updateContactInfo(blockNo, prefix) {
-  var contactHiddenElement = 'input[id="' + prefix + 'contact_id_' + blockNo + '"]';
+  var contactHiddenElement = 'input[name="' + prefix + 'contact_select_id[' + blockNo + ']"]';
   var contactId = cj(contactHiddenElement).val();
 
   var returnProperties = '';
-  var profileFields = [];
+  var profileFields = new Array();
   {/literal}
   {if $contactFields}
   {foreach from=$contactFields item=val key=fldName}
@@ -350,7 +338,7 @@ function updateContactInfo(blockNo, prefix) {
               },
               { success: function (data) {
                 var memTypeContactId = data.values[0].member_of_contact_id;
-                cj('select[id="member_option_' + blockNo + '"]').prop('disabled', false).val(2);
+                cj('select[id="member_option_' + blockNo + '"]').removeAttr('disabled').val(2);
                 cj('select[id="field_' + blockNo + '_membership_type_0"]').val(memTypeContactId).change();
                 cj('select[id="field_' + blockNo + '_membership_type_1"]').val(membershipTypeId).change();
                 setDateFieldValue('join_date', membershipJoinDate, blockNo)

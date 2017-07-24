@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -103,7 +103,8 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
 
     $orderClause = false;
     $buttonName  = $this->controller->getButtonName();
-    if ( $buttonName == '_qf_Interview_submit_orderBy' && !empty($_POST['order_bys'])) {
+    if ( $buttonName == '_qf_Interview_submit_orderBy' &&
+      CRM_Utils_Array::value('order_bys', $_POST) ) {
       $orderByParams = CRM_Utils_Array::value('order_bys', $_POST);
     }
     elseif ( CRM_Core_OptionGroup::getValue('activity_type','WalkList') == $this->_surveyDetails['activity_type_id'] ) {
@@ -135,7 +136,7 @@ class CRM_Campaign_Form_Task_Interview extends CRM_Campaign_Form_Task {
     $orderBy = array();
     if ( !empty($orderByParams) ) {
       foreach ( $orderByParams as $key => $val ) {
-        if (!empty($val['column'])) {
+        if (CRM_Utils_Array::value('column', $val)) {
           $orderBy[] = "{$val['column']} {$val['order']}";
         }
       }
@@ -387,7 +388,7 @@ WHERE {$clause}
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     //load default data for only contact fields.
@@ -448,7 +449,7 @@ WHERE {$clause}
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $buttonName = $this->controller->getButtonName();
@@ -469,11 +470,6 @@ WHERE {$clause}
     return;
   }
 
-  /**
-   * @param $params
-   *
-   * @return mixed
-   */
   static function registerInterview($params) {
     $activityId = CRM_Utils_Array::value('activity_id', $params);
     $surveyTypeId = CRM_Utils_Array::value('activity_type_id', $params);
@@ -541,7 +537,7 @@ WHERE {$clause}
     $activity->activity_date_time = date('YmdHis');
     $activity->status_id = $statusId;
 
-    if (!empty($params['activity_date_time'])) {
+    if (CRM_Utils_Array::value('activity_date_time', $params)) {
       $activity->activity_date_time = CRM_Utils_Date::processDate($params['activity_date_time'], $params['activity_date_time_time']);
     }
 
@@ -566,7 +562,7 @@ WHERE {$clause}
       'duration' => 'activity_duration'
     );
     foreach ($activityParams as $key => $field) {
-      if (!empty($params[$field])) {
+      if (CRM_Utils_Array::value($field, $params)) {
         $activity->$key = $params[$field];
       }
     }

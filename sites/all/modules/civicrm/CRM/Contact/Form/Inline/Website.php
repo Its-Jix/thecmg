@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -106,12 +106,6 @@ class CRM_Contact_Form_Inline_Website extends CRM_Contact_Form_Inline {
       foreach ($this->_websites as $id => $value) {
         $defaults['website'][$id] = $value;
       }
-    }
-    else {
-      // set the default website type
-      $defaults['website'][1]['website_type_id'] = key(CRM_Core_OptionGroup::values('website_type',
-        FALSE, FALSE, FALSE, ' AND is_default = 1'
-      ));
     }
     return $defaults;
   }

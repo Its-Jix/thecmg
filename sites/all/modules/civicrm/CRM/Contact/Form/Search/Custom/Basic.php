@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,20 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_query;
+  protected $_aclFrom = NULL;
+  protected $_aclWhere = NULL;
 
-  /**
-   * @param $formValues
-   */
-  /**
-   * @param $formValues
-   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -68,7 +64,9 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
 
     foreach ($this->_columns as $name => $field) {
       if (in_array($field, array(
-        'street_address', 'city', 'state_province', 'postal_code', 'country')) && empty($addressOptions[$field])) {
+        'street_address', 'city', 'state_province', 'postal_code', 'country')) &&
+        !CRM_Utils_Array::value($field, $addressOptions)
+      ) {
         unset($this->_columns[$name]);
         continue;
       }
@@ -110,23 +108,17 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     return;
   }
 
-  /**
-   * @param $form
-   */
   function buildForm(&$form) {
-    //@todo FIXME - using the CRM_Core_DAO::VALUE_SEPARATOR creates invalid html - if you can find the form
-    // this is loaded onto then replace with something like '__' & test
-    $separator = CRM_Core_DAO::VALUE_SEPARATOR;
-    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements(FALSE, TRUE, $separator);
-    $form->add('select', 'contact_type', ts('Find...'), $contactTypes, FALSE, array('class' => 'crm-select2 huge'));
+    $contactTypes = array('' => ts('- any contact type -')) + CRM_Contact_BAO_ContactType::getSelectElements();
+    $form->add('select', 'contact_type', ts('Find...'), $contactTypes);
 
     // add select for groups
     $group = array('' => ts('- any group -')) + CRM_Core_PseudoConstant::nestedGroup();
-    $form->addElement('select', 'group', ts('in'), $group, array('class' => 'crm-select2 huge'));
+    $form->addElement('select', 'group', ts('in'), $group);
 
     // add select for categories
     $tag = array('' => ts('- any tag -')) + CRM_Core_PseudoConstant::get('CRM_Core_DAO_EntityTag', 'tag_id', array('onlyActive' => FALSE));
-    $form->addElement('select', 'tag', ts('Tagged'), $tag, array('class' => 'crm-select2 huge'));
+    $form->addElement('select', 'tag', ts('Tagged'), $tag);
 
     // text for sort_name
     $form->add('text', 'sort_name', ts('Name'));
@@ -134,22 +126,10 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     $form->assign('elements', array('sort_name', 'contact_type', 'group', 'tag'));
   }
 
-  /**
-   * @return CRM_Contact_DAO_Contact
-   */
   function count() {
     return $this->_query->searchQuery(0, 0, NULL, TRUE);
   }
 
-  /**
-   * @param int $offset
-   * @param int $rowCount
-   * @param null $sort
-   * @param bool $includeContactIDs
-   * @param bool $justIDs
-   *
-   * @return CRM_Contact_DAO_Contact
-   */
   function all(
     $offset = 0,
     $rowCount = 0,
@@ -169,36 +149,36 @@ class CRM_Contact_Form_Search_Custom_Basic extends CRM_Contact_Form_Search_Custo
     );
   }
 
-  /**
-   * @return string
-   */
   function from() {
-    return $this->_query->_fromClause;
+    $this->buildACLClause('contact_a');
+    $from = $this->_query->_fromClause;
+    $from .= "{$this->_aclFrom}";
+    return $from;
   }
 
-  /**
-   * @param bool $includeContactIDs
-   *
-   * @return string|void
-   */
   function where($includeContactIDs = FALSE) {
     if ($whereClause = $this->_query->whereClause()) {
+      if ($this->_aclWhere) {
+        $whereClause .= "AND {$this->_aclWhere} ";
+      }
       return $whereClause;
     }
     return ' (1) ';
   }
 
-  /**
-   * @return string
-   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Basic.tpl';
   }
 
-  /**
-   * @return CRM_Contact_BAO_Query
-   */
   function getQueryObj() {
     return $this->_query;
   }
+
+  /**
+   * @param string $tableAlias
+   */
+  public function buildAclClause($tableAlias = 'contact') {
+    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
+  }
+
 }

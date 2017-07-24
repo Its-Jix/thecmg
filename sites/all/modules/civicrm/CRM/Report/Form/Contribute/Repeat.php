@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -38,12 +38,6 @@ class CRM_Report_Form_Contribute_Repeat extends CRM_Report_Form {
 
   public $_drilldownReport = array('contribute/detail' => 'Link to Detail Report');
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -243,9 +237,24 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
         ),
         'group_bys' => array('contribution_source' => NULL),
       ),
+      'civicrm_group' =>
+      array(
+        'dao' => 'CRM_Contact_DAO_GroupContact',
+        'alias' => 'cgroup',
+        'filters' =>
+        array(
+          'gid' =>
+          array(
+            'name' => 'group_id',
+            'title' => ts('Group'),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'group' => TRUE,
+            'options' => CRM_Core_PseudoConstant::nestedGroup(),
+          ),
+        ),
+      ),
     );
 
-    $this->_groupFilter = TRUE;
     $this->_tagFilter = TRUE;
 
     parent::__construct();
@@ -255,11 +264,6 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     parent::preProcess();
   }
 
-  /**
-   * @param bool $freeze
-   *
-   * @return array
-   */
   function setDefaultValues($freeze = TRUE) {
     return parent::setDefaultValues($freeze);
   }
@@ -277,7 +281,9 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (CRM_Utils_Array::value('required', $field) ||
+            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          ) {
             if (isset($field['clause'])) {
               $select[] = $field['clause'];
 
@@ -293,7 +299,7 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
             $select[] = "{$field['dbAlias']} as {$field['alias']}_{$field['name']}";
             $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['type'] = CRM_Utils_Array::value('type', $field);
             $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['title'] = CRM_Utils_Array::value('title', $field);
-            if (!empty($field['no_display'])) {
+            if (CRM_Utils_Array::value('no_display', $field)) {
               $this->_columnHeaders["{$field['alias']}_{$field['name']}"]['no_display'] = TRUE;
             }
           }
@@ -304,16 +310,13 @@ contribution_civireport2.total_amount_sum as contribution2_total_amount_sum',
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  /**
-   * @param bool $tableCol
-   */
   function groupBy($tableCol = FALSE) {
     $this->_groupBy = "";
     if (!empty($this->_params['group_bys']) && is_array($this->_params['group_bys'])) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
+            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
               if ($tableCol) {
                 return array($tableName, $field['alias'], $field['name']);
               }
@@ -365,11 +368,6 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
        ON $fromAlias.$fromCol = {$this->_aliases['civicrm_contribution']}2.$contriCol";
   }
 
-  /**
-   * @param string $replaceAliasWith
-   *
-   * @return mixed|string
-   */
   function whereContribution($replaceAliasWith = 'contribution1') {
     $clauses = array("is_test" => "{$this->_aliases['civicrm_contribution']}.is_test = 0");
 
@@ -400,11 +398,11 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
 
     if (!$this->_amountClauseWithAND) {
       $amountClauseWithAND = array();
-      if (!empty($clauses['total_amount1'])) {
+      if (CRM_Utils_Array::value('total_amount1', $clauses)) {
         $amountClauseWithAND[] = str_replace("{$this->_aliases['civicrm_contribution']}.total_amount",
           "{$this->_aliases['civicrm_contribution']}1.total_amount_sum", $clauses['total_amount1']);
       }
-      if (!empty($clauses['total_amount2'])) {
+      if (CRM_Utils_Array::value('total_amount2', $clauses)) {
         $amountClauseWithAND[] = str_replace("{$this->_aliases['civicrm_contribution']}.total_amount",
           "{$this->_aliases['civicrm_contribution']}2.total_amount_sum", $clauses['total_amount2']);
       }
@@ -457,14 +455,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
     $this->_where = !empty($clauses) ? "WHERE " . implode(' AND ', $clauses) : '';
   }
 
-  /**
-   * @param $fields
-   * @param $files
-   * @param $self
-   *
-   * @return array
-   */
-  static function formRule($fields, $files, $self) {
+  function formRule($fields, $files, $self) {
 
     $errors = $checkDate = $errorCount = array();
 
@@ -492,7 +483,6 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
 
     $idMapping = array(
       'id' => ts('Contact'),
-      'exposed_id' => ts('Contact'),
       'country_id' => ts('Country'),
       'state_province_id' => ts('State/Province'),
       'contribution_source' => ts('Contribution Source'),
@@ -537,7 +527,7 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
       }
     }
 
-    if (!empty($fields['gid_value']) && !empty($fields['group_bys'])) {
+    if (!empty($fields['gid_value']) && CRM_Utils_Array::value('group_bys', $fields)) {
       if (!array_key_exists('id', $fields['group_bys'])) {
         $errors['gid_value'] = ts("Filter with Group only allow with group by Contact");
       }
@@ -616,11 +606,6 @@ LEFT JOIN civicrm_temp_civireport_repeat2 {$this->_aliases['civicrm_contribution
     return $errors;
   }
 
-  /**
-   * @param $rows
-   *
-   * @return array
-   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -908,9 +893,6 @@ currency varchar(3)
     $this->endPostProcess($rows);
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     list($from1, $to1) = $this->getFromTo(CRM_Utils_Array::value("receive_date1_relative", $this->_params),

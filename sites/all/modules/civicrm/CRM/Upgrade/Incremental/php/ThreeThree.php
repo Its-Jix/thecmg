@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,23 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Upgrade_Incremental_php_ThreeThree {
-  /**
-   * @param $errors
-   *
-   * @return bool
-   */
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_3_3_alpha1($rev) {
     $config = CRM_Core_Config::singleton();
     if ($config->userSystem->is_drupal) {
@@ -134,9 +126,6 @@ WHERE id = %2
     // CRM_Core_BAO_ConfigSetting::add( $parambs );
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_3_3_beta1($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
@@ -251,9 +240,6 @@ WHERE id = %2
     }
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_3_3_beta3($rev) {
     // get the duplicate Ids of line item entries
     $dupeLineItemIds = array();
@@ -282,9 +268,6 @@ WHERE id = %2
     $upgrade->processSQL($rev);
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_3_3_0($rev) {
     $upgrade = new CRM_Upgrade_Form();
     $upgrade->processSQL($rev);
@@ -322,9 +305,6 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     }
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_3_3_2($rev) {
     $dropMailingIndex = FALSE;
     $indexes = CRM_Core_DAO::executeQuery('SHOW INDEXES FROM civicrm_mailing_job');
@@ -367,9 +347,6 @@ INNER JOIN  civicrm_option_group grp ON ( grp.id = val.option_group_id )
     $upgrade->processSQL($rev);
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_3_3_7($rev) {
     $dao = new CRM_Contact_DAO_Contact();
     $dbName = $dao->_database;

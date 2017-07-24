@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -97,30 +97,20 @@ class CRM_Batch_Page_AJAX {
     $batches = CRM_Batch_BAO_Batch::getBatchListSelector($params);
 
     $iFilteredTotal = $iTotal = $params['total'];
+    $selectorElements = array(
+      'batch_name',
+      'payment_instrument',
+      'item_count',
+      'total',
+      'status',
+      'created_by',
+      'links',
+    );
 
     if ($context == 'financialBatch') {
-      $selectorElements = array(
-        'check',
-        'batch_name',
-        'payment_instrument',
-        'item_count',
-        'total',
-        'status',
-        'created_by',
-        'links',
-      );
+      $selectorElements = array_merge(array('check'), $selectorElements);
     }
-    else {
-      $selectorElements = array(
-        'batch_name',
-        'type',
-        'item_count',
-        'total',
-        'status',
-        'created_by',
-        'links',
-      );
-    }
+    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($batches, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }

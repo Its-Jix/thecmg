@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -73,7 +73,6 @@ Class CRM_Core_Form_Date {
   /**
    * This function is to retrieve the date range - relative or absolute
    * and assign it to the form
-   *
    * @param object $form - the form the dates should be added to
    * @param string $fieldName
    * @param integer $count
@@ -83,7 +82,7 @@ Class CRM_Core_Form_Date {
    * @param boolean $required
    * @param array $operators Additional value pairs to add
    * @param string $dateFormat
-   * @param bool|string $displayTime
+   * @param string $displayTime
    *
    *
    * @static
@@ -201,26 +200,24 @@ Class CRM_Core_Form_Date {
   /**
    * This function is to build the date range - relative or absolute
    *
-   * @param CRM_Core_Form $form the form object that we are operating on
+   * @param Object  $form   the form object that we are operating on
    * @param string $fieldName
    * @param Array $selector array of option values to add
+   * @param integer $count
+   * @param string $from
+   * @param stringe $to
    * @param string $from Label
-   * @param string|\stringe $to
-   * @param string $fromLabel
    * @param boolean $required
    * @param string $dateFormat
    * @param boolean $displayTime
-   *
-   * @internal param int $count
    * @return null
    */
   static function addDateRangeToForm(&$form, $fieldName, $selector, $from = '_from', $to = '_to', $fromLabel = 'From:', $required = FALSE, $dateFormat = 'searchDate', $displayTime = FALSE) {
     $form->add('select',
       "{$fieldName}_relative",
       ts('Relative Date Range'),
-      $selector,
-      $required,
-      array('class' => 'crm-select2')
+        $selector,
+        $required
       );
 
       $form->addDateRange($fieldName, $from, $to, $fromLabel, $dateFormat, FALSE, $displayTime);

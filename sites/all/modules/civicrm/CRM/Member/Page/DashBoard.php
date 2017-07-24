@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -51,7 +51,7 @@ class CRM_Member_Page_DashBoard extends CRM_Core_Page {
     //CRM-13901 don't show dashboard to contacts with limited view writes & it does not relect
     //what they have access to
     //@todo implement acls on dashboard querys (preferably via api to enhance that at the same time)
-    if(!CRM_Core_Permission::check(array('view all contacts', 'edit all contacts'))) {
+    if (!CRM_Core_Permission::check('view all contacts') && !CRM_Core_Permission::check('edit all contacts')) {
       $this->showMembershipSummary = FALSE;
       $this->assign('membershipSummary', FALSE);
       return;

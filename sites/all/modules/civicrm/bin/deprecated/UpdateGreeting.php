@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                               |
+ | CiviCRM version 4.4                                               |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,14 +37,7 @@
  * IMPORTANT: You must first create valid option value before using via admin interface.
  * Check option lists for Email Greetings, Postal Greetings and Addressee
  */
-
-/**
- * Class CRM_UpdateGreeting
- */
 class CRM_UpdateGreeting {
-  /**
-   *
-   */
   function __construct() {
     $this->initialize();
 
@@ -209,7 +202,7 @@ SELECT DISTINCT id, $idFldName
           $contactIds[] = $contactID;
         }
       }
-      CRM_Contact_BAO_Contact_Utils::processGreetingTemplate($greetingString, $contactDetails, $contactID, 'CRM_UpdateGreeting');
+      CRM_Utils_Token::replaceGreetingTokens($greetingString, $contactDetails, $contactID, 'CRM_UpdateGreeting');
       $greetingString = CRM_Core_DAO::escapeString($greetingString);
       $cacheFieldQuery .= " WHEN {$contactID} THEN '{$greetingString}' ";
 

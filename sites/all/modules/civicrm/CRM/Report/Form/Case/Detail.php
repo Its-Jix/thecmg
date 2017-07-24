@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -54,14 +54,8 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
   protected $_caseDetailExtra = array(
     );
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
-    $this->case_statuses = CRM_Core_OptionGroup::values('case_status');
+    $this->case_statuses = CRM_Case_PseudoConstant::caseStatus();
     $this->case_types    = CRM_Case_PseudoConstant::caseType();
     $rels                = CRM_Core_PseudoConstant::relationshipType();
     foreach ($rels as $relid => $v) {
@@ -310,7 +304,9 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           if ($tableName == 'civicrm_address') {
             $this->_addressField = TRUE;
           }
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (CRM_Utils_Array::value('required', $field) ||
+            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          ) {
             if ($tableName == 'civicrm_email') {
               $this->_emailField = TRUE;
             }
@@ -416,7 +412,7 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
           else {
 
             $op = CRM_Utils_Array::value("{$fieldName}_op", $this->_params);
-            if ($fieldName == 'case_type_id' && !empty($this->_params['case_type_id_value'])) {
+            if ($fieldName == 'case_type_id' && CRM_Utils_Array::value('case_type_id_value', $this->_params)) {
               foreach ($this->_params['case_type_id_value'] as $key => $value) {
                 if (strpos($value, CRM_Core_DAO::VALUE_SEPARATOR) === FALSE) {
                   $value = CRM_Core_DAO::VALUE_SEPARATOR . $value . CRM_Core_DAO::VALUE_SEPARATOR;
@@ -464,11 +460,6 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
     $this->_groupBy = " GROUP BY {$this->_aliases['civicrm_case']}.id";
   }
 
-  /**
-   * @param $rows
-   *
-   * @return array
-   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -559,23 +550,21 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
       $this->_relField = TRUE;
     }
 
-    if (!empty($this->_params['activity_date_time_relative']) || !empty($this->_params['activity_date_time_from']) ||
+    if (CRM_Utils_Array::value('activity_date_time_relative', $this->_params) ||
+      CRM_Utils_Array::value('activity_date_time_from', $this->_params) ||
       CRM_Utils_Array::value('activity_date_time_to', $this->_params)
     ) {
       $this->_activityLast = TRUE;
     }
 
     foreach (array_keys($this->_caseDetailExtra) as $field) {
-      if (!empty($this->_params['case_detail_extra'][$field])) {
+      if (CRM_Utils_Array::value($field, $this->_params['case_detail_extra'])) {
         $this->_includeCaseDetailExtra = TRUE;
         break;
       }
     }
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     $entryFound = FALSE;
     $activityTypes = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
@@ -627,8 +616,10 @@ class CRM_Report_Form_Case_Detail extends CRM_Report_Form {
         }
         $entryFound = TRUE;
       }
-      if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) && empty($row['civicrm_activity_last_completed_last_completed_activity_subject'])) {
-        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(no subject)');
+      if (array_key_exists('civicrm_activity_last_completed_last_completed_activity_subject', $row) &&
+        !CRM_Utils_Array::value('civicrm_activity_last_completed_last_completed_activity_subject', $row)
+      ) {
+        $rows[$rowNum]['civicrm_activity_last_completed_last_completed_activity_subject'] = ts('(No Subject)');
         $entryFound = TRUE;
       }
       if (array_key_exists('civicrm_contact_client_sort_name', $row) &&

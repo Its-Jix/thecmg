@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Core_I18n_SchemaStructure_3_1_beta2 {
-  /**
-   * @return array
-   */
   static function &columns() {
     static $result = NULL;
     if (!$result) {
@@ -192,9 +189,6 @@ class CRM_Core_I18n_SchemaStructure_3_1_beta2 {
     return $result;
   }
 
-  /**
-   * @return array
-   */
   static function &indices() {
     static $result = NULL;
     if (!$result) {
@@ -273,9 +267,6 @@ class CRM_Core_I18n_SchemaStructure_3_1_beta2 {
     return $result;
   }
 
-  /**
-   * @return array
-   */
   static function &tables() {
     static $result = NULL;
     if (!$result) {

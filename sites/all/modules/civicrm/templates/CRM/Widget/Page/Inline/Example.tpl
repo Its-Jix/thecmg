@@ -20,7 +20,7 @@ If load the page directly from your browser, it automatically adds all the page 
 
 <script>
 {literal}
-CRM.$(function($) {
+cj (function($) {
   $("#dialog").click (function () {
     var $n=$('<div>Loading '+window.location+'</div>').appendTo('body');
     $n.load(''+window.location, function(){

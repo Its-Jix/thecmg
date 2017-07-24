@@ -1,12 +1,5 @@
 <?php
-
-/**
- * Class CRM_Event_Badge_Logo
- */
 class CRM_Event_Badge_Logo extends CRM_Event_Badge {
-  /**
-   *
-   */
   function __construct() {
     parent::__construct();
     // A4
@@ -24,9 +17,6 @@ class CRM_Event_Badge_Logo extends CRM_Event_Badge {
     //      $this->setDebug ();
   }
 
-  /**
-   * @param $participant
-   */
   public function generateLabel($participant) {
     $x = $this->pdf->GetAbsX();
     $y = $this->pdf->GetY();

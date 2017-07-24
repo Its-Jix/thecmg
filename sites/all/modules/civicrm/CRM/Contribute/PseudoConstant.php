@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -119,8 +119,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
-   *
    * @return array - array reference of all financial types if any
    * @static
    */
@@ -150,12 +148,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the financial Accounts
    *
    * @access public
-   *
-   * @param null $id
-   * @param null $financialAccountTypeId
-   * @param string $retrieveColumn
-   * @param string $key
-   *
    * @return array - array reference of all financial accounts if any
    * @static
    */
@@ -192,7 +184,8 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param bool|string $name pseudoconstant to be flushed
+   * @param boolean $name pseudoconstant to be flushed
+   *
    */
   public static function flush($name = 'cache') {
    if (isset(self::$$name)) {
@@ -241,8 +234,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param string $columnName
-   *
    * @return array - array reference of all payment instruments if any
    * @static
    */
@@ -273,7 +264,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $pageID
    * @return array - array of all Premiums if any
    * @static
    */
@@ -321,8 +311,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
-   * @param string $columnName
    * @return array - array reference of all contribution statuses
    * @static
    */
@@ -345,9 +333,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * Get all the Personal campaign pages
    *
    * @access public
-   *
-   * @param null $pageType
-   * @param null $id
    *
    * @return array - array reference of all pcp if any
    * @static
@@ -381,7 +366,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param string $column
    * @return array - array reference of all PCP activity statuses
    */
   public static function &pcpStatus($column = 'label') {
@@ -406,8 +390,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    * @access public
    * @static
    *
-   * @param $financialTypeId
-   * @param null $relationTypeId
    * @return array - array reference of all financial accounts for a Financial type
    */
   public static function financialAccountType($financialTypeId, $relationTypeId = NULL) {
@@ -437,7 +419,6 @@ class CRM_Contribute_PseudoConstant extends CRM_Core_PseudoConstant {
    *
    * @access public
    *
-   * @param null $id
    * @return array - array reference of all batches if any
    * @static
    */

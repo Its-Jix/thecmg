@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -137,7 +137,7 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {}
   //end of function
@@ -145,14 +145,9 @@ class CRM_Contact_Form_Task_Map extends CRM_Contact_Form_Task {
   /**
    * assign smarty variables to the template that will be used by google api to plot the contacts
    *
-   * @param $ids
-   * @param int $locationId location_id
+   * @param array $contactIds list of contact ids that we need to plot
+   * @param int   $locationId location_id
    *
-   * @param $page
-   * @param $addBreadCrumb
-   * @param string $type
-   *
-   * @internal param array $contactIds list of contact ids that we need to plot
    * @return string           the location of the file we have created
    * @access protected
    */

@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.4                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
+| Copyright CiviCRM LLC (c) 2004-2013                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -67,9 +67,6 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
     return self::$_stringActionLinks;
   }
 
-  /**
-   * @return array
-   */
   function &customizeActionLinks() {
     // check if variable _actionsLinks is populated
     if (!isset(self::$_customizeActionLinks)) {
@@ -122,12 +119,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
       if ($daoResult->is_config == 1) {
         $values[$daoResult->id]['action'] = CRM_Core_Action::formLink(self::customizeActionLinks(),
           NULL,
-          array('id' => $daoResult->id),
-          ts('more'),
-          FALSE,
-          'persistent.config.actions',
-          'Persistent',
-          $daoResult->id
+          array('id' => $daoResult->id)
         );
         $values[$daoResult->id]['data'] = implode(',', unserialize($daoResult->data));
         $configCustomization[$daoResult->id] = $values[$daoResult->id];
@@ -135,12 +127,7 @@ class CRM_Admin_Page_Persistent extends CRM_Core_Page {
       if ($daoResult->is_config == 0) {
         $values[$daoResult->id]['action'] = CRM_Core_Action::formLink(self::stringActionLinks(),
           NULL,
-          array('id' => $daoResult->id),
-          ts('more'),
-          FALSE,
-          'persistent.row.actions',
-          'Persistent',
-          $daoResult->id
+          array('id' => $daoResult->id)
         );
         $configStrings[$daoResult->id] = $values[$daoResult->id];
       }

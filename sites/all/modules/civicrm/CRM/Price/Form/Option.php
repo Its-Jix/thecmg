@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -63,7 +63,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    * @access public
    */
   public function preProcess() {
-    $this->setPageTitle(ts('Price Option'));
+
     $this->_fid = CRM_Utils_Request::retrieve('fid', 'Positive',
       $this
     );
@@ -145,9 +145,6 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
 
       // hidden Option Id for validation use
       $this->add('hidden', 'optionId', $this->_oid);
-
-      // Needed for i18n dialog
-      $this->assign('optionId', $this->_oid);
 
       //hidden field ID for validation use
       $this->add('hidden', 'fieldId', $this->_fid);
@@ -274,10 +271,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
   /**
    * global validation rules for the form
    *
-   * @param array $fields posted values of the form
-   *
-   * @param $files
-   * @param $form
+   * @param array  $fields   (referance) posted values of the form
    *
    * @return array    if errors then list of errors to be posted back to the form,
    *                  true otherwise
@@ -286,7 +280,7 @@ class CRM_Price_Form_Option extends CRM_Core_Form {
    */
   static function formRule($fields, $files, $form) {
     $errors = array();
-    if (!empty($fields['count']) && !empty($fields['max_value']) &&
+    if (CRM_Utils_Array::value('count', $fields) && CRM_Utils_Array::value('max_value', $fields) &&
       $fields['count'] > $fields['max_value']
     ) {
       $errors['count'] = ts('Participant count can not be greater than max participants.');

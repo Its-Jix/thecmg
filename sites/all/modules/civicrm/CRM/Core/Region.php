@@ -41,9 +41,6 @@ class CRM_Core_Region {
    */
   var $_isSorted;
 
-  /**
-   * @param $name
-   */
   public function __construct($name) {
     // Templates injected into regions should normally be file names, but sometimes inline notation is handy.
     require_once 'CRM/Core/Smarty/resources/String.php';
@@ -97,8 +94,6 @@ class CRM_Core_Region {
    *   - jquery: string, Javascript code which runs inside a jQuery(function($){...}); block
    *   - style: string, CSS code
    *   - styleUrl: string, URL of a CSS file
-   *
-   * @return array
    */
   public function add($snippet) {
     static $types = array('markup', 'template', 'callback', 'scriptUrl', 'script', 'jquery', 'style', 'styleUrl');
@@ -125,20 +120,11 @@ class CRM_Core_Region {
     return $snippet;
   }
 
-  /**
-   * @param $name
-   * @param $snippet
-   */
   public function update($name, $snippet) {
     $this->_snippets[$name] = array_merge($this->_snippets[$name], $snippet);
     $this->_isSorted = FALSE;
   }
 
-  /**
-   * @param $name
-   *
-   * @return mixed
-   */
   public function &get($name) {
     return @$this->_snippets[$name];
   }
@@ -189,7 +175,7 @@ class CRM_Core_Region {
           }
           break;
         case 'jquery':
-          $snippet['script'] = sprintf("CRM.\$(function(\$) {\n%s\n});", $snippet['jquery']);
+          $snippet['script'] = sprintf("cj(function(\$){\n%s\n});", $snippet['jquery']);
           // no break - continue processing as script
         case 'script':
           if (!$allowCmsOverride || !$cms->addScript($snippet['script'], $this->_name)) {
@@ -215,12 +201,6 @@ class CRM_Core_Region {
     return $html;
   }
 
-  /**
-   * @param $a
-   * @param $b
-   *
-   * @return int
-   */
   static function _cmpSnippet($a, $b) {
     if ($a['weight'] < $b['weight']) return -1;
     if ($a['weight'] > $b['weight']) return 1;

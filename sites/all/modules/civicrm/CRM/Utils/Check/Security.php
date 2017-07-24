@@ -1,7 +1,7 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
@@ -210,10 +210,7 @@ class CRM_Utils_Check_Security {
 
 
   /**
-   * Check that some files are not present.
-   *
-   * These files have generally been deleted but Civi source tree but could be
-   * left online if one does a faulty upgrade.
+   * Check that some files are not present
    *
    * @return array of messages
    */
@@ -222,9 +219,7 @@ class CRM_Utils_Check_Security {
 
     $messages = array();
     $files = array(
-      "{$civicrm_root}/packages/dompdf/dompdf.php", // CRM-16005, upgraded from Civi <= 4.5.6
-      "{$civicrm_root}/packages/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.5.7
-      "{$civicrm_root}/vendor/dompdf/dompdf/dompdf.php", // CRM-16005, Civi >= 4.6.0
+      "{$civicrm_root}/packages/dompdf/dompdf.php", // CRM-16005
     );
     foreach ($files as $file) {
       if (file_exists($file)) {
@@ -298,11 +293,6 @@ class CRM_Utils_Check_Security {
     return $result;
   }
 
-  /**
-   * @param $topic
-   *
-   * @return string
-   */
   public function createDocUrl($topic) {
     return CRM_Utils_System::getWikiBaseURL() . $topic;
   }

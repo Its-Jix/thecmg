@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,7 +35,7 @@
  * implement the Selector/Api.interface.php class
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -184,20 +184,16 @@ class CRM_Core_Selector_Controller {
   /**
    * Class constructor
    *
-   * @param CRM_Core_Selector_API $object an object that implements the selector API
-   * @param int $pageID default pageID
-   * @param int $sortID default sortID
-   * @param int $action the actions to potentially support
-   * @param CRM_Core_Page|CRM_Core_Form $store place in session to store some values
-   * @param int $output what do we so with the output, session/template//both
+   * @param CRM_Core_Selector_API $object  an object that implements the selector API
+   * @param int               $pageID  default pageID
+   * @param int               $sortID  default sortID
+   * @param int               $action  the actions to potentially support
+   * @param CRM_Core_Page|CRM_Core_Form $store   place in session to store some values
+   * @param int               $output  what do we so with the output, session/template//both
    *
-   * @param null $prefix
-   * @param null $case
-   *
-   * @return \CRM_Core_Selector_Controller
-  @access public
-   */
-  function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
+   * @return Object
+   * @access public
+   */ function __construct($object, $pageID, $sortID, $action, $store = NULL, $output = self::TEMPLATE, $prefix = NULL, $case = NULL) {
 
     $this->_object = $object;
     $this->_pageID = $pageID ? $pageID : 1;
@@ -392,8 +388,6 @@ class CRM_Core_Selector_Controller {
   /**
    * function to retrieve rows.
    *
-   * @param $form
-   *
    * @return array of rows
    * @access public
    */
@@ -420,9 +414,6 @@ class CRM_Core_Selector_Controller {
     return $this->_object->getQill();
   }
 
-  /**
-   * @return mixed
-   */
   public function getSummary() {
     return $this->_object->getSummary();
   }
@@ -534,16 +525,10 @@ class CRM_Core_Selector_Controller {
     return $this->_print;
   }
 
-  /**
-   * @param $value
-   */
   function setDynamicAction($value) {
     $this->_dynamicAction = $value;
   }
 
-  /**
-   * @return bool
-   */
   function getDynamicAction() {
     return $this->_dynamicAction;
   }

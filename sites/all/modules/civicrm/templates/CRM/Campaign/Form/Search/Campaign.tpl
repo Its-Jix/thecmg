@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -38,17 +38,16 @@
 
 {* load campaign selector *}
 
-  {include file="CRM/common/enableDisableApi.tpl"}
-  {include file="CRM/common/crmeditable.tpl"}
+  {include file="CRM/common/enableDisable.tpl"}
 
   {literal}
     <script type="text/javascript">
-      CRM.$(function($) {
+      cj(function () {
         loadCampaignList();
       });
     </script>
   {/literal}
-  <table class="campaigns">
+  <table id="campaigns">
     <thead>
     <tr class="columnheader">
       <th class="hiddenElement">{ts}Campaign ID{/ts}</th>
@@ -141,11 +140,15 @@
 {literal}
 <script type="text/javascript">
 
+  cj(function () {
+    cj().crmAccordions();
+  });
+
   {/literal}
   {* load selector when force *}
   {if $force and !$buildSelector}
   {literal}
-  CRM.$(function($) {
+  cj(function () {
     searchCampaigns({/literal}'{$qfKey}'{literal});
   });
 
@@ -161,12 +164,12 @@
       dataUrl = dataUrl + '&qfKey=' + qfKey;
     }
 
-    CRM.$.get(dataUrl, null, function (campaignList) {
-      CRM.$('#campaignList').html(campaignList).trigger('crmLoad');
+    cj.get(dataUrl, null, function (campaignList) {
+      cj('#campaignList').html(campaignList);
 
       //collapse the search form.
       var searchFormName = '#search_form_' + {/literal}'{$searchFor}'{literal};
-      CRM.$(searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
+      cj(searchFormName + '.crm-accordion-wrapper:not(.collapsed)').crmAccordionToggle();
     }, 'html');
   }
 
@@ -182,9 +185,9 @@
     noRecordFoundMsg += '<div class="qill">';
 
     var count = 0;
-    var searchQill = [];
+    var searchQill = new Array();
     for (param in searchParams) {
-      if (val = CRM.$('#' + param).val()) {
+      if (val = cj('#' + param).val()) {
         if (param == 'status_id') {
           val = campaignStatus[val];
         }
@@ -195,7 +198,8 @@
       }
     }
     noRecordFoundMsg += searchQill.join('<span class="font-italic"> ...AND... </span></div><div class="qill">');
-    CRM.$('table.campaigns', '#campaignList').dataTable({
+
+    cj('#campaigns').dataTable({
       "bFilter": false,
       "bAutoWidth": false,
       "bProcessing": false,
@@ -225,20 +229,20 @@
       "oLanguage": {"sEmptyTable": noRecordFoundMsg,
         "sZeroRecords": noRecordFoundMsg },
       "fnDrawCallback": function () {
-        CRM.$().crmtooltip();
+        cj().crmtooltip();
       },
       "fnRowCallback": function (nRow, aData, iDisplayIndex) {
         //insert the id for each row for enable/disable.
-        var rowId = 'campaign-' + aData[0];
-        CRM.$(nRow).attr('id', rowId).addClass('crm-entity');
+        var rowId = 'campaign_row_' + aData[0];
+        cj(nRow).attr('id', rowId);
         //handled disabled rows.
         var isActive = Boolean(Number(aData[10]));
         if (!isActive) {
-          CRM.$(nRow).addClass('disabled');
+          cj(nRow).addClass('disabled');
         }
 
         //add id for yes/no column.
-        CRM.$(nRow).children().eq(11).attr('id', rowId + '_status');
+        cj(nRow).children().eq(11).attr('id', rowId + '_status');
 
         return nRow;
       },
@@ -247,7 +251,7 @@
         var dataLength = aoData.length;
 
         var count = 1;
-        var searchCriteria = [];
+        var searchCriteria = new Array();
 
         //get the search criteria.
         var searchParams = {/literal}{$searchParams}{literal};
@@ -256,7 +260,7 @@
           if (param == 'campaign_title') {
             fldName = 'title';
           }
-          if (val = CRM.$('#' + param).val()) {
+          if (val = cj('#' + param).val()) {
             aoData[dataLength++] = {name: fldName, value: val};
           }
           searchCriteria[count++] = fldName;
@@ -268,7 +272,7 @@
         //lets transfer search criteria.
         aoData[dataLength++] = {name: 'searchCriteria', value: searchCriteria.join(',')};
 
-        CRM.$.ajax({
+        cj.ajax({
           "dataType": 'json',
           "type": "POST",
           "url": sSource,

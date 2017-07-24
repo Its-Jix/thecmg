@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,24 +28,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
-
-  public $useLivePageJS = TRUE;
-
-  /**
-   * @return string
-   */
   function getBAOName() {
     return 'CRM_Event_BAO_ParticipantStatusType';
   }
 
-  /**
-   * @return array
-   */
   function &links() {
     static $links = NULL;
     if ($links === NULL) {
@@ -64,12 +55,14 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_ParticipantStatusType' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable Status'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Event_BAO_ParticipantStatusType' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable Status'),
         ),
       );
@@ -99,40 +92,20 @@ class CRM_Admin_Page_ParticipantStatus extends CRM_Core_Page_Basic {
         }
       }
       $action -= $dao->is_active ? CRM_Core_Action::ENABLE : CRM_Core_Action::DISABLE;
-      $statusTypes[$dao->id]['action'] = CRM_Core_Action::formLink(
-        self::links(),
-        $action,
-        array('id' => $dao->id),
-        ts('more'),
-        FALSE,
-        'participantStatusType.manage.action',
-        'ParticipantStatusType',
-        $dao->id
-      );
+      $statusTypes[$dao->id]['action'] = CRM_Core_Action::formLink(self::links(), $action, array('id' => $dao->id));
       $statusTypes[$dao->id]['visibility'] = $visibilities[$dao->visibility_id];
     }
     $this->assign('rows', $statusTypes);
   }
 
-  /**
-   * @return string
-   */
   function editForm() {
     return 'CRM_Admin_Form_ParticipantStatus';
   }
 
-  /**
-   * @return string
-   */
   function editName() {
     return 'Participant Status';
   }
 
-  /**
-   * @param null $mode
-   *
-   * @return string
-   */
   function userContext($mode = NULL) {
     return 'civicrm/admin/participant_status';
   }

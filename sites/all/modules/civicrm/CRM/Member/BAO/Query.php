@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,15 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Member_BAO_Query {
 
-  /**
-   * @return array
-   */
   static function &getFields() {
     $fields = CRM_Member_BAO_Membership::exportableFields();
     return $fields;
@@ -44,8 +41,6 @@ class CRM_Member_BAO_Query {
 
   /**
    * if membership are involved, add the specific membership fields
-   *
-   * @param $query
    *
    * @return void
    * @access public
@@ -62,7 +57,7 @@ class CRM_Member_BAO_Query {
       $query->_whereTables['civicrm_membership'] = 1;
 
       //add membership type
-      if (!empty($query->_returnProperties['membership_type'])) {
+      if (CRM_Utils_Array::value('membership_type', $query->_returnProperties)) {
         $query->_select['membership_type'] = "civicrm_membership_type.name as membership_type";
         $query->_element['membership_type'] = 1;
         $query->_tables['civicrm_membership_type'] = 1;
@@ -70,26 +65,26 @@ class CRM_Member_BAO_Query {
       }
 
       //add join date
-      if (!empty($query->_returnProperties['join_date'])) {
+      if (CRM_Utils_Array::value('join_date', $query->_returnProperties)) {
         $query->_select['join_date'] = "civicrm_membership.join_date as join_date";
         $query->_element['join_date'] = 1;
       }
 
       //add source
-      if (!empty($query->_returnProperties['membership_source'])) {
+      if (CRM_Utils_Array::value('membership_source', $query->_returnProperties)) {
         $query->_select['membership_source'] = "civicrm_membership.source as membership_source";
         $query->_element['membership_source'] = 1;
       }
 
       //add status
-      if (!empty($query->_returnProperties['membership_status'])) {
+      if (CRM_Utils_Array::value('membership_status', $query->_returnProperties)) {
         $query->_select['membership_status'] = "civicrm_membership_status.label as membership_status";
         $query->_element['membership_status'] = 1;
         $query->_tables['civicrm_membership_status'] = 1;
         $query->_whereTables['civicrm_membership_status'] = 1;
       }
 
-      if (!empty($query->_returnProperties['status_id'])) {
+      if (CRM_Utils_Array::value('status_id', $query->_returnProperties)) {
         $query->_select['status_id'] = "civicrm_membership_status.id as status_id";
         $query->_element['status_id'] = 1;
         $query->_tables['civicrm_membership_status'] = 1;
@@ -97,47 +92,44 @@ class CRM_Member_BAO_Query {
       }
 
       //add start date / end date
-      if (!empty($query->_returnProperties['membership_start_date'])) {
+      if (CRM_Utils_Array::value('membership_start_date', $query->_returnProperties)) {
         $query->_select['membership_start_date'] = "civicrm_membership.start_date as membership_start_date";
         $query->_element['membership_start_date'] = 1;
       }
 
-      if (!empty($query->_returnProperties['membership_end_date'])) {
+      if (CRM_Utils_Array::value('membership_end_date', $query->_returnProperties)) {
         $query->_select['membership_end_date'] = "civicrm_membership.end_date as  membership_end_date";
         $query->_element['membership_end_date'] = 1;
       }
 
       //add owner_membership_id
-      if (!empty($query->_returnProperties['owner_membership_id'])) {
+      if (CRM_Utils_Array::value('owner_membership_id', $query->_returnProperties)) {
         $query->_select['owner_membership_id'] = "civicrm_membership.owner_membership_id as owner_membership_id";
         $query->_element['owner_membership_id'] = 1;
       }
       //add max_related
-      if (!empty($query->_returnProperties['max_related'])) {
+      if (CRM_Utils_Array::value('max_related', $query->_returnProperties)) {
         $query->_select['max_related'] = "civicrm_membership.max_related as max_related";
         $query->_element['max_related'] = 1;
       }
       //add recur id w/o taking contribution table in join.
-      if (!empty($query->_returnProperties['membership_recur_id'])) {
+      if (CRM_Utils_Array::value('membership_recur_id', $query->_returnProperties)) {
         $query->_select['membership_recur_id'] = "civicrm_membership.contribution_recur_id as membership_recur_id";
         $query->_element['membership_recur_id'] = 1;
       }
 
       //add campaign id.
-      if (!empty($query->_returnProperties['member_campaign_id'])) {
+      if (CRM_Utils_Array::value('member_campaign_id', $query->_returnProperties)) {
         $query->_select['member_campaign_id'] = 'civicrm_membership.campaign_id as member_campaign_id';
         $query->_element['member_campaign_id'] = 1;
       }
     }
   }
 
-  /**
-   * @param $query
-   */
   static function where(&$query) {
     $grouping = NULL;
     foreach (array_keys($query->_params) as $id) {
-      if (empty($query->_params[$id][0])) {
+      if (!CRM_Utils_Array::value(0, $query->_params[$id])) {
         continue;
       }
       if (substr($query->_params[$id][0], 0, 7) == 'member_' || substr($query->_params[$id][0], 0, 11) == 'membership_') {
@@ -150,10 +142,6 @@ class CRM_Member_BAO_Query {
     }
   }
 
-  /**
-   * @param $values
-   * @param $query
-   */
   static function whereClauseSingle(&$values, &$query) {
     list($name, $op, $value, $grouping, $wildcard) = $values;
     switch ($name) {
@@ -215,7 +203,7 @@ class CRM_Member_BAO_Query {
         }
         else {
           $status = implode(',', array_keys($value));
-          if (count($value) > 0) {
+          if (count($value) > 1) {
             $op = 'IN';
             $status = "({$status})";
           }
@@ -253,9 +241,11 @@ class CRM_Member_BAO_Query {
           $query->_where[$grouping][] = CRM_Contact_BAO_Query::buildClause(
             "ccr.contribution_status_id",
             $op,
-            array_search(
-              'Cancelled', 
-              CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name')
+            CRM_Core_DAO::getFieldValue(
+              'CRM_Core_DAO_OptionValue',
+              'Cancelled',
+              'value',
+              'name'
             ),
             "Integer"
           );
@@ -296,7 +286,7 @@ class CRM_Member_BAO_Query {
         }
         else {
           $mType = implode(',', array_keys($value));
-          if (count($value) > 0) {
+          if (count($value) > 1) {
             $op = 'IN';
             $mType = "({$mType})";
           }
@@ -347,13 +337,6 @@ class CRM_Member_BAO_Query {
     }
   }
 
-  /**
-   * @param $name
-   * @param $mode
-   * @param $side
-   *
-   * @return null|string
-   */
   static function from($name, $mode, $side) {
     $from = NULL;
     switch ($name) {
@@ -387,12 +370,6 @@ class CRM_Member_BAO_Query {
     return $from;
   }
 
-  /**
-   * @param $mode
-   * @param bool $includeCustomFields
-   *
-   * @return array|null
-   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -432,9 +409,6 @@ class CRM_Member_BAO_Query {
     return $properties;
   }
 
-  /**
-   * @param $form
-   */
   static function buildSearchForm(&$form) {
     foreach (CRM_Member_PseudoConstant::membershipType() as $id => $Name) {
       $form->_membershipType = &$form->addElement('checkbox', "member_membership_type_id[$id]", NULL, $Name);
@@ -453,10 +427,10 @@ class CRM_Member_BAO_Query {
 
     CRM_Core_Form_Date::buildDateRange($form, 'member_end_date', 1, '_low', '_high', ts('From'), FALSE);
 
-    $form->addYesNo('member_is_primary', ts('Primary Member?'), TRUE);
-    $form->addYesNo('member_pay_later', ts('Pay Later?'), TRUE);
-    $form->addYesNo('member_auto_renew', ts('Auto-Renew?'), TRUE);
-    $form->addYesNo('member_test', ts('Membership is a Test?'), TRUE);
+    $form->addYesNo('member_is_primary', ts('Primary Member?'));
+    $form->addYesNo('member_pay_later', ts('Pay Later?'));
+    $form->addYesNo('member_auto_renew', ts('Auto-Renew?'));
+    $form->addYesNo('member_test', ts('Membership is a Test?'));
 
     // add all the custom  searchable fields
     $extends = array('Membership');
@@ -482,18 +456,16 @@ class CRM_Member_BAO_Query {
     $form->setDefaults(array('member_test' => 0));
   }
 
-  /**
-   * @param $row
-   * @param $id
-   */
   static function searchAction(&$row, $id) {}
 
-  /**
-   * @param $tables
-   */
+  static function addShowHide(&$showHide) {
+    $showHide->addHide('memberForm');
+    $showHide->addShow('memberForm_show');
+  }
+
   static function tableNames(&$tables) {
     //add membership table
-    if (!empty($tables['civicrm_membership_log']) || !empty($tables['civicrm_membership_status']) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
+    if (CRM_Utils_Array::value('civicrm_membership_log', $tables) || CRM_Utils_Array::value('civicrm_membership_status', $tables) || CRM_Utils_Array::value('civicrm_membership_type', $tables)) {
       $tables = array_merge(array('civicrm_membership' => 1), $tables);
     }
   }

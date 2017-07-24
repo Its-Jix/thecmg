@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -87,12 +87,15 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
 
-  // Contact-related data permissions.
-  // CRM-14094 - Users can edit and delete contact-related objects using inline edit with 'edit all contacts' permission
+  // Contact-related data permissions
   $permissions['address'] = array(
     'get' => array(
       'access CiviCRM',
       'view all contacts',
+    ),
+    'delete' => array(
+      'access CiviCRM',
+      'delete contacts',
     ),
     'default' => array(
       'access CiviCRM',
@@ -107,22 +110,6 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
   $permissions['entity_tag'] = $permissions['address'];
   $permissions['note'] = $permissions['address'];
 
-  //relationship permissions
-  $permissions['relationship'] = array(
-    'get' => array(
-      'access CiviCRM',
-      'view all contacts',
-    ),
-    'delete' => array(
-      'access CiviCRM',
-      'delete contacts',
-    ),
-    'default' => array(
-      'access CiviCRM',
-      'edit all contacts',
-    ),
-  );
-  
   // Activity permissions
   $permissions['activity'] = array(
     'delete' => array(
@@ -392,8 +379,6 @@ function _civicrm_api3_permissions($entity, $action, &$params) {
     ),
   );
   $permissions['uf_field'] = $permissions['uf_group'];
-  $permissions['option_value'] = $permissions['uf_group'];
-  $permissions['option_group'] = $permissions['option_value'];
 
   // Translate 'create' action to 'update' if id is set
   if ($action == 'create' && (!empty($params['id']) || !empty($params[$entity . '_id']))) {

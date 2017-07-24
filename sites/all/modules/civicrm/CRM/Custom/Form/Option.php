@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -125,7 +125,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
         || $fieldDefaults['html_type'] == 'Multi-Select'
         || $fieldDefaults['html_type'] == 'AdvMulti-Select'
       ) {
-        if (!empty($fieldDefaults['default_value'])) {
+        if (CRM_Utils_Array::value('default_value', $fieldDefaults)) {
           $defaultCheckValues = explode(CRM_Core_DAO::VALUE_SEPARATOR,
             substr($fieldDefaults['default_value'], 1, -1)
           );
@@ -162,8 +162,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    */
   public function buildQuickForm() {
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $option = civicrm_api3('option_value', 'getsingle', array('id' => $this->_id));
-      $this->assign('label', $option['label']);
       $this->addButtons(array(
           array(
             'type' => 'next',
@@ -235,7 +233,7 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
         $this->addElement('button',
           'done',
           ts('Done'),
-          array('onclick' => "location.href='$url'", 'class' => 'crm-form-submit')
+          array('onclick' => "location.href='$url'", 'class' => 'form-submit')
         );
       }
     }
@@ -246,9 +244,6 @@ class CRM_Custom_Form_Option extends CRM_Core_Form {
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
-   *
-   * @param $files
-   * @param $form
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -408,11 +403,10 @@ SELECT count(*)
     $params = $this->controller->exportValues('Option');
 
     if ($this->_action == CRM_Core_Action::DELETE) {
-      $option = civicrm_api3('option_value', 'getsingle', array('id' => $this->_id));
       $fieldValues = array('option_group_id' => $this->_optionGroupID);
-      CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
+      $wt = CRM_Utils_Weight::delWeight('CRM_Core_DAO_OptionValue', $this->_id, $fieldValues);
       CRM_Core_BAO_CustomOption::del($this->_id);
-      CRM_Core_Session::setStatus(ts('Option "%1" has been deleted.', array(1 => $option['label'])), ts('Deleted'), 'success');
+      CRM_Core_Session::setStatus(ts('Your multiple choice option has been deleted'), ts('Deleted'), 'success');
       return;
     }
 
@@ -455,7 +449,7 @@ SELECT count(*)
         CRM_Core_DAO::VALUE_SEPARATOR,
         substr($customField->default_value, 1, -1)
       );
-      if (!empty($params['default_value'])) {
+      if (CRM_Utils_Array::value('default_value', $params)) {
         if (!in_array($customOption->value, $defVal)) {
           if (empty($defVal[0])) {
             $defVal = array($customOption->value);
@@ -500,7 +494,7 @@ SELECT count(*)
           break;
       }
 
-      if (!empty($params['default_value'])) {
+      if (CRM_Utils_Array::value('default_value', $params)) {
         $customField->default_value = $customOption->value;
         $customField->save();
       }

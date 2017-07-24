@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -66,10 +66,7 @@ class CRM_Queue_Task {
   /**
    * Perform the task
    *
-   * @param $taskCtx
-   *
-   * @throws Exception
-   * @internal param array $taskContext with keys:
+   * @param $taskContext array with keys:
    *  - log: object 'Log'
    *
    * @return bool, TRUE if task completes successfully

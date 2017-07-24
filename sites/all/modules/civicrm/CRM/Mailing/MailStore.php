@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -39,12 +39,11 @@ class CRM_Mailing_MailStore {
   /**
    * Return the proper mail store implementation, based on config settings
    *
-   * @param  string $name name of the settings set from civimail_mail_settings to use (null for default)
+   * @param  string $name  name of the settings set from civimail_mail_settings to use (null for default)
    *
-   * @throws Exception
    * @return object        mail store implementation for processing CiviMail-bound emails
    */
-  public static function getStore($name = NULL) {
+  function getStore($name = NULL) {
     $dao               = new CRM_Core_DAO_MailSettings;
     $dao->domain_id    = CRM_Core_Config::domainID();
     $name ? $dao->name = $name : $dao->is_default = 1;
@@ -53,9 +52,6 @@ class CRM_Mailing_MailStore {
     }
 
     $protocols = CRM_Core_PseudoConstant::get('CRM_Core_DAO_MailSettings', 'protocol');
-    if (empty($protocols[$dao->protocol])) {
-      throw new Exception("Empty mail protocol");
-    }
 
     switch ($protocols[$dao->protocol]) {
       case 'IMAP':
@@ -139,9 +135,8 @@ class CRM_Mailing_MailStore {
   /**
    * Point to (and create if needed) a local Maildir for storing retrieved mail
    *
-   * @param string $name name of the Maildir
+   * @param string $name  name of the Maildir
    *
-   * @throws Exception
    * @return string       path to the Maildir's cur directory
    */
   function maildir($name) {

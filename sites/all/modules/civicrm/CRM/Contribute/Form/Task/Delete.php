@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -77,7 +77,7 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $deletedContributions = 0;
@@ -86,8 +86,9 @@ class CRM_Contribute_Form_Task_Delete extends CRM_Contribute_Form_Task {
         $deletedContributions++;
       }
     }
-    $status = ts('Deleted Contribution(s): %1 (Total Selected: %2) ', array(1 => $deletedContributions, 2 => count($this->_contributionIds)));
-    CRM_Core_Session::setStatus($status, '', 'info');
+
+    CRM_Core_Session::setStatus(ts('Deleted Contribution(s): %1', array(1 => $deletedContributions)), '', 'info');
+    CRM_Core_Session::setStatus(ts('Total Selected Contribution(s): %1', array(1 => count($this->_contributionIds))), '', 'info');
   }
 }
 

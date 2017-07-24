@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -44,7 +44,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function preProcess() {
     $contactID       = CRM_Utils_Request::retrieve('cid', 'Integer', $this, TRUE);
@@ -55,6 +55,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
       $activityID,
       'subject'
     );
+    $type = CRM_Utils_Request::retrieve('type', 'String', CRM_Core_DAO::$_nullObject);
 
     //check for required permissions, CRM-6264
     if ($activityID &&
@@ -65,6 +66,7 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
 
     $this->assign('contactID', $contactID);
     $this->assign('caseID', $caseID);
+    $this->assign('type', $type);
     // CRM-9145
     $this->assign('activityID', $activityID);
 
@@ -106,8 +108,8 @@ class CRM_Case_Form_ActivityView extends CRM_Core_Form {
     }
 
     if ($revs) {
-      CRM_Utils_System::setTitle(ts('Activity Revision History'));
       $this->assign('revs', $revs);
+
       $this->assign('result', $viewPriorActivities);
       $this->assign('subject', $activitySubject);
       $this->assign('latestRevisionID', $latestRevisionID);

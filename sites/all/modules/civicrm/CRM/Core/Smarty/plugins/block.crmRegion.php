@@ -5,11 +5,9 @@
  *
  * @see CRM_Core_Regions
  *
- * @param array $params must define 'name'
- * @param string $content Default content
- * @param object $smarty the Smarty object
- *
- * @param $repeat
+ * @param array $params   must define 'name'
+ * @param string $content    Default content
+ * @param object $smarty  the Smarty object
  *
  * @return string
  */

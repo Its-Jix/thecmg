@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -99,24 +99,12 @@
         <span class="description">{ts}Users with appropriate permissions can add this report to their dashboard.{/ts}</span>
       </td>
     </tr>
-    <tr id ="limit_result" class="crm-report-instanceForm-form-block-limitUser">
-      <td class="report-label">{$form.row_count.label} {help id="id-dash_limit" file="CRM/Report/Form/Settings.hlp"}</td>
-      <td>{$form.row_count.html}</td>
-    </tr>
 </table>
 
 {include file="CRM/common/showHideByFieldValue.tpl"
     trigger_field_id    ="is_navigation"
     trigger_value       =""
     target_element_id   ="navigation_menu"
-    target_element_type ="table-row"
-    field_type          ="radio"
-    invert              = 0
-}
-{include file="CRM/common/showHideByFieldValue.tpl"
-    trigger_field_id    ="addToDashboard"
-    trigger_value       =""
-    target_element_id   ="limit_result"
     target_element_type ="table-row"
     field_type          ="radio"
     invert              = 0
@@ -131,20 +119,22 @@
 
 {literal}
 <script type="text/javascript">
-  CRM.$(function($) {
+  cj(document).ready(function() {
+    cj('#title').data('initial_value', cj('#title').val());
+  });
+  cj( function(){
       var formName = {/literal}"{$form.formName}"{literal};
-      $('#title').data('initial_value', $('#title').val());
-      $('#_qf_' + formName + '_submit_save').click (
+      cj('#_qf_' + formName + '_submit_save').click (
           function(){
-              if ( $('#is_navigation').prop('checked') && $('#parent_id').val() == '') {
+              if ( cj('#is_navigation').attr('checked') && cj('#parent_id').val() == '') {
                   var confirmMsg = {/literal}'{ts escape="js"}You have chosen to include this report in the Navigation Menu without selecting a Parent Menu item from the dropdown. This will add the report to the top level menu bar. Are you sure you want to continue?{/ts}'{literal}
                   return confirm(confirmMsg);
               }
           }
       );
-      $('#_qf_' + formName + '_submit_next').click (
+      cj('#_qf_' + formName + '_submit_next').click (
           function(){
-              if ( $('#title').data('initial_value') == $('#title').val() ) {
+              if ( cj('#title').data('initial_value') == cj('#title').val() ) {
                   var confirmMsg = {/literal}'{ts escape="js"}You are saving a copy of this report with the same report title. Are you sure you want to continue?{/ts}'{literal}
                   return confirm(confirmMsg);
               }

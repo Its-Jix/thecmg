@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,11 +37,6 @@ class CRM_Upgrade_Incremental_php_FourTwo {
   const SETTINGS_SNIPPET_PATTERN = '/CRM_Core_ClassLoader::singleton\(\)-\>register/';
   const SETTINGS_SNIPPET = "\nrequire_once 'CRM/Core/ClassLoader.php';\nCRM_Core_ClassLoader::singleton()->register();\n";
 
-  /**
-   * @param $errors
-   *
-   * @return bool
-   */
   function verifyPreDBstate(&$errors) {
     return TRUE;
   }
@@ -52,11 +47,8 @@ class CRM_Upgrade_Incremental_php_FourTwo {
    * Note: This function is called iteratively for each upcoming
    * revision to the database.
    *
-   * @param $preUpgradeMessage
+   * @param $postUpgradeMessage string, alterable
    * @param $rev string, a version number, e.g. '4.2.alpha1', '4.2.beta3', '4.2.0'
-   * @param null $currentVer
-   *
-   * @internal param string $postUpgradeMessage , alterable
    * @return void
    */
   function setPreUpgradeMessage(&$preUpgradeMessage, $rev, $currentVer = NULL) {
@@ -165,9 +157,6 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
   }
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_alpha1($rev) {
     //checking whether the foreign key exists before dropping it
     //drop foreign key queries of CRM-9850
@@ -211,9 +200,6 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
     $this->addTask(ts('Upgrade DB to 4.2.alpha1: Event Profile'), 'task_4_2_alpha1_eventProfile');
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_beta2($rev) {
     // note: error conditions are also checked in setPreUpgradeMessage()
     if (defined('CIVICRM_SETTINGS_PATH')) {
@@ -225,9 +211,6 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
     }
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_beta3($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.beta3')), 'task_4_2_x_runSql', $rev);
     $minParticipantId = CRM_Core_DAO::singleValueQuery('SELECT coalesce(min(id),0) FROM civicrm_participant');
@@ -240,9 +223,6 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
     }
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_beta5($rev) {
     // CRM-10629 Create a setting for extension URLs
     // For some reason, this isn't working when placed in the .sql file
@@ -252,16 +232,10 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
     ");
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_0($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.0')), 'task_4_2_x_runSql', $rev);
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_2($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.2')), 'task_4_2_x_runSql', $rev);
     //create line items for memberships and participants for api/import
@@ -299,9 +273,6 @@ INNER JOIN civicrm_price_set cps ON cps.id = cpf.price_set_id AND cps.name <>'de
     }
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_3($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.3')), 'task_4_2_x_runSql', $rev);
     // CRM-10953 Remove duplicate activity type for 'Reminder Sent' which is mistakenly inserted by 4.2.alpha1 upgrade script
@@ -341,9 +312,6 @@ DELETE from civicrm_option_value
     }
   }
 
-  /**
-   * @param $rev
-   */
   function upgrade_4_2_5($rev) {
     $this->addTask(ts('Upgrade DB to %1: SQL', array(1 => '4.2.5')), 'task_4_2_x_runSql', $rev);
     //CRM-11077
@@ -411,7 +379,7 @@ WHERE  name LIKE '%.amount.%' ";
     $dao = CRM_Core_DAO::executeQuery($query);
     while ($dao->fetch()) {
       $addTo = explode('.', $dao->name);
-      if (!empty($addTo[2])) {
+      if (CRM_Utils_Array::value(2, $addTo)) {
         $options = array ('optionGroup' => $dao->name);
         self::createPriceSet($daoName, $addTo, $options);
       }
@@ -470,12 +438,12 @@ WHERE     cpse.price_set_id IS NULL";
     }
 
     $optionValue = array();
-    if (!empty($options['optionGroup'])) {
+    if (CRM_Utils_Array::value('optionGroup', $options)) {
       CRM_Core_OptionGroup::getAssoc($options['optionGroup'], $optionValue);
       if (empty($optionValue))
         return;
     }
-    elseif (empty($options['otherAmount']) && empty($options['membership'])) {
+    elseif (!CRM_Utils_Array::value('otherAmount', $options) && !CRM_Utils_Array::value('membership', $options)) {
       //CRM-12273
       //if options group, otherAmount, membersip is empty then return, contribution should be default price set
       return;
@@ -494,7 +462,7 @@ WHERE     cpse.price_set_id IS NULL";
     CRM_Upgrade_Snapshot_V4p2_Price_BAO_Set::addTo($addTo[0], $addTo[2], $priceSet->id, 1);
 
     $fieldParams['price_set_id'] = $priceSet->id;
-    if (!empty($options['optionGroup'])) {
+    if (CRM_Utils_Array::value('optionGroup', $options)) {
       $fieldParams['html_type'] = 'Radio';
       $fieldParams['is_required'] = 1;
       if ($addTo[0] == 'civicrm_event') {
@@ -510,7 +478,7 @@ WHERE     cpse.price_set_id IS NULL";
         $fieldParams['label'] = "Contribution Amount";
         $defaultAmountColumn = 'default_amount_id';
         $options['otherAmount'] = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_ContributionPage', $addTo[2], 'is_allow_other_amount');
-        if (!empty($options['otherAmount'])) {
+        if (CRM_Utils_Array::value('otherAmount', $options)) {
           $fieldParams['is_required'] = 0;
         }
       }
@@ -524,7 +492,7 @@ WHERE     cpse.price_set_id IS NULL";
       $priceField = CRM_Upgrade_Snapshot_V4p2_Price_BAO_Field::create($fieldParams);
 
     }
-    if (!empty($options['membership'])) {
+    if (CRM_Utils_Array::value('membership', $options)) {
       $dao               = new CRM_Member_DAO_MembershipBlock();
       $dao->entity_table = 'civicrm_contribution_page';
       $dao->entity_id    = $addTo[2];
@@ -565,7 +533,7 @@ WHERE     cpse.price_set_id IS NULL";
         }
       }
     }
-    if (!empty($options['otherAmount'])) {
+    if (CRM_Utils_Array::value('otherAmount', $options)) {
 
       $fieldParams = array(
         'name'               => strtolower(CRM_Utils_String::munge("Other Amount", '_', 245)),
@@ -590,11 +558,8 @@ WHERE     cpse.price_set_id IS NULL";
    * Find any contribution records and create corresponding line-item
    * records.
    *
-   * @param CRM_Queue_TaskContext $ctx
    * @param $startId int, the first/lowest contribution ID to convert
    * @param $endId int, the last/highest contribution ID to convert
-   *
-   * @return bool
    */
   static function task_4_2_alpha1_convertContributions(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $upgrade = new CRM_Upgrade_Form();
@@ -736,11 +701,8 @@ WHERE     cpf.price_set_id = %1
    * Find any participant records and create corresponding line-item
    * records.
    *
-   * @param CRM_Queue_TaskContext $ctx
    * @param $startId int, the first/lowest participant ID to convert
    * @param $endId int, the last/highest participant ID to convert
-   *
-   * @return bool
    */
   static function task_4_2_alpha1_convertParticipants(CRM_Queue_TaskContext $ctx, $startId, $endId) {
     $upgrade = new CRM_Upgrade_Form();
@@ -890,9 +852,6 @@ VALUES
     $queue->createItem($task, array('weight' => -1));
   }
 
-  /**
-   * @return array
-   */
   public static function deleteInvalidPairs() {
     require_once 'CRM/Member/PseudoConstant.php';
     require_once 'CRM/Contribute/PseudoConstant.php';

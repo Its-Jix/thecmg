@@ -1,9 +1,9 @@
 <?php
 /*
    +--------------------------------------------------------------------+
-   | CiviCRM version 4.5                                                |
+   | CiviCRM version 4.4                                                |
    +--------------------------------------------------------------------+
-   | Copyright CiviCRM LLC (c) 2004-2014                                |
+   | Copyright CiviCRM LLC (c) 2004-2013                                |
    +--------------------------------------------------------------------+
    | This file is a part of CiviCRM.                                    |
    |                                                                    |
@@ -29,7 +29,7 @@
  * This class handles all REST client requests.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  *
  */
 class CRM_Utils_REST {
@@ -49,7 +49,7 @@ class CRM_Utils_REST {
    * Class constructor.  This caches the real user framework class locally,
    * so we can use it for authentication and validation.
    *
-   * @internal param string $uf The userframework class
+   * @param  string $uf       The userframework class
    */
   public function __construct() {
     // any external program which call Rest Server is responsible for
@@ -74,11 +74,6 @@ class CRM_Utils_REST {
   }
 
   // Generates values needed for error messages
-  /**
-   * @param string $message
-   *
-   * @return array
-   */
   static function error($message = 'Unknown Error') {
     $values = array(
       'error_message' => $message,
@@ -88,28 +83,17 @@ class CRM_Utils_REST {
   }
 
   // Generates values needed for non-error responses.
-  /**
-   * @param $params
-   *
-   * @return array
-   */
   static function simple($params) {
     $values = array('is_error' => 0);
     $values += $params;
     return $values;
   }
 
-  /**
-   * @return string
-   */
   function run() {
     $result = self::handle();
     return self::output($result);
   }
 
-  /**
-   * @return string
-   */
   function bootAndRun() {
     $response = $this->loadCMSBootstrap();
     if (is_array($response)) {
@@ -118,11 +102,6 @@ class CRM_Utils_REST {
     return $this->run();
   }
 
-  /**
-   * @param $result
-   *
-   * @return string
-   */
   static function output(&$result) {
     $requestParams = CRM_Utils_Request::exportValues();
 
@@ -148,7 +127,7 @@ class CRM_Utils_REST {
     if (CRM_Utils_Array::value('json', $requestParams)) {
       header('Content-Type: text/javascript');
       $json = json_encode(array_merge($result));
-      if (CRM_Utils_Array::value('prettyprint', $requestParams)) {
+      if (CRM_Utils_Array::value('debug', $requestParams)) {
         return self::jsonFormated($json);
       }
       return $json;
@@ -181,11 +160,6 @@ class CRM_Utils_REST {
     return $xml;
   }
 
-  /**
-   * @param $json
-   *
-   * @return string
-   */
   static function jsonFormated($json) {
     $tabcount   = 0;
     $result     = '';
@@ -264,9 +238,6 @@ class CRM_Utils_REST {
     return $result;
   }
 
-  /**
-   * @return array|int
-   */
   static function handle() {
     $requestParams = CRM_Utils_Request::exportValues();
 
@@ -338,12 +309,6 @@ class CRM_Utils_REST {
     return self::process($args, self::buildParamList());
   }
 
-  /**
-   * @param $args
-   * @param $params
-   *
-   * @return array|int
-   */
   static function process(&$args, $params) {
     $params['check_permissions'] = TRUE;
     $fnName = $apiFile = NULL;
@@ -392,9 +357,9 @@ class CRM_Utils_REST {
     }
 
     // trap all fatal errors
-    $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
+    CRM_Core_Error::setCallback(array('CRM_Utils_REST', 'fatal'));
     $result = civicrm_api($args[1], $args[2], $params);
-    unset($errorScope);
+    CRM_Core_Error::setCallback();
 
     if ($result === FALSE) {
       return self::error('Unknown error.');
@@ -402,9 +367,6 @@ class CRM_Utils_REST {
     return $result;
   }
 
-  /**
-   * @return array|mixed|null
-   */
   static function &buildParamList() {
     $requestParams = CRM_Utils_Request::exportValues();
     $params = array();
@@ -435,9 +397,6 @@ class CRM_Utils_REST {
     return $params;
   }
 
-  /**
-   * @param $pearError
-   */
   static function fatal($pearError) {
     header('Content-Type: text/xml');
     $error = array();
@@ -532,7 +491,7 @@ class CRM_Utils_REST {
     if (!$config->debug && (!array_key_exists('HTTP_X_REQUESTED_WITH', $_SERVER) ||
         $_SERVER['HTTP_X_REQUESTED_WITH'] != "XMLHttpRequest"
       )) {
-      $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api3().",
+      $error = civicrm_api3_create_error("SECURITY ALERT: Ajax requests can only be issued by javascript clients, eg. CRM.api().",
         array(
           'IP' => $_SERVER['REMOTE_ADDR'],
           'level' => 'security',
@@ -563,11 +522,11 @@ class CRM_Utils_REST {
     if (!$params['sequential']) {
       $params['sequential'] = 1;
     }
-
     // trap all fatal errors
-    $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
+    CRM_Core_Error::setCallback(array('CRM_Utils_REST', 'fatal'));
     $result = civicrm_api($entity, $action, $params);
-    unset($errorScope);
+
+    CRM_Core_Error::setCallback();
 
     echo self::output($result);
 

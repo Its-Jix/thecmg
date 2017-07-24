@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,9 +42,6 @@ class CRM_Activity_Form_ActivityLinks extends CRM_Core_Form {
     self::commonBuildQuickForm($this);
   }
 
-  /**
-   * @param $self
-   */
   static function commonBuildQuickForm($self) {
     $contactId = CRM_Utils_Request::retrieve('cid', 'Positive', $self);
     if (!$contactId) {

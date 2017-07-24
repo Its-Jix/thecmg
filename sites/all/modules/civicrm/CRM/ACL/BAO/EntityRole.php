@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -39,9 +39,6 @@
 class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
   static $_entityTable = NULL;
 
-  /**
-   * @return array|null
-   */
   static function entityTable() {
     if (!self::$_entityTable) {
       self::$_entityTable = array(
@@ -52,22 +49,13 @@ class CRM_ACL_BAO_EntityRole extends CRM_ACL_DAO_EntityRole {
     return self::$_entityTable;
   }
 
-  /**
-   * @param $params
-   *
-   * @return CRM_ACL_DAO_EntityRole
-   */
   static function create(&$params) {
     $dao = new CRM_ACL_DAO_EntityRole();
     $dao->copyValues($params);
+
     $dao->save();
-    return $dao;
   }
 
-  /**
-   * @param $params
-   * @param $defaults
-   */
   static function retrieve(&$params, &$defaults) {
     CRM_Core_DAO::commonRetrieve('CRM_ACL_DAO_EntityRole', $params, $defaults);
   }

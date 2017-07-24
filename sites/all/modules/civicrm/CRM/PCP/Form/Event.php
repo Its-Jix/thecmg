@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -57,7 +57,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function setDefaultValues() {
     $defaults = array();
@@ -74,7 +74,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
       $this->assign('pageId', $this->_id);
     }
 
-    if (empty($defaults['id'])) {
+    if (!CRM_Utils_Array::value('id', $defaults)) {
       $defaults['target_entity_type'] = 'event';
       $defaults['is_approval_needed'] = 1;
       $defaults['is_tellfriend_enabled'] = 1;
@@ -92,7 +92,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -135,23 +135,20 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
-   * @param $files
-   * @param $self
-   *
    * @return mixed true or array of errors
    * @access public
    * @static
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
-    if (!empty($params['is_active'])) {
+    if (CRM_Utils_Array::value('is_active', $params)) {
 
-      if (!empty($params['is_tellfriend_enabled']) &&
+      if (CRM_Utils_Array::value('is_tellfriend_enabled', $params) &&
         (CRM_Utils_Array::value('tellfriend_limit', $params) <= 0)
       ) {
         $errors['tellfriend_limit'] = ts('if Tell Friend is enable, Maximum recipients limit should be greater than zero.');
       }
-      if (empty($params['supporter_profile_id'])) {
+      if (!CRM_Utils_Array::value('supporter_profile_id', $params)) {
         $errors['supporter_profile_id'] = ts('Supporter profile is a required field.');
       }
       else {
@@ -177,7 +174,7 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     // get the submitted form values.
@@ -206,9 +203,6 @@ class CRM_PCP_Form_Event extends CRM_Event_Form_ManageEvent {
     $params['is_tellfriend_enabled'] = CRM_Utils_Array::value('is_tellfriend_enabled', $params, FALSE);
 
     $dao = CRM_PCP_BAO_PCP::add($params);
-
-    // Update tab "disabled" css class
-    $this->ajaxResponse['tabValid'] = !empty($params['is_active']);
 
     parent::endPostProcess();
   }

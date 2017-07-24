@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -65,12 +65,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return NULL;
   }
 
-  /**
-   * @param null $usedFor
-   * @param bool $excludeHidden
-   *
-   * @return mixed
-   */
   function getTree($usedFor = NULL, $excludeHidden = FALSE) {
     if (!isset($this->tree)) {
       $this->buildTree($usedFor, $excludeHidden);
@@ -78,13 +72,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return $this->tree;
   }
 
-  /**
-   * Build a nested array from hierarchical tags. Supports infinite levels of nesting.
-   * @param null $usedFor
-   * @param bool $excludeHidden
-   */
   function buildTree($usedFor = NULL, $excludeHidden = FALSE) {
-    $sql = "SELECT id, parent_id, name, description FROM civicrm_tag";
+    $sql = "SELECT civicrm_tag.id, civicrm_tag.parent_id,civicrm_tag.name FROM civicrm_tag ";
 
     $whereClause = array();
     if ($usedFor) {
@@ -102,32 +91,44 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
 
     $dao = CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray, TRUE, NULL, FALSE, FALSE);
 
-    $refs = array();
+    $orphan = array();
     while ($dao->fetch()) {
-      $thisref = &$refs[$dao->id];
-
-      $thisref['parent_id'] = $dao->parent_id;
-      $thisref['name'] = $dao->name;
-      $thisref['description'] = $dao->description;
-
       if (!$dao->parent_id) {
-        $this->tree[$dao->id] = &$thisref;
+        $this->tree[$dao->id]['name'] = $dao->name;
       }
       else {
-        $refs[$dao->parent_id]['children'][$dao->id] = &$thisref;
+        if (array_key_exists($dao->parent_id, $this->tree)) {
+          $parent = &$this->tree[$dao->parent_id];
+          if (!isset($this->tree[$dao->parent_id]['children'])) {
+            $this->tree[$dao->parent_id]['children'] = array();
+          }
+        }
+        else {
+          //3rd level tag
+          if (!array_key_exists($dao->parent_id, $orphan)) {
+            $orphan[$dao->parent_id] = array('children' => array());
+          }
+          $parent = &$orphan[$dao->parent_id];
+        }
+        $parent['children'][$dao->id] = array('name' => $dao->name);
       }
     }
+    if (sizeof($orphan)) {
+      //hang the 3rd level lists at the right place
+      foreach ($this->tree as & $level1) {
+        if (!isset($level1['children'])) {
+          continue;
+        }
 
+        foreach ($level1['children'] as $key => & $level2) {
+          if (array_key_exists($key, $orphan)) {
+            $level2['children'] = $orphan[$key]['children'];
+          }
+        }
+      }
+    }
   }
 
-  /**
-   * @param array $usedFor
-   * @param bool $buildSelect
-   * @param bool $all
-   * @param null $parentId
-   *
-   * @return array
-   */
   static function getTagsUsedFor($usedFor = array('civicrm_contact'),
     $buildSelect = TRUE,
     $all         = FALSE,
@@ -181,14 +182,6 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     return $tags;
   }
 
-  /**
-   * @param string $usedFor
-   * @param array $tags
-   * @param null $parentId
-   * @param string $separator
-   *
-   * @return array
-   */
   static function getTags($usedFor = 'civicrm_contact',
     &$tags = array(),
     $parentId  = NULL,
@@ -321,7 +314,7 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
     $tag = new CRM_Core_DAO_Tag();
 
     // if parent id is set then inherit used for and is hidden properties
-    if (!empty($params['parent_id'])) {
+    if (CRM_Utils_Array::value('parent_id', $params)) {
       // get parent details
       $params['used_for'] = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Tag', $params['parent_id'], 'used_for');
     }
@@ -396,7 +389,8 @@ class CRM_Core_BAO_Tag extends CRM_Core_DAO_Tag {
   /**
    * Function to get the tags that are not children of a tagset.
    *
-   * @return array $tags associated array of tag name and id@access public
+   * @return $tags associated array of tag name and id
+   * @access public
    * @static
    */
   static function getTagsNotInTagset() {

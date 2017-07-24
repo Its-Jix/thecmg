@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -40,11 +40,6 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
 
   static $_cache = NULL;
 
-  /**
-   * @param $id
-   *
-   * @return mixed
-   */
   static function &build($id) {
     if (!self::$_cache) {
       self::$_cache = array();
@@ -66,11 +61,6 @@ class CRM_ACL_BAO_Cache extends CRM_ACL_DAO_Cache {
     return self::$_cache[$id];
   }
 
-  /**
-   * @param $id
-   *
-   * @return array
-   */
   static function retrieve($id) {
     $query = "
 SELECT acl_id
@@ -92,10 +82,6 @@ SELECT acl_id
     return $cache;
   }
 
-  /**
-   * @param $id
-   * @param $cache
-   */
   static function store($id, &$cache) {
     foreach ($cache as $aclID => $data) {
       $dao = new CRM_ACL_DAO_Cache();
@@ -110,9 +96,6 @@ SELECT acl_id
     }
   }
 
-  /**
-   * @param $id
-   */
   static function deleteEntry($id) {
     if (self::$_cache &&
       array_key_exists($id, self::$_cache)
@@ -125,12 +108,9 @@ DELETE FROM civicrm_acl_cache
 WHERE contact_id = %1
 ";
     $params = array(1 => array($id, 'Integer'));
-    CRM_Core_DAO::executeQuery($query, $params);
+    $dao = CRM_Core_DAO::executeQuery($query, $params);
   }
 
-  /**
-   * @param $id
-   */
   static function updateEntry($id) {
     // rebuilds civicrm_acl_cache
     self::deleteEntry($id);

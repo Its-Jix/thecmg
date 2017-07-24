@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -24,10 +24,6 @@
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
 */
-
-/**
- * Class CRM_Contact_Import_Field
- */
 class CRM_Contact_Import_Field {
 
   /**#@+
@@ -129,20 +125,6 @@ class CRM_Contact_Import_Field {
    */
   public $_relatedContactPhoneType;
 
-  /**
-   * @param $name
-   * @param $title
-   * @param int $type
-   * @param string $columnPattern
-   * @param string $dataPattern
-   * @param null $hasLocationType
-   * @param null $phoneType
-   * @param null $related
-   * @param null $relatedContactType
-   * @param null $relatedContactDetails
-   * @param null $relatedContactLocType
-   * @param null $relatedContactPhoneType
-   */
   function __construct($name, $title, $type = CRM_Utils_Type::T_INT, $columnPattern = '//', $dataPattern = '//', $hasLocationType = NULL, $phoneType = NULL, $related = NULL, $relatedContactType = NULL, $relatedContactDetails = NULL, $relatedContactLocType = NULL, $relatedContactPhoneType = NULL) {
     $this->_name = $name;
     $this->_title = $title;
@@ -172,9 +154,6 @@ class CRM_Contact_Import_Field {
     $this->_value = $value;
   }
 
-  /**
-   * @return bool
-   */
   function validate() {
     //  echo $this->_value."===========<br>";
     $message = '';

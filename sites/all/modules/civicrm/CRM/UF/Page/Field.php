@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,8 +42,6 @@
  *
  */
 class CRM_UF_Page_Field extends CRM_Core_Page {
-
-  public $useLivePageJS = TRUE;
 
   /**
    * The group id of the field
@@ -83,12 +81,14 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFField' . '\',\'' . 'enable-disable' . '\',0,\'UFField\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable CiviCRM Profile Field'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_UFField' . '\',\'' . 'disable-enable' . '\',0,\'UFField\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable CiviCRM Profile Field'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -110,11 +110,6 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
    * @static
    */
   function browse() {
-    $resourceManager = CRM_Core_Resources::singleton();
-    if (!empty($_GET['new']) && $resourceManager->ajaxPopupsEnabled) {
-      $resourceManager->addScriptFile('civicrm', 'js/crm.addNew.js', 999, 'html-header');
-    }
-
     $ufField = array();
     $ufFieldBAO = new CRM_Core_BAO_UFField();
 
@@ -149,12 +144,11 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
     $select['group'] = ts('Group(s)');
     $select['tag'] = ts('Tag(s)');
 
-    $visibility = CRM_Core_SelectValues::ufVisibility();
     while ($ufFieldBAO->fetch()) {
       $ufField[$ufFieldBAO->id] = array();
       $phoneType = $locType = '';
       CRM_Core_DAO::storeValues($ufFieldBAO, $ufField[$ufFieldBAO->id]);
-      $ufField[$ufFieldBAO->id]['visibility_display'] = $visibility[$ufFieldBAO->visibility];
+      CRM_Core_DAO_UFField::addDisplayEnums($ufField[$ufFieldBAO->id]);
 
       $ufField[$ufFieldBAO->id]['label'] = $ufFieldBAO->label;
 
@@ -177,12 +171,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
         array(
           'id' => $ufFieldBAO->id,
           'gid' => $this->_gid,
-        ),
-        ts('more'),
-        FALSE,
-        'ufField.row.actions',
-        'UFField',
-        $ufFieldBAO->id
+        )
       );
     }
 
@@ -283,10 +272,7 @@ class CRM_UF_Page_Field extends CRM_Core_Page {
   /**
    * Preview custom field
    *
-   * @param $fieldId
-   * @param $groupId
-   *
-   * @internal param int $id custom field id
+   * @param int $id custom field id
    *
    * @return void
    * @access public

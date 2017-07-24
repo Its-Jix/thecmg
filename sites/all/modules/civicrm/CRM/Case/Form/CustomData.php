@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -91,10 +91,8 @@ class CRM_Case_Form_CustomData extends CRM_Core_Form {
     );
     // simplified formatted groupTree
     $groupTree = CRM_Core_BAO_CustomGroup::formatGroupTree($groupTree, 1, $this);
-    // Array contains only one item
     foreach ($groupTree as $groupValues) {
       $this->_customTitle = $groupValues['title'];
-      CRM_Utils_System::setTitle(ts('Edit %1', array(1 => $groupValues['title'])));
     }
 
     $this->_defaults = array();

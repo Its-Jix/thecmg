@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -30,7 +30,7 @@
  * system.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -53,8 +53,6 @@ class CRM_Extension_System {
   private $_repoUrl = NULL;
 
   /**
-   * @param bool $fresh
-   *
    * @return CRM_Extension_System
    */
   public static function singleton($fresh = FALSE) {
@@ -68,16 +66,10 @@ class CRM_Extension_System {
     return self::$singleton;
   }
 
-  /**
-   * @param CRM_Extension_System $singleton
-   */
   public static function setSingleton(CRM_Extension_System $singleton) {
     self::$singleton = $singleton;
   }
 
-  /**
-   * @param array $parameters
-   */
   public function __construct($parameters = array()) {
     $config = CRM_Core_Config::singleton();
     if (!array_key_exists('extensionsDir', $parameters)) {

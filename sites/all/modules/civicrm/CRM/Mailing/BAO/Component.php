@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -82,27 +82,40 @@ class CRM_Mailing_BAO_Component extends CRM_Mailing_DAO_Component {
    * Create and Update mailing component
    *
    * @param array $params (reference ) an assoc array of name/value pairs
-   * @param array $ids (deprecated) the array that holds all the db ids
+   * @param array $ids (reference ) the array that holds all the db ids
    *
    * @return object CRM_Mailing_BAO_Component object
    *
    * @access public
    * @static
    */
-  static function add(&$params, $ids = array()) {
-    $id = CRM_Utils_Array::value('id', $params, CRM_Utils_Array::value('id', $ids));
+  static function add(&$params, &$ids) {
+    // action is taken depending upon the mode
     $component = new CRM_Mailing_DAO_Component();
-    $component->id = $id;
-    $component->copyValues($params);
-    if (empty($id) && empty($params['body_text'])) {
-      $component->body_text = CRM_Utils_String::htmlToText(CRM_Utils_Array::value('body_html', $params));
+    $component->name = $params['name'];
+    $component->component_type = $params['component_type'];
+    $component->subject = $params['subject'];
+    if ($params['body_text']) {
+      $component->body_text = $params['body_text'];
+    }
+    else {
+      $component->body_text = CRM_Utils_String::htmlToText($params['body_html']);
+    }
+    $component->body_html = $params['body_html'];
+    $component->is_active = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $component->is_default = CRM_Utils_Array::value('is_default', $params, FALSE);
+
+    if ($component->is_default) {
+      $query = "UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}'";
+      CRM_Core_DAO::executeQuery($query, CRM_Core_DAO::$_nullArray);
     }
 
-    if ($component->is_default && !empty($id)) {
-      CRM_Core_DAO::executeQuery("UPDATE civicrm_mailing_component SET is_default = 0 WHERE component_type ='{$component->component_type}' AND id <> $id");
-    }
+    $component->id = CRM_Utils_Array::value('id', $ids);
 
     $component->save();
-    return $component;
+
+    CRM_Core_Session::setStatus(ts('The mailing component \'%1\' has been saved.',
+        array(1 => $component->name)
+      ), ts('Saved'), 'success');
   }
 }

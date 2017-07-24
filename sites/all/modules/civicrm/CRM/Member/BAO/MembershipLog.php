@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -58,10 +58,7 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
   /**
    * Function to delete membership log record
    *
-   * @param $membershipID
-   *
-   * @return mixed
-   * @internal param int $membershipTypeId
+   * @param int $membershipTypeId
    * @static
    */
 
@@ -71,9 +68,6 @@ class CRM_Member_BAO_MembershipLog extends CRM_Member_DAO_MembershipLog {
     return $membershipLog->delete();
   }
 
-  /**
-   * @param $contactID
-   */
   static function resetModifiedID($contactID) {
     $query = "
 UPDATE civicrm_membership_log

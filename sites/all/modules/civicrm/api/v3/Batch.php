@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -41,8 +41,6 @@
  * {@getfields batch_create}
  * @example BatchCreate.php
  *
- * @param $params
- *
  * @return array of newly created batch property values.
  * @access public
  */
@@ -61,7 +59,6 @@ function _civicrm_api3_batch_create_spec(&$params) {
   // it is actually required)
   $params['entity_table']['api.default'] = "civicrm_batch";
   $params['entity_table']['type'] = CRM_Utils_Type::T_STRING;
-  $params['entity_table']['title'] = 'Batch Entity Table - remove?';
 
   $params['modified_date']['api.default'] = "now";
   $params['status_id']['api.required'] = 1;
@@ -76,8 +73,6 @@ function _civicrm_api3_batch_create_spec(&$params) {
  * {@getfields batch_get}
  * @example BatchCreate.php
  *
- * @param $params
- *
  * @return array of retrieved batch property values.
  * @access public
  */
@@ -91,8 +86,6 @@ function civicrm_api3_batch_get($params) {
  * Allowed @params array keys are:
  * {@getfields batch_delete}
  * @example BatchCreate.php
- *
- * @param $params
  *
  * @return array of deleted values.
  * @access public

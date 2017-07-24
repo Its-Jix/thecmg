@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -208,7 +208,7 @@ class CRM_Dedupe_Finder {
       'gender' => 'gender_id',
     );
     foreach (array('individual_suffix', 'individual_prefix', 'gender') as $name) {
-      if (!empty($fields[$name])) {
+      if (CRM_Utils_Array::value($name, $fields)) {
         $flat[$replace_these[$name]] = $flat[$name];
         unset($flat[$name]);
       }
@@ -217,7 +217,7 @@ class CRM_Dedupe_Finder {
     // handle {birth,deceased}_date
     foreach (array(
       'birth_date', 'deceased_date') as $date) {
-      if (!empty($fields[$date])) {
+      if (CRM_Utils_Array::value($date, $fields)) {
         $flat[$date] = $fields[$date];
         if (is_array($flat[$date])) {
           $flat[$date] = CRM_Utils_Date::format($flat[$date]);
@@ -226,13 +226,13 @@ class CRM_Dedupe_Finder {
       }
     }
 
-    if (!empty($flat['contact_source'])) {
+    if (CRM_Utils_Array::value('contact_source', $flat)) {
       $flat['source'] = $flat['contact_source'];
       unset($flat['contact_source']);
     }
 
     // handle preferred_communication_method
-    if (!empty($fields['preferred_communication_method'])) {
+    if (array_key_exists('preferred_communication_method', $fields)) {
       $methods = array_intersect($fields['preferred_communication_method'], array('1'));
       $methods = array_keys($methods);
       sort($methods);
@@ -290,13 +290,13 @@ class CRM_Dedupe_Finder {
             'state_province' => 'state_province_id', 'county' => 'county_id',
           );
           foreach ($fixes as $orig => $target) {
-            if (!empty($flat[$orig])) {
+            if (CRM_Utils_Array::value($orig, $flat)) {
               $params[$table][$target] = $flat[$orig];
             }
           }
         }
         foreach ($fields as $field => $title) {
-          if (!empty($flat[$field])) {
+          if (CRM_Utils_Array::value($field, $flat)) {
             $params[$table][$field] = $flat[$field];
           }
         }

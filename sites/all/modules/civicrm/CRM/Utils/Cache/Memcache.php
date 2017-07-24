@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -80,9 +80,9 @@ class CRM_Utils_Cache_Memcache {
   /**
    * Constructor
    *
-   * @param array $config an array of configuration params
+   * @param array   $config  an array of configuration params
    *
-   * @return \CRM_Utils_Cache_Memcache
+   * @return void
    */
   function __construct($config) {
     if (isset($config['host'])) {
@@ -107,12 +107,6 @@ class CRM_Utils_Cache_Memcache {
     }
   }
 
-  /**
-   * @param $key
-   * @param $value
-   *
-   * @return bool
-   */
   function set($key, &$value) {
     if (!$this->_cache->set($this->_prefix . $key, $value, FALSE, $this->_timeout)) {
       return FALSE;
@@ -120,28 +114,15 @@ class CRM_Utils_Cache_Memcache {
     return TRUE;
   }
 
-  /**
-   * @param $key
-   *
-   * @return mixed
-   */
   function &get($key) {
     $result = $this->_cache->get($this->_prefix . $key);
     return $result;
   }
 
-  /**
-   * @param $key
-   *
-   * @return mixed
-   */
   function delete($key) {
     return $this->_cache->delete($this->_prefix . $key);
   }
 
-  /**
-   * @return mixed
-   */
   function flush() {
     return $this->_cache->flush();
   }

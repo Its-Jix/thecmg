@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,14 +28,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
-  /**
-   *
-   */
   function __construct() {
     parent::__construct();
     // expire cookie in one day
@@ -58,7 +55,7 @@ class CRM_Campaign_BAO_Petition extends CRM_Campaign_BAO_Survey {
         'sortOrder' => 'desc',
       );
       foreach ($sortParams as $name => $default) {
-        if (!empty($params[$name])) {
+        if (CRM_Utils_Array::value($name, $params)) {
           $sortParams[$name] = $params[$name];
         }
       }
@@ -98,11 +95,11 @@ INNER JOIN civicrm_option_group grp ON ( activity_type.option_group_id = grp.id 
       $where[] = "( petition.activity_type_id = %1 )";
       $queryParams[1] = array($petitionTypeID, 'Positive');
     }
-    if (!empty($params['title'])) {
+    if (CRM_Utils_Array::value('title', $params)) {
       $where[] = "( petition.title LIKE %2 )";
       $queryParams[2] = array('%' . trim($params['title']) . '%', 'String');
     }
-    if (!empty($params['campaign_id'])) {
+    if (CRM_Utils_Array::value('campaign_id', $params)) {
       $where[] = '( petition.campaign_id = %3 )';
       $queryParams[3] = array($params['campaign_id'], 'Positive');
     }
@@ -197,6 +194,7 @@ SELECT  petition.id                         as id,
       $surveyInfo = CRM_Campaign_BAO_Petition::getSurveyInfo($params['sid']);
 
       // create activity
+      // activity status id (from /civicrm/admin/optionValue?reset=1&action=browse&gid=25)
       // 1-Schedule, 2-Completed
 
       $activityParams = array(
@@ -215,7 +213,7 @@ SELECT  petition.id                         as id,
       $activity = CRM_Activity_BAO_Activity::create($activityParams);
 
       // save activity custom data
-      if (!empty($params['custom']) &&
+      if (CRM_Utils_Array::value('custom', $params) &&
         is_array($params['custom'])
       ) {
         CRM_Core_BAO_CustomValueTable::store($params['custom'], 'civicrm_activity', $activity->id);
@@ -228,13 +226,6 @@ SELECT  petition.id                         as id,
     return $activity;
   }
 
-  /**
-   * @param $activity_id
-   * @param $contact_id
-   * @param $petition_id
-   *
-   * @return bool
-   */
   function confirmSignature($activity_id, $contact_id, $petition_id) {
     // change activity status to completed (status_id = 2)
     // I wonder why do we need contact_id when we have activity_id anyway? [chastell]
@@ -281,11 +272,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param $surveyId
-   *
-   * @return array
-   * @internal param bool $all
-   * @internal param int $id
+   * @param boolean $all
+   * @param int $id
    * @static
    */
   static function getPetitionSignatureTotalbyCountry($surveyId) {
@@ -326,11 +314,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Total
    *
-   * @param $surveyId
-   *
-   * @return array
-   * @internal param bool $all
-   * @internal param int $id
+   * @param boolean $all
+   * @param int $id
    * @static
    */
   static function getPetitionSignatureTotal($surveyId) {
@@ -355,11 +340,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   }
 
 
-  /**
-   * @param null $surveyId
-   *
-   * @return array
-   */
   public static function getSurveyInfo($surveyId = NULL) {
     $surveyInfo = array();
 
@@ -389,12 +369,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
   /**
    * Function to get Petition Signature Details
    *
-   * @param $surveyId
-   * @param null $status_id
-   *
-   * @return array
-   * @internal param bool $all
-   * @internal param int $id
+   * @param boolean $all
+   * @param int $id
    * @static
    */
   static function getPetitionSignature($surveyId, $status_id = NULL) {
@@ -491,8 +467,6 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param int $surveyId
    * @param int $contactId
-   *
-   * @return array
    * @static
    */
   static function checkSignature($surveyId, $contactId) {
@@ -544,11 +518,8 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
    *
    * @param array $params (reference ) an assoc array of name/value pairs
    *
-   * @param $sendEmailMode
-   *
-   * @throws Exception
-   * @return void
-  @access public
+   * @return
+   * @access public
    * @static
    */
   public static function sendEmail($params, $sendEmailMode) {
@@ -653,11 +624,11 @@ AND         tag_id = ( SELECT id FROM civicrm_tag WHERE name = %2 )";
 
 
         $confirmUrl = CRM_Utils_System::url('civicrm/petition/confirm',
-          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
+          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&p={$params['sid']}",
           TRUE
         );
         $confirmUrlPlainText = CRM_Utils_System::url('civicrm/petition/confirm',
-          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&pid={$params['sid']}",
+          "reset=1&cid={$se->contact_id}&sid={$se->id}&h={$se->hash}&a={$params['activityId']}&p={$params['sid']}",
           TRUE,
           NULL,
           FALSE

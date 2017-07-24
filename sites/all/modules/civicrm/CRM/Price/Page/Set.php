@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -84,12 +84,14 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%sid%%,\'' . 'CRM_Price_BAO_PriceSet' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable Price Set'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%sid%%,\'' . 'CRM_Price_BAO_PriceSet' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable Price Set'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -201,10 +203,9 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * edit price set
    *
-   * @param $sid
-   * @param string $action the action to be invoked
+   * @param int    $id       price set id
+   * @param string $action   the action to be invoked
    *
-   * @internal param int $id price set id
    * @return void
    * @access public
    */
@@ -224,9 +225,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
   /**
    * Preview price set
    *
-   * @param $sid
-   *
-   * @internal param int $id price set id
+   * @param int $id price set id
    *
    * @return void
    * @access public
@@ -277,13 +276,8 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         CRM_Utils_Array::value('extends', $priceSet[$dao->id])
       );
       $extends = array();
-      //CRM-10225
-      foreach ($compIds as $compId) {
-        if (!empty($comps[CRM_Core_Component::getComponentName($compId)])) {
-          $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
-        }
-      }
-     $priceSet[$dao->id]['extends'] = implode(', ', $extends);
+      foreach ($compIds as $compId) $extends[] = $comps[CRM_Core_Component::getComponentName($compId)];
+      $priceSet[$dao->id]['extends'] = implode(', ', $extends);
 
       // form all action links
       $action = array_sum(array_keys($this->actionLinks()));
@@ -306,12 +300,7 @@ class CRM_Price_Page_Set extends CRM_Core_Page {
         $actionLinks[CRM_Core_Action::BROWSE]['name'] = 'View Price Fields';
       }
       $priceSet[$dao->id]['action'] = CRM_Core_Action::formLink($actionLinks, $action,
-        array('sid' => $dao->id),
-        ts('more'),
-        FALSE,
-        'priceSet.row.actions',
-        'PriceSet',
-        $dao->id
+        array('sid' => $dao->id)
       );
     }
     $this->assign('rows', $priceSet);

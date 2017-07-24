@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,17 +29,11 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Report_Form_Contribute_PCP extends CRM_Report_Form {
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -277,11 +271,6 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     }
   }
 
-  /**
-   * @param $rows
-   *
-   * @return array
-   */
   function statistics(&$rows) {
     $statistics = parent::statistics($rows);
 
@@ -314,10 +303,6 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
     );
     return $statistics;
   }
-
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;
@@ -329,7 +314,7 @@ LEFT JOIN civicrm_contribution_page {$this->_aliases['civicrm_contribution_page'
         $repeatFound = FALSE;
 
         foreach ($row as $colName => $colVal) {
-          if (!empty($checkList[$colName]) &&
+          if (CRM_Utils_Array::value($colName, $checkList) &&
             is_array($checkList[$colName]) &&
             in_array($colVal, $checkList[$colName])
           ) {

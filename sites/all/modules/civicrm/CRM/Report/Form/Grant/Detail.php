@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -40,12 +40,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
   protected $_customGroupExtends = array(
     'Grant');
 
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -190,19 +184,17 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
           array(
             'title' => ts('Application Received'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
           ),
           'money_transfer_date' =>
           array(
             'title' => ts('Money Transfer Date'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
           ),
           'grant_due_date' =>
           array(
             'title' => ts('Grant Report Due'),
             'operatorType' => CRM_Report_Form::OP_DATE,
-            'type' => CRM_Utils_Type::T_DATE,
+            'type' => CRM_Report_Form::OP_DATE,
           ),
           'decision_date' =>
           array(
@@ -258,7 +250,9 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
       }
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
+          if (CRM_Utils_Array::value('required', $field) ||
+            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          ) {
 
             $select[] = "{$field['dbAlias']} as {$tableName}_{$fieldName}";
 
@@ -325,14 +319,14 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
 
   function groupBy() {
     $this->_groupBy = "";
-    if (!empty($this->_params['group_bys']) &&
+    if (CRM_Utils_Array::value('group_bys', $this->_params) &&
       is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
+            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
               $this->_groupBy[] = $field['dbAlias'];
             }
           }
@@ -347,9 +341,6 @@ class CRM_Report_Form_Grant_Detail extends CRM_Report_Form {
     }
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
     // custom code to alter rows
     $entryFound = FALSE;

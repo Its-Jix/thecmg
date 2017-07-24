@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -46,19 +46,19 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *
    * @param array  $params         (reference ) an assoc array of name/value pairs
    *
-   * @return CRM_Contact_DAO_GroupOrganization
+   * @return void
    * @access public
    * @static
    */
   static function add(&$params) {
-    $formattedValues = array();
-    self::formatValues($params, $formattedValues);
-    $dataExists = self::dataExists($formattedValues);
+    $formatedValues = array();
+    self::formatValues($params, $formatedValues);
+    $dataExists = self::dataExists($formatedValues);
     if (!$dataExists) {
       return NULL;
     }
     $groupOrganization = new CRM_Contact_DAO_GroupOrganization();
-    $groupOrganization->copyValues($formattedValues);
+    $groupOrganization->copyValues($formatedValues);
     // we have ensured we have group_id & organization_id so we can do a find knowing that
     // this can only find a matching record
     $groupOrganization->find(TRUE);
@@ -77,15 +77,15 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    * @static
    */
   static function formatValues(&$params, &$formatedValues) {
-    if (!empty($params['group_organization'])) {
+    if (CRM_Utils_Array::value('group_organization', $params)) {
       $formatedValues['id'] = $params['group_organization'];
     }
 
-    if (!empty($params['group_id'])) {
+    if (CRM_Utils_Array::value('group_id', $params)) {
       $formatedValues['group_id'] = $params['group_id'];
     }
 
-    if (!empty($params['organization_id'])) {
+    if (CRM_Utils_Array::value('organization_id', $params)) {
       $formatedValues['organization_id'] = $params['organization_id'];
     }
   }
@@ -101,16 +101,14 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    */
   static function dataExists($params) {
     // return if no data present
-    if (!empty($params['organization_id']) && !empty($params['group_id'])) {
+    if (CRM_Utils_Array::value('organization_id', $params) &&
+      CRM_Utils_Array::value('group_id', $params)
+    ) {
       return TRUE;
     }
     return FALSE;
   }
 
-  /**
-   * @param $groupID
-   * @param $defaults
-   */
   static function retrieve($groupID, &$defaults) {
     $dao = new CRM_Contact_DAO_GroupOrganization();
     $dao->group_id = $groupID;
@@ -123,9 +121,7 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
   /**
    * Method to check group organization relationship exist
    *
-   * @param $contactID
-   *
-   * @internal param int $contactId
+   * @param  int  $contactId
    *
    * @return boolean
    * @access public
@@ -146,7 +142,8 @@ class CRM_Contact_BAO_GroupOrganization extends CRM_Contact_DAO_GroupOrganizatio
    *
    * @param int $groupOrganizationID group organization id that needs to be deleted
    *
-   * @return mixed|null $results   no of deleted group organization on success, false otherwise@access public
+   * @return $results   no of deleted group organization on success, false otherwise
+   * @access public
    */
   static function deleteGroupOrganization($groupOrganizationID) {
     $results = NULL;

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -82,8 +82,7 @@ class CRM_Badge_BAO_Layout extends CRM_Core_DAO_PrintLabel {
    * Function to add a name label
    *
    * @param array $params reference array contains the values submitted by the form
-   *
-   * @internal param array $ids reference array contains the id
+   * @param array $ids    reference array contains the id
    *
    * @access public
    * @static

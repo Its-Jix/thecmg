@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -49,15 +49,11 @@
  * @endcode
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  */
 
 require_once 'api/Wrapper.php';
-
-/**
- * Class CRM_Utils_API_MatchOption
- */
 class CRM_Utils_API_MatchOption implements API_Wrapper {
 
   /**
@@ -169,10 +165,8 @@ class CRM_Utils_API_MatchOption implements API_Wrapper {
   /**
    * Create APIv3 "get" parameters to lookup an existing record using $keys
    *
-   * @param $origParams
+   * @param array $apiRequest
    * @param array $keys list of keys to match against
-   *
-   * @internal param array $apiRequest
    * @return array APIv3 $params
    */
   function createGetParams($origParams, $keys) {

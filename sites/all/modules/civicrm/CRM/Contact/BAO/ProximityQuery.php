@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -185,14 +185,6 @@ class CRM_Contact_BAO_ProximityQuery {
     );
   }
 
-  /**
-   * @param $latitude
-   * @param $longitude
-   * @param $distance
-   * @param string $tablePrefix
-   *
-   * @return string
-   */
   static function where($latitude, $longitude, $distance, $tablePrefix = 'civicrm_address') {
     self::initialize();
 
@@ -241,12 +233,6 @@ ACOS(
     return $where;
   }
 
-  /**
-   * @param $query
-   * @param $values
-   *
-   * @throws Exception
-   */
   static function process(&$query, &$values) {
     list($name, $op, $distance, $grouping, $wildcard) = $values;
 
@@ -351,9 +337,6 @@ ACOS(
     return;
   }
 
-  /**
-   * @param $input
-   */
   static function fixInputParams(&$input) {
     foreach ($input as $param) {
       if (CRM_Utils_Array::value('0', $param) == 'prox_distance') {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,7 +42,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -90,7 +90,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
           $element->freeze();
         }
       }
-      if (!empty($this->_values['is_reserved'])) {
+      if (CRM_Utils_Array::value('is_reserved', $this->_values)) {
         $this->freeze(array('name', 'is_active'));
       }
     }
@@ -103,7 +103,7 @@ class CRM_Admin_Form_OptionGroup extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     CRM_Utils_System::flushCache();

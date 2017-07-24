@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  * @package CRM
  * @author Alan Dixon
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -53,9 +53,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_IATS
+   * @return void
    */
   function __construct($mode, &$paymentProcessor) {
     $this->_paymentProcessor = $paymentProcessor;
@@ -74,12 +72,6 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 
-  /**
-   * @param string $mode
-   * @param array $paymentProcessor
-   *
-   * @return mixed
-   */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
     if (self::$_singleton[$processorName] === NULL) {
@@ -88,15 +80,6 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     return self::$_singleton[$processorName];
   }
 
-  /**
-   * This function collects all the information from a web/api form and invokes
-   * the relevant payment processor specific functions to perform the transaction
-   *
-   * @param  array $params assoc array of input parameters for this transaction
-   *
-   * @return array the result in an nice formatted array (or an error object)
-   * @abstract
-   */
   function doDirectPayment(&$params) {
     // $result = '';
     //       foreach($params as $key => $value) {
@@ -111,7 +94,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     if (!in_array($params['currencyID'], explode(',', self::CURRENCIES))) {
       return self::error('Invalid currency selection, must be one of ' . self::CURRENCIES);
     }
-    $isRecur = CRM_Utils_Array::value('is_recur', $params, FALSE);
+    $isRecur = $params['is_recur'];
     // AgentCode = $this->_paymentProcessor['signature'];
     // Password  = $this->_paymentProcessor['password' ];
     // beginning of modified sample code from IATS php api include IATS supplied api library
@@ -261,11 +244,6 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     }
   }
 
-  /**
-   * @param null $error
-   *
-   * @return object
-   */
   function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {
@@ -292,11 +270,6 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
     return $e;
   }
 
-  /**
-   * @param $error_id
-   *
-   * @return string
-   */
   function errorString($error_id) {
     $errors = array(
       1 => 'Agent Code has not been set up on the authorization system.',
@@ -334,7 +307,7 @@ class CRM_Core_Payment_IATS extends CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @internal param string $mode the mode we are operating in (live or test)
+   * @param  string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
    * @public

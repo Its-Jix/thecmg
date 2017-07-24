@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -137,16 +137,14 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
   /**
    * Class constructor
    *
-   * @param array $queryParams array of parameters for query
-   * @param \const|int $action - action of search basic or advanced.
-   * @param string $grantClause if the caller wants to further restrict the search
+   * @param array   $queryParams array of parameters for query
+   * @param int     $action - action of search basic or advanced.
+   * @param string  $grantClause if the caller wants to further restrict the search
    * @param boolean $single are we dealing only with one contact?
-   * @param int $limit how many participations do we want returned
+   * @param int     $limit  how many participations do we want returned
    *
-   * @param string $context
-   *
-   * @return \CRM_Grant_Selector_Search
-  @access public
+   * @return CRM_Contact_Selector
+   * @access public
    */
   function __construct(&$queryParams,
     $action      = CRM_Core_Action::NONE,
@@ -183,10 +181,9 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
    * - View
    * - Edit
    *
-   * @param null $key
-   *
    * @return array
    * @access public
+   *
    */
   static function &links($key = NULL) {
     $cid = CRM_Utils_Request::retrieve('cid', 'Integer', $this);
@@ -209,10 +206,13 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
       );
 
       if ($cid) {
+        $deleteExtra = ts('Are you sure you want to delete this grant?');
+
         $delLink = array(
           CRM_Core_Action::DELETE => array('name' => ts('Delete'),
             'url' => 'civicrm/contact/view/grant',
             'qs' => 'action=delete&reset=1&cid=%%cid%%&id=%%id%%&selectedChild=grant' . $extraParams,
+            'extra' => 'onclick = "if (confirm(\'' . $deleteExtra . '\') ) this.href+=\'&amp;confirmed=1\'; else return false;"',
             'title' => ts('Delete Grant'),
           ),
         );
@@ -221,14 +221,12 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     }
     return self::$_links;
   }
+  //end of function
 
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param $action
-   * @param $params
-   *
-   * @internal param $
+   * @param
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -314,12 +312,7 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
           'id' => $result->grant_id,
           'cid' => $result->contact_id,
           'cxt' => $this->_context,
-        ),
-        ts('more'),
-        FALSE,
-        'grant.selector.row',
-        'Grant',
-        $result->grant_id
+        )
       );
 
       $row['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage($result->contact_sub_type ?
@@ -409,9 +402,6 @@ class CRM_Grant_Selector_Search extends CRM_Core_Selector_Base implements CRM_Co
     return self::$_columnHeaders;
   }
 
-  /**
-   * @return string
-   */
   function &getQuery() {
     return $this->_query;
   }

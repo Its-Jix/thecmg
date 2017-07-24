@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,16 +29,12 @@
  * This file contains the various menus of the CiviCRM module
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
 require_once 'CRM/Core/I18n.php';
-
-/**
- * Class CRM_Core_Menu
- */
 class CRM_Core_Menu {
 
   /**
@@ -68,15 +64,8 @@ class CRM_Core_Menu {
   static $_menuCache = NULL;
   CONST MENU_ITEM = 1;
 
-  /**
-   * This function fetches the menu items from xml and xmlMenu hooks
-   *
-   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
-   *
-   * @return array
-   */
-  static function &xmlItems($fetchFromXML = FALSE) {
-    if (!self::$_items || $fetchFromXML) {
+  static function &xmlItems() {
+    if (!self::$_items) {
       $config = CRM_Core_Config::singleton();
 
       // We needs this until Core becomes a component
@@ -102,12 +91,6 @@ class CRM_Core_Menu {
     return self::$_items;
   }
 
-  /**
-   * @param $name
-   * @param $menu
-   *
-   * @throws Exception
-   */
   static function read($name, &$menu) {
 
     $config = CRM_Core_Config::singleton();
@@ -162,20 +145,13 @@ class CRM_Core_Menu {
   /**
    * This function defines information for various menu items
    *
-   * @param boolen $fetchFromXML fetch the menu items from xml and not from cache
-   *
    * @static
    * @access public
    */
-  static function &items($fetchFromXML = FALSE) {
-    return self::xmlItems($fetchFromXML);
+  static function &items() {
+    return self::xmlItems();
   }
 
-  /**
-   * @param $values
-   *
-   * @return bool
-   */
   static function isArrayTrue(&$values) {
     foreach ($values as $name => $value) {
       if (!$value) {
@@ -185,12 +161,6 @@ class CRM_Core_Menu {
     return TRUE;
   }
 
-  /**
-   * @param $menu
-   * @param $path
-   *
-   * @throws Exception
-   */
   static function fillMenuValues(&$menu, $path) {
     $fieldsToPropagate = array(
       'access_callback',
@@ -260,17 +230,13 @@ class CRM_Core_Menu {
     self::buildAdminLinks($menu);
   }
 
-  /**
-   * This function recomputes menu from xml and populates civicrm_menu
-   * @param bool $truncate
-   */
   static function store($truncate = TRUE) {
     // first clean up the db
     if ($truncate) {
       $query = 'TRUNCATE civicrm_menu';
       CRM_Core_DAO::executeQuery($query);
     }
-    $menuArray = self::items($truncate);
+    $menuArray = self::items();
 
     self::build($menuArray);
 
@@ -301,18 +267,15 @@ class CRM_Core_Menu {
     }
   }
 
-  /**
-   * @param $menu
-   */
   static function buildAdminLinks(&$menu) {
     $values = array();
 
     foreach ($menu as $path => $item) {
-      if (empty($item['adminGroup'])) {
+      if (!CRM_Utils_Array::value('adminGroup', $item)) {
         continue;
       }
 
-      $query = !empty($item['path_arguments']) ? str_replace(',', '&', $item['path_arguments']) . '&reset=1' : 'reset=1';
+      $query = CRM_Utils_Array::value('path_arguments', $item) ? str_replace(',', '&', $item['path_arguments']) . '&reset=1' : 'reset=1';
 
       $value = array(
         'title' => $item['title'],
@@ -349,12 +312,6 @@ class CRM_Core_Menu {
     $menu['admin'] = array('breadcrumb' => $values);
   }
 
-  /**
-   * @param bool $all
-   *
-   * @return mixed
-   * @throws Exception
-   */
   static function &getNavigation($all = FALSE) {
     CRM_Core_Error::fatal();
 
@@ -461,9 +418,6 @@ class CRM_Core_Menu {
     return $values;
   }
 
-  /**
-   * @return null
-   */
   static function &getAdminLinks() {
     $links = self::get('admin');
 
@@ -508,7 +462,7 @@ class CRM_Core_Menu {
       if (array_key_exists($currentPath, $menu) &&
         isset($menu[$currentPath]['title'])
       ) {
-        $urlVar = !empty($menu[$currentPath]['path_arguments']) ? '&' . $menu[$currentPath]['path_arguments'] : '';
+        $urlVar = CRM_Utils_Array::value('path_arguments', $menu[$currentPath]) ? '&' . $menu[$currentPath]['path_arguments'] : '';
         $crumbs[] = array(
           'title' => $menu[$currentPath]['title'],
           'url' => CRM_Utils_System::url($currentPath,
@@ -527,22 +481,12 @@ class CRM_Core_Menu {
     return $crumbs;
   }
 
-  /**
-   * @param $menu
-   * @param $path
-   */
   static function buildReturnUrl(&$menu, $path) {
     if (!isset($menu[$path]['return_url'])) {
       list($menu[$path]['return_url'], $menu[$path]['return_url_args']) = self::getReturnUrl($menu, $path);
     }
   }
 
-  /**
-   * @param $menu
-   * @param $path
-   *
-   * @return array
-   */
   static function getReturnUrl(&$menu, $path) {
     if (!isset($menu[$path]['return_url'])) {
       $pathElements = explode('/', $path);
@@ -567,10 +511,6 @@ class CRM_Core_Menu {
     }
   }
 
-  /**
-   * @param $menu
-   * @param $path
-   */
   static function fillComponentIds(&$menu, $path) {
     static $cache = array();
 
@@ -604,11 +544,6 @@ class CRM_Core_Menu {
     }
   }
 
-  /**
-   * @param $path
-   *
-   * @return null
-   */
   static function get($path) {
     // return null if menu rebuild
     $config = CRM_Core_Config::singleton();
@@ -711,11 +646,6 @@ UNION (
     return $menuPath;
   }
 
-  /**
-   * @param $pathArgs
-   *
-   * @return mixed
-   */
   static function getArrayForPathArgs($pathArgs) {
     if (!is_string($pathArgs)) {
       return;
@@ -725,7 +655,7 @@ UNION (
     $elements = explode(',', $pathArgs);
     //CRM_Core_Error::debug( 'e', $elements );
     foreach ($elements as $keyVal) {
-      list($key, $val) = explode('=', $keyVal, 2);
+      list($key, $val) = explode('=', $keyVal);
       $arr[$key] = $val;
     }
 

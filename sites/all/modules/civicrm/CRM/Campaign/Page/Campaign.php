@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -37,8 +37,6 @@
  * Page for displaying Campaigns
  */
 class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
-
-  public $useLivePageJS = TRUE;
 
   /**
    * The action links that we need to display for the browse screen
@@ -67,12 +65,14 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
           'title' => ts('Disable Campaign'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
           'title' => ts('Enable Campaign'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Campaign_BAO_Campaign' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
         ),
         CRM_Core_Action::DELETE => array(
           'name' => ts('Delete'),
@@ -110,12 +110,7 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
           $action -= CRM_Core_Action::DISABLE;
         }
         $campaigns[$cmpid]['action'] = CRM_Core_Action::formLink(self::actionLinks(), $action,
-          array('id' => $campaign['id']),
-          ts('more'),
-          FALSE,
-          'campaign.selector.row',
-          'Campaign',
-          $campaign['id']
+          array('id' => $campaign['id'])
         );
       }
     }
@@ -124,9 +119,6 @@ class CRM_Campaign_Page_Campaign extends CRM_Core_Page {
     $this->assign('addCampaignUrl', CRM_Utils_System::url('civicrm/campaign/add', 'reset=1&action=add'));
   }
 
-  /**
-   * @return string
-   */
   function run() {
     if (!CRM_Core_Permission::check('administer CiviCampaign')) {
       CRM_Utils_System::permissionDenied();

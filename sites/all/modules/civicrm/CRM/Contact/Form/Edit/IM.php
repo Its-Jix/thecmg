@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -59,10 +59,10 @@ class CRM_Contact_Form_Edit_IM {
     $form->applyFilter('__ALL__', 'trim');
 
     //IM provider select
-    $form->addSelect("im[$blockId][provider_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
+    $form->addElement('select', "im[$blockId][provider_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_IM', 'provider_id'));
 
     //Block type select
-    $form->addSelect("im[$blockId][location_type_id]", array('entity' => 'im', 'class' => 'eight', 'placeholder' => NULL));
+    $form->addElement('select', "im[$blockId][location_type_id]", '', CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id'));
 
     //IM box
     $form->addElement('text', "im[$blockId][name]", ts('Instant Messenger'),

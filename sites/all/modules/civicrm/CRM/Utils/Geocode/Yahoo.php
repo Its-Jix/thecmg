@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -73,7 +73,7 @@ class CRM_Utils_Geocode_Yahoo {
 
     $whereComponents = array();
 
-    if (!empty($values['street_address'])) {
+    if (CRM_Utils_Array::value('street_address', $values)) {
       $whereComponents['street'] = $values['street_address'];
     }
 
@@ -81,8 +81,8 @@ class CRM_Utils_Geocode_Yahoo {
       $whereComponents['city'] = $city;
     }
 
-    if (!empty($values['state_province'])) {
-      if (!empty($values['state_province_id'])) {
+    if (CRM_Utils_Array::value('state_province', $values)) {
+      if (CRM_Utils_Array::value('state_province_id', $values)) {
         $stateProvince = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_StateProvince', $values['state_province_id']);
       }
       else {
@@ -104,11 +104,11 @@ class CRM_Utils_Geocode_Yahoo {
       }
     }
 
-    if (!empty($values['postal_code'])) {
+    if (CRM_Utils_Array::value('postal_code', $values)) {
       $whereComponents['postal'] = $values['postal_code'];
     }
 
-    if (!empty($values['country'])) {
+    if (CRM_Utils_Array::value('country', $values)) {
       $whereComponents['country'] = $values['country'];
     }
 

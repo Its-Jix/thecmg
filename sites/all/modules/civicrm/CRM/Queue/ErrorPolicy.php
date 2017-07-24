@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,10 +43,6 @@
  */
 class CRM_Queue_ErrorPolicy {
   var $active;
-
-  /**
-   * @param null $level
-   */
   function __construct($level = NULL) {
     register_shutdown_function(array($this, 'onShutdown'));
     if ($level === NULL) {
@@ -78,11 +74,6 @@ class CRM_Queue_ErrorPolicy {
     $this->active = FALSE;
   }
 
-  /**
-   * @param $callable
-   *
-   * @return mixed
-   */
   function call($callable) {
     $this->activate();
     try {

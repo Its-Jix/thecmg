@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  * abstract class.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -40,14 +40,7 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   // docs inherited from interface
   protected $keyword = 'pledge';
 
-  /**
-   * Provides base information about the component.
-   * Needs to be implemented in component's information
-   * class.
-   *
-   * @return array collection of required component settings
-   * @access public
-   */
+  // docs inherited from interface
   public function getInfo() {
     return array(
       'name' => 'CiviPledge',
@@ -60,24 +53,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
 
 
   // docs inherited from interface
-  /**
-   * Provides permissions that are used by component.
-   * Needs to be implemented in component's information
-   * class.
-   *
-   * NOTE: if using conditionally permission return,
-   * implementation of $getAllUnconditionally is required.
-   *
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null collection of permissions, null if none
-   * @access public
-   */
-  /**
-   * @param bool $getAllUnconditionally
-   *
-   * @return array|null
-   */
   public function getPermissions($getAllUnconditionally = FALSE) {
     return array(
       'access CiviPledge',
@@ -87,18 +62,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
-  /**
-   * Provides information about user dashboard element
-   * offered by this component.
-   *
-   * @return array|null collection of required dashboard settings,
-   *                    null if no element offered
-   * @access public
-   *
-   */
-  /**
-   * @return array|null
-   */
   public function getUserDashboardElement() {
     return array('name' => ts('Pledges'),
       'title' => ts('Your Pledge(s)'),
@@ -109,18 +72,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
-  /**
-   * Provides information about user dashboard element
-   * offered by this component.
-   *
-   * @return array|null collection of required dashboard settings,
-   *                    null if no element offered
-   * @access public
-   *
-   */
-  /**
-   * @return array|null
-   */
   public function registerTab() {
     return array('title' => ts('Pledges'),
       'url' => 'pledge',
@@ -129,18 +80,6 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
-  /**
-   * Provides information about advanced search pane
-   * offered by this component.
-   *
-   * @return array|null collection of required pane settings,
-   *                    null if no element offered
-   * @access public
-   *
-   */
-  /**
-   * @return array|null
-   */
   public function registerAdvancedSearchPane() {
     return array('title' => ts('Pledges'),
       'weight' => 25,
@@ -148,27 +87,11 @@ class CRM_Pledge_Info extends CRM_Core_Component_Info {
   }
 
   // docs inherited from interface
-  /**
-   * Provides potential activity types that this
-   * component might want to register in activity history.
-   * Needs to be implemented in component's information
-   * class.
-   *
-   * @return array|null collection of activity types
-   * @access public
-   *
-   */
-  /**
-   * @return array|null
-   */
   public function getActivityTypes() {
     return NULL;
   }
 
   // add shortcut to Create New
-  /**
-   * @param $shortCuts
-   */
   public function creatNewShortcut(&$shortCuts) {
     if (CRM_Core_Permission::check('access CiviPledge') &&
       CRM_Core_Permission::check('edit pledges')

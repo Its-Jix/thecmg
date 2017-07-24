@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
   | Copyright (C) 2011 Marty Wright                                    |
   | Licensed to CiviCRM under the Academic Free License version 3.0.   |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -39,11 +39,6 @@
  */
 class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
 
-  /**
-   * @param null $id
-   *
-   * @return array
-   */
   static function getMapping($id = NULL) {
     static $_action_mapping;
 
@@ -69,21 +64,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   }
 
   /**
-   * Get all fields of the type Date
-   */
-
-  static function getDateFields() {
-    $allFields = CRM_Core_BAO_CustomField::getFields('');
-    $dateFields = array('birth_date' => ts('Birth Date'));
-    foreach ($allFields as $fieldID => $field) {
-      if ($field['data_type'] == 'Date') {
-        $dateFields["custom_$fieldID"] = $field['label'];
-      }
-    }
-    return $dateFields;
-  }
-
-  /**
    * Retrieve list of selections/drop downs for Scheduled Reminder form
    *
    * @param bool    $id    mapping id
@@ -95,7 +75,7 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   static function getSelection($id = NULL) {
     $mapping = self::getMapping($id);
     $activityStatus = CRM_Core_PseudoConstant::activityStatus();
-    $activityType   = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+    $activityType = CRM_Core_PseudoConstant::activityType(FALSE) + CRM_Core_PseudoConstant::activityType(FALSE, TRUE);
 
     $participantStatus = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
@@ -103,9 +83,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     $eventTemplate = CRM_Event_PseudoConstant::eventTemplates();
     $autoRenew = CRM_Core_OptionGroup::values('auto_renew_options');
     $membershipType = CRM_Member_PseudoConstant::membershipType();
-    $dateFieldParams = array('data_type' => 'Date');
-    $dateFields = self::getDateFields();
-    $contactOptions = CRM_Core_OptionGroup::values('contact_date_reminder_options');
 
     asort($activityType);
 
@@ -165,13 +142,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
             $sel1Val = ts('Membership');
           }
           $sel2[$key] = $valueLabel + $membershipType;
-          break;
-
-        case 'civicrm_contact':
-          if ($value['entity'] == 'civicrm_contact') {
-            $sel1Val = ts('Contact');
-          }
-          $sel2[$key] = $dateFields;
           break;
       }
       $sel1[$key] = $sel1Val;
@@ -238,12 +208,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
           }
           break;
 
-        case 'contact_date_reminder_options':
-          foreach ($sel3[$id] as $kkey => & $vval) {
-            $vval = $contactOptions;
-          }
-          break;
-
         case '':
           $sel3[$id] = '';
           break;
@@ -261,11 +225,6 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
     );
   }
 
-  /**
-   * @param null $id
-   *
-   * @return array
-   */
   static function getSelection1($id = NULL) {
     $mapping = self::getMapping($id);
     $sel4 = $sel5 = array();
@@ -316,34 +275,29 @@ class CRM_Core_BAO_ActionSchedule extends CRM_Core_DAO_ActionSchedule {
   /**
    * Retrieve list of Scheduled Reminders
    *
-   * @param bool $namesOnly return simple list of names
-   *
-   * @param null $entityValue
-   * @param null $id
+   * @param bool    $namesOnly    return simple list of names
    *
    * @return array  (reference)   reminder list
    * @static
    * @access public
    */
   static function &getList($namesOnly = FALSE, $entityValue = NULL, $id = NULL) {
-    $activity_type = CRM_Core_PseudoConstant::activityType(TRUE, TRUE);
+    $activity_type = CRM_Core_PseudoConstant::activityType(FALSE) + CRM_Core_PseudoConstant::activityType(FALSE, TRUE);
     $activity_status = CRM_Core_PseudoConstant::activityStatus();
 
     $event_type = CRM_Event_PseudoConstant::eventType();
     $civicrm_event = CRM_Event_PseudoConstant::event(NULL, FALSE, "( is_template IS NULL OR is_template != 1 )");
     $civicrm_participant_status_type = CRM_Event_PseudoConstant::participantStatus(NULL, NULL, 'label');
     $event_template = CRM_Event_PseudoConstant::eventTemplates();
-    $civicrm_contact = self::getDateFields();
 
     $auto_renew_options = CRM_Core_OptionGroup::values('auto_renew_options');
-    $contact_date_reminder_options = CRM_Core_OptionGroup::values('contact_date_reminder_options');
     $civicrm_membership_type = CRM_Member_PseudoConstant::membershipType();
 
+    asort($activity_type);
     $entity = array(
       'civicrm_activity' => 'Activity',
       'civicrm_participant' => 'Event',
       'civicrm_membership' => 'Member',
-      'civicrm_contact' => 'Contact',
     );
 
     $query = "
@@ -414,19 +368,8 @@ WHERE   cas.entity_value = $id AND
     return $list;
   }
 
-  /**
-   * @param $contactId
-   * @param $to
-   * @param $scheduleID
-   * @param $from
-   * @param $tokenParams
-   *
-   * @return bool|null
-   * @throws CRM_Core_Exception
-   */
-  static function sendReminder($contactId, $to, $scheduleID, $from, $tokenParams) {
-    $email = $to['email'];
-    $phoneNumber = $to['phone'];
+  static function sendReminder($contactId, $email, $scheduleID, $from, $tokenParams) {
+
     $schedule = new CRM_Core_DAO_ActionSchedule();
     $schedule->id = $scheduleID;
 
@@ -437,7 +380,6 @@ WHERE   cas.entity_value = $id AND
     if ($schedule->find(TRUE)) {
       $body_text    = $schedule->body_text;
       $body_html    = $schedule->body_html;
-      $sms_body_text = $schedule->sms_body_text;
       $body_subject = $schedule->subject;
       if (!$body_text) {
         $body_text = CRM_Utils_String::htmlToText($body_html);
@@ -462,16 +404,12 @@ WHERE   cas.entity_value = $id AND
       CRM_Utils_Hook::tokens($hookTokens);
       $categories = array_keys($hookTokens);
 
-      $type = array('body_html' => 'html', 'body_text' => 'text', 'sms_body_text' => 'text');
+      $type = array('html', 'text');
 
-      foreach ($type as $bodyType => $value) {
+      foreach ($type as $key => $value) {
         $dummy_mail = new CRM_Mailing_BAO_Mailing();
-        if ($bodyType == 'sms_body_text') {
-          $dummy_mail->body_text = $$bodyType;
-        }
-        else {
-          $dummy_mail->$bodyType = $$bodyType;
-        }
+        $bodyType = "body_{$value}";
+        $dummy_mail->$bodyType = $$bodyType;
         $tokens = $dummy_mail->getTokens();
 
         if ($$bodyType) {
@@ -484,11 +422,10 @@ WHERE   cas.entity_value = $id AND
       }
       $html = $body_html;
       $text = $body_text;
-      $sms_text = $sms_body_text;
 
       $smarty = CRM_Core_Smarty::singleton();
       foreach (array(
-          'text', 'html', 'sms_text') as $elem) {
+          'text', 'html') as $elem) {
         $$elem = $smarty->fetch("string:{$$elem}");
       }
 
@@ -504,74 +441,45 @@ WHERE   cas.entity_value = $id AND
         foreach ($matches[1] as $token) {
           list($type, $name) = preg_split('/\./', $token, 2);
           if ($name) {
-            if (!isset($subjectToken[$type])) {
-              $subjectToken[$type] = array();
+            if (!isset($subjectToken['contact'])) {
+              $subjectToken['contact'] = array();
             }
-            $subjectToken[$type][] = $name;
+            $subjectToken['contact'][] = $name;
           }
         }
       }
 
       $messageSubject = CRM_Utils_Token::replaceContactTokens($body_subject, $contact, FALSE, $subjectToken);
-      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $subjectToken);
-      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $subjectToken, TRUE);
+      $messageSubject = CRM_Utils_Token::replaceDomainTokens($messageSubject, $domain, TRUE, $tokens[$value]);
+      $messageSubject = CRM_Utils_Token::replaceComponentTokens($messageSubject, $contact, $tokens[$value], TRUE);
       $messageSubject = CRM_Utils_Token::replaceHookTokens($messageSubject, $contact, $categories, TRUE);
 
       $messageSubject = $smarty->fetch("string:{$messageSubject}");
 
-      if ($schedule->mode == 'SMS' or $schedule->mode == 'User_Preference') {
-        $session = CRM_Core_Session::singleton();
-        $userID = $session->get('userID') ? $session->get('userID') : $contactId;
-        $smsParams = array('To' => $phoneNumber, 'provider_id' => $schedule->sms_provider_id, 'activity_subject' => $messageSubject);
-        $activityTypeID = CRM_Core_OptionGroup::getValue('activity_type',
-          'SMS',
-          'name'
-        );
-        $activityParams = array(
-          'source_contact_id' => $userID,
-          'activity_type_id' => $activityTypeID,
-          'activity_date_time' => date('YmdHis'),
-          'subject' => $messageSubject,
-          'details' => $sms_text,
-          'status_id' => CRM_Core_OptionGroup::getValue('activity_status', 'Completed', 'name'),
-        );
+      // set up the parameters for CRM_Utils_Mail::send
+      $mailParams = array(
+        'groupName' => 'Scheduled Reminder Sender',
+        'from' => $from,
+        'toName' => $contact['display_name'],
+        'toEmail' => $email,
+        'subject' => $messageSubject,
+        'entity' => 'action_schedule',
+        'entity_id' => $scheduleID,
+      );
 
-        $activity = CRM_Activity_BAO_Activity::create($activityParams);
-
-        CRM_Activity_BAO_Activity::sendSMSMessage($contactId,
-          $sms_text,
-          $smsParams,
-          $activity->id,
-          $userID
-        );
+      if (!$html || $contact['preferred_mail_format'] == 'Text' ||
+        $contact['preferred_mail_format'] == 'Both'
+      ) {
+        // render the &amp; entities in text mode, so that the links work
+        $mailParams['text'] = str_replace('&amp;', '&', $text);
       }
-
-      if ($schedule->mode == 'Email' or $schedule->mode == 'User_Preference') {
-        // set up the parameters for CRM_Utils_Mail::send
-        $mailParams = array(
-          'groupName' => 'Scheduled Reminder Sender',
-          'from' => $from,
-          'toName' => $contact['display_name'],
-          'toEmail' => $email,
-          'subject' => $messageSubject,
-          'entity' => 'action_schedule',
-          'entity_id' => $scheduleID,
-        );
-
-        if (!$html || $contact['preferred_mail_format'] == 'Text' ||
+      if ($html && ($contact['preferred_mail_format'] == 'HTML' ||
           $contact['preferred_mail_format'] == 'Both'
-        ) {
-          // render the &amp; entities in text mode, so that the links work
-          $mailParams['text'] = str_replace('&amp;', '&', $text);
-        }
-        if ($html && ($contact['preferred_mail_format'] == 'HTML' ||
-            $contact['preferred_mail_format'] == 'Both'
-          )
-        ) {
-          $mailParams['html'] = $html;
-        }
-        $result = CRM_Utils_Mail::send($mailParams);
+        )) {
+        $mailParams['html'] = $html;
       }
+
+      $result = CRM_Utils_Mail::send($mailParams);
     }
     $schedule->free();
 
@@ -659,12 +567,6 @@ WHERE   cas.entity_value = $id AND
     return CRM_Core_DAO::setFieldValue('CRM_Core_DAO_ActionSchedule', $id, 'is_active', $is_active);
   }
 
-  /**
-   * @param $mappingID
-   * @param $now
-   *
-   * @throws CRM_Core_Exception
-   */
   static function sendMailings($mappingID, $now) {
     $domainValues = CRM_Core_BAO_Domain::getNameAndEmail();
     $fromEmailAddress = "$domainValues[0] <$domainValues[1]>";
@@ -683,10 +585,6 @@ WHERE   cas.entity_value = $id AND
 
     while ($actionSchedule->fetch()) {
       $extraSelect = $extraJoin = $extraWhere = $extraOn = '';
-
-    if ($actionSchedule->from_email)
-            $fromEmailAddress = "$actionSchedule->from_name <$actionSchedule->from_email>";
-
 
       if ($actionSchedule->record_activity) {
         if ($mapping->entity == 'civicrm_membership') {
@@ -719,7 +617,7 @@ LEFT JOIN civicrm_option_value ov ON e.activity_type_id = ov.value AND ov.option
 
       if ($mapping->entity == 'civicrm_participant') {
         $tokenEntity = 'event';
-        $tokenFields = array('event_type', 'title', 'event_id', 'start_date', 'end_date', 'summary', 'description', 'location', 'info_url', 'registration_url', 'fee_amount', 'contact_email', 'contact_phone', 'balance');
+        $tokenFields = array('event_type', 'title', 'event_id', 'start_date', 'end_date', 'summary', 'description', 'location', 'info_url', 'registration_url', 'fee_amount', 'contact_email', 'contact_phone');
         $extraSelect = ', ov.label as event_type, ev.title, ev.id as event_id, ev.start_date, ev.end_date, ev.summary, ev.description, address.street_address, address.city, address.state_province_id, address.postal_code, email.email as contact_email, phone.phone as contact_phone ';
 
         $extraJoin   = "
@@ -759,13 +657,6 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
         }
       }
 
-      if ($mapping->entity == 'civicrm_contact') {
-        $tokenEntity = 'contact';
-        //TODO: get full list somewhere!
-        $tokenFields = array('birth_date', 'last_name');
-        //TODO: is there anything to add here?
-      }
-
       $entityJoinClause = "INNER JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
       if ($actionSchedule->limit_to == 0) {
         $entityJoinClause = "LEFT JOIN {$mapping->entity} e ON e.id = reminder.entity_id";
@@ -774,7 +665,7 @@ LEFT JOIN civicrm_phone phone ON phone.id = lb.phone_id
       $entityJoinClause .= $extraOn;
 
       $query = "
-SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.entity_table as entityTable, reminder.*, e.id as entityID, e.* {$extraSelect}
+SELECT reminder.id as reminderID, reminder.contact_id as contactID, reminder.*, e.id as entityID, e.* {$extraSelect}
 FROM  civicrm_action_log reminder
 {$entityJoinClause}
 {$extraJoin}
@@ -806,49 +697,19 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
           elseif (in_array($field, array('start_date','end_date','join_date','activity_date_time'))) {
             $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Date::customFormat($dao->$field);
           }
-          elseif ($field == 'balance') {
-            if ($dao->entityTable == 'civicrm_contact') {
-              $balancePay = 'N/A';
-            }
-            elseif (!empty($dao->entityID)) {
-              $info = CRM_Contribute_BAO_Contribution::getPaymentInfo($dao->entityID, 'event');
-              $balancePay = CRM_Utils_Array::value('balance', $info);
-              $balancePay = CRM_Utils_Money::format($balancePay);
-            }
-            $entityTokenParams["{$tokenEntity}." . $field] = $balancePay;
-          }
-          elseif ($field == 'fee_amount') {
-            $entityTokenParams["{$tokenEntity}." . $field] = CRM_Utils_Money::format($dao->$field);
-          }
           else {
             $entityTokenParams["{$tokenEntity}." . $field] = $dao->$field;
           }
         }
 
         $isError  = 0;
-        $errorMsg = $toEmail = $toPhoneNumber = '';
-
-        if ($actionSchedule->mode == 'SMS' or $actionSchedule->mode == 'User_Preference') {
-          $filters = array('is_deceased' => 0, 'is_deleted' => 0, 'do_not_sms' => 0);
-          $toPhoneNumbers = CRM_Core_BAO_Phone::allPhones($dao->contactID, FALSE, 'Mobile', $filters);
-          //to get primary mobile ph,if not get a first mobile phONE
-          if (!empty($toPhoneNumbers)) {
-            $toPhoneNumberDetails = reset($toPhoneNumbers);
-            $toPhoneNumber = CRM_Utils_Array::value('phone', $toPhoneNumberDetails);
-            //contact allows to send sms
-            $toDoNotSms = 0;
-          }
-        }
-        if ($actionSchedule->mode == 'Email' or $actionSchedule->mode == 'User_Preference') {
-          $toEmail = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
-        }
-        if ($toEmail || !(empty($toPhoneNumber) or $toDoNotSms)) {
-          $to['email'] = $toEmail;
-          $to['phone'] = $toPhoneNumber;
+        $errorMsg = '';
+        $toEmail  = CRM_Contact_BAO_Contact::getPrimaryEmail($dao->contactID);
+        if ($toEmail) {
           $result =
             CRM_Core_BAO_ActionSchedule::sendReminder(
               $dao->contactID,
-              $to,
+              $toEmail,
               $actionSchedule->id,
               $fromEmailAddress,
               $entityTokenParams
@@ -894,13 +755,6 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
     }
   }
 
-  /**
-   * @param $mappingID
-   * @param $now
-   * @param array $params
-   *
-   * @throws API_Exception
-   */
   static function buildRecipientContacts($mappingID, $now, $params = array()) {
     $actionSchedule = new CRM_Core_DAO_ActionSchedule();
     $actionSchedule->mapping_id = $mappingID;
@@ -921,6 +775,7 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
       // 'limit to' option
       $select = $join = $where = $limitWhere = array();
       $limitTo = $actionSchedule->limit_to;
+      $isSendToAdditionalContacts = (!is_null($limitTo) && $limitTo == 0 && (!empty($actionSchedule->group_id) || !empty($actionSchedule->recipient_manual))) ? TRUE : FALSE;
       $value = explode(CRM_Core_DAO::VALUE_SEPARATOR,
         trim($actionSchedule->entity_value, CRM_Core_DAO::VALUE_SEPARATOR)
       );
@@ -930,8 +785,6 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         trim($actionSchedule->entity_status, CRM_Core_DAO::VALUE_SEPARATOR)
       );
       $status = implode(',', $status);
-
-      $anniversary = false;
 
       if (!CRM_Utils_System::isNull($mapping->entity_recipient)) {
         $recipientOptions = CRM_Core_OptionGroup::values($mapping->entity_recipient, FALSE, FALSE, FALSE, NULL, 'name');
@@ -1051,42 +904,6 @@ WHERE reminder.action_schedule_id = %1 AND reminder.action_date_time IS NULL
         $where[] = "e.status_id IN ({$mStatus})";
       }
 
-      if ($mapping->entity == 'civicrm_contact') {
-        if ($value == 'birth_date') {
-          $dateDBField = 'birth_date';
-          $table = 'civicrm_contact e';
-          $contactField = 'e.id';
-          $where[] = 'e.is_deleted = 0';
-          $where[] = 'e.is_deceased = 0';
-        }
-        else {
-          //custom field
-          $customFieldParams = array('id' => substr($value, 7));
-          $customGroup = $customField = array();
-          CRM_Core_BAO_CustomField::retrieve($customFieldParams, $customField);
-          $dateDBField = $customField['column_name'];
-          $customGroupParams = array('id' => $customField['custom_group_id'], $customGroup);
-          CRM_Core_BAO_CustomGroup::retrieve($customGroupParams, $customGroup);
-          $from = $table = "{$customGroup['table_name']} e";
-          $contactField = 'e.entity_id';
-          $where[] = '1'; // possible to have no "where" in this case
-        }
-
-        $status_ = explode(',', $status);
-        if (in_array(2, $status_)) {
-          // anniversary mode:
-          $dateField = 'DATE_ADD(e.' . $dateDBField . ', INTERVAL ROUND(DATEDIFF(DATE(' . $now . '), e.' . $dateDBField . ') / 365) YEAR)';
-          $anniversary = true;
-        }
-        else {
-          // regular mode:
-          $dateField = 'e.' . $dateDBField;
-        }
-        // TODO get this working
-
-        // TODO: Make sure everything's provided for repetition, etc.
-      }
-
       // CRM-13577 Introduce Smart Groups Handling
       if ($actionSchedule->group_id) {
 
@@ -1158,14 +975,7 @@ reminder.entity_id          = e.id AND
 reminder.entity_table       = '{$mapping->entity}' AND
 reminder.action_schedule_id = %1";
 
-      if ($anniversary) {
-        // only consider reminders less than 11 months ago
-        $reminderJoinClause .= " AND reminder.action_date_time > DATE_SUB({$now}, INTERVAL 11 MONTH)";
-      }
-
-      if ($table != 'civicrm_contact e') {
-        $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
-      }
+      $join[] = "INNER JOIN civicrm_contact c ON c.id = {$contactField} AND c.is_deleted = 0 AND c.is_deceased = 0 ";
 
       if ($actionSchedule->start_action_date) {
         $startDateClause = array();
@@ -1208,8 +1018,7 @@ LEFT JOIN {$reminderJoinClause}
 {$whereClause} {$limitWhereClause} AND {$dateClause} {$notINClause}
 ";
       CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
-
-      if ($limitTo == 0 && (!empty($addGroup) || !empty($addWhere))) {
+      if ($isSendToAdditionalContacts) {
         $additionWhere = ' WHERE ';
         if ($actionSchedule->start_action_date) {
           $additionWhere = $whereClause . ' AND ';
@@ -1227,12 +1036,12 @@ LEFT JOIN {$reminderJoinClause}
         $insertAdditionalSql ="
 INSERT INTO civicrm_action_log (contact_id, entity_id, entity_table, action_schedule_id)
 {$addSelect}
-FROM ({$contactTable})
+FROM ({$contactTable}, {$table})
 LEFT JOIN {$additionReminderClause}
 {$addGroup}
-WHERE c.is_deleted = 0 AND c.is_deceased = 0
+{$additionWhere} c.is_deleted = 0 AND c.is_deceased = 0
 {$addWhereClause}
-
+AND {$dateClause}
 AND c.id NOT IN (
      SELECT rem.contact_id
      FROM civicrm_action_log rem INNER JOIN {$mapping->entity} e ON rem.entity_id = e.id
@@ -1274,11 +1083,12 @@ GROUP BY c.id
         // event (e.g membership_end_date) has changed then the reminder may no longer apply
         // @todo - this only handles events that get moved later. Potentially they might get moved earlier
         $originalEventStartDateClause = empty($startDateClause) ? '' : 'AND' . $startDateClause[0];
+
         $sqlInsertValues = "{$selectClause}
 {$fromClause}
 {$joinClause}
 INNER JOIN {$reminderJoinClause}
-{$whereClause} {$limitWhereClause} AND {$repeatEventClause} {$originalEventStartDateClause} {$notINClause}
+{$whereClause} {$limitWhereClause} AND {$repeatEventClause} {$notINClause} $originalEventStartDateClause
 {$groupByClause}
 {$havingClause}";
 
@@ -1297,7 +1107,7 @@ INNER JOIN {$reminderJoinClause}
           CRM_Core_DAO::executeQuery($query, array(1 => array($actionSchedule->id, 'Integer')));
         }
 
-        if ($limitTo == 0) {
+        if ($isSendToAdditionalContacts) {
           $addSelect .= ', MAX(reminder.action_date_time) as latest_log_time';
           $sqlEndEventCheck = "
 SELECT * FROM {$table}
@@ -1332,11 +1142,6 @@ GROUP BY reminder.contact_id
     }
   }
 
-  /**
-   * @param $field
-   *
-   * @return null|string
-   */
   static function permissionedRelationships($field) {
     $query = '
 SELECT    cm.id AS owner_id, cm.contact_id AS owner_contact, m.id AS slave_id, m.contact_id AS slave_contact, cmt.relationship_type_id AS relation_type, rel.contact_id_a, rel.contact_id_b, rel.is_permission_a_b, rel.is_permission_b_a
@@ -1367,12 +1172,6 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return NULL;
   }
 
-  /**
-   * @param null $now
-   * @param array $params
-   *
-   * @return array
-   */
   static function processQueue($now = NULL, $params = array()) {
     $now = $now ? CRM_Utils_Time::setTime($now) : CRM_Utils_Time::getTime();
 
@@ -1407,12 +1206,6 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return CRM_Core_DAO::singleValueQuery($queryString, $params);
   }
 
-  /**
-   * @param $mappingID
-   * @param $recipientType
-   *
-   * @return array
-   */
   static function getRecipientListing($mappingID, $recipientType) {
     $options = array();
     if (!$mappingID || !$recipientType) {
@@ -1424,7 +1217,7 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     switch ($mapping['entity']) {
       case 'civicrm_participant':
         $eventContacts = CRM_Core_OptionGroup::values('event_contacts', FALSE, FALSE, FALSE, NULL, 'name');
-        if (empty($eventContacts[$recipientType])) {
+        if (!CRM_Utils_Array::value($recipientType, $eventContacts)) {
           return $options;
         }
         if ($eventContacts[$recipientType] == 'participant_role') {
@@ -1436,3 +1229,4 @@ WHERE     m.owner_membership_id IS NOT NULL AND
     return $options;
   }
 }
+

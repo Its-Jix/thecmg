@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -80,16 +80,12 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
     $contributionStatuses = CRM_Contribute_PseudoConstant::contributionStatus(NULL, 'name');
     $financialItemStatus = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_FinancialItem', 'status_id');
     $itemStatus = NULL;
-    if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)
-      || $contribution->contribution_status_id == array_search('Pending refund', $contributionStatuses)) {
+    if ($contribution->contribution_status_id == array_search('Completed', $contributionStatuses)) {
       $itemStatus = array_search('Paid', $financialItemStatus);
     }
-    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses)
+    elseif ($contribution->contribution_status_id == array_search('Pending', $contributionStatuses) 
       || $contribution->contribution_status_id == array_search('In Progress', $contributionStatuses)) {
       $itemStatus = array_search('Unpaid', $financialItemStatus);
-    }
-    elseif ($contribution->contribution_status_id == array_search('Partially paid', $contributionStatuses)) {
-      $itemStatus = array_search('Partially paid', $financialItemStatus);
     }
     $params = array(
       'transaction_date'  => CRM_Utils_Date::isoToMysql($contribution->receive_date),
@@ -116,7 +112,8 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
     $trxn = CRM_Core_BAO_FinancialTrxn::getFinancialTrxnId($contribution->id, 'ASC', TRUE);
     $trxnId['id'] = $trxn['financialTrxnId'];
-    return self::create($params, NULL, $trxnId);
+
+    self::create($params, NULL, $trxnId);
   }
 
   /**
@@ -132,21 +129,13 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
    */
   static function create(&$params, $ids = NULL, $trxnIds = NULL) {
     $financialItem = new CRM_Financial_DAO_FinancialItem();
-    
-    if (!empty($ids['id'])) {
-      CRM_Utils_Hook::pre('edit', 'FinancialItem', $ids['id'], $params);
-    }
-    else {
-      CRM_Utils_Hook::pre('create', 'FinancialItem', NULL, $params);
-    }
-    
     $financialItem->copyValues($params);
-    if (!empty($ids['id'])) {
+    if (CRM_Utils_Array::value('id', $ids)) {
       $financialItem->id = $ids['id'];
     }
 
     $financialItem->save();
-    if (!empty($trxnIds['id'])) {
+    if (CRM_Utils_Array::value('id', $trxnIds)) {
       $entity_financial_trxn_params = array(
         'entity_table'      => "civicrm_financial_item",
         'entity_id'         => $financialItem->id,
@@ -156,16 +145,10 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
 
       $entity_trxn = new CRM_Financial_DAO_EntityFinancialTrxn();
       $entity_trxn->copyValues($entity_financial_trxn_params);
-      if (!empty($ids['entityFinancialTrxnId'])) {
+      if (CRM_Utils_Array::value('entityFinancialTrxnId', $ids)) {
         $entity_trxn->id = $ids['entityFinancialTrxnId'];
       }
       $entity_trxn->save();
-    }
-    if (!empty($ids['id'])) {
-      CRM_Utils_Hook::post('edit', 'FinancialItem', $financialItem->id, $financialItem);
-    }
-    else {      
-      CRM_Utils_Hook::post('create', 'FinancialItem', $financialItem->id, $financialItem);
     }
     return $financialItem;
   }
@@ -189,11 +172,9 @@ class CRM_Financial_BAO_FinancialItem extends CRM_Financial_DAO_FinancialItem {
   /**
    * retrive entity financial trxn details
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array  $params (reference ) an assoc array of name/value pairs
    *
-   * @param bool $maxId
-   *
-   * @internal param bool $maxID to retrive max id
+   * @param boolean $maxID to retrive max id
    *
    * @return array
    * @access public

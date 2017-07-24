@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -113,7 +113,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     $membershipType->copyValues($params);
     $membershipType->id = $id;
 
-    // $previousID is the old organization id for membership type i.e 'member_of_contact_id'. This is used when an oganization is changed.
+    // $previousID is the old organization id for memberhip type i.e 'member_of_contact_id'. This is used when an oganization is changed.
     $previousID = NULL;
     if ($membershipType->id) {
       $previousID = CRM_Core_DAO::getFieldValue('CRM_Member_DAO_MembershipType', $membershipType->id, 'member_of_contact_id');
@@ -134,9 +134,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Function to delete membership Types
    *
    * @param int $membershipTypeId
-   *
-   * @throws CRM_Core_Exception
-   * @return bool|mixed
    * @static
    */
   static function del($membershipTypeId) {
@@ -200,7 +197,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     );
     foreach ($membershipType as $id => $details) {
       foreach ($periodDays as $pDay) {
-        if (!empty($details[$pDay])) {
+        if (CRM_Utils_Array::value($pDay, $details)) {
           if ($details[$pDay] > 31) {
             $month    = substr($details[$pDay], 0, strlen($details[$pDay]) - 2);
             $day      = substr($details[$pDay], -2);
@@ -231,10 +228,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /**
    * Function to get membership Types
    *
-   * @param bool $public
-   *
-   * @return array
-   * @internal param int $membershipTypeId
+   * @param int $membershipTypeId
    * @static
    */
   static function getMembershipTypes($public = TRUE) {
@@ -257,8 +251,6 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    * Function to get membership Type Details
    *
    * @param int $membershipTypeId
-   *
-   * @return array|null
    * @static
    */
   static function getMembershipTypeDetails($membershipTypeId) {
@@ -280,11 +272,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   /**
    * Function to calculate start date and end date for new membership
    *
-   * @param int $membershipTypeId membership type id
+   * @param int  $membershipTypeId membership type id
    * @param date $joinDate member since ( in mysql date format )
    * @param date $startDate start date ( in mysql date format )
-   * @param null $endDate
-   * @param int $numRenewTerms how many membership terms are being added to end date (default is 1)
+   * @param int  $numRenewTerms    how many membership terms are being added to end date (default is 1)
    *
    * @return array associated array with  start date, end date and join date for the membership
    * @static
@@ -360,7 +351,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
         $fixedEndDate = date('Y-m-d', mktime(0, 0, 0,
             $dateParts[1],
             $dateParts[2] - 1,
-            $dateParts[0] + ($numRenewTerms * $membershipTypeDetails['duration_interval'])
+            $dateParts[0] + 1
           ));
 
         //make sure rollover window should be
@@ -606,14 +597,10 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
     return $memTypeOrgs;
   }
 
-  /**
-   * The function returns all the Organization for  all membershiptypes .
-   *
-   * @param null $membershipTypeId
-   *
-   * @return array
-   * @internal param array $allmembershipTypes array of allMembershipTypes
+  /** The function returns all the Organization for  all membershiptypes .
+   *  @param  array      $allmembershipTypes       array of allMembershipTypes
    *  with organization id Key - value pairs.
+   *
    */
   static function getMembershipTypeOrganization($membershipTypeId = NULL) {
     $allmembershipTypes = array();
@@ -659,17 +646,11 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
   }
 
 
-  /**
-   * @param $params
-   * @param $ids
-   * @param $previousID
-   * @param $membershipTypeId
-   */
   public static function createMembershipPriceField($params, $ids, $previousID, $membershipTypeId) {
 
     $priceSetId = CRM_Core_DAO::getFieldValue('CRM_Price_DAO_PriceSet', 'default_membership_type_amount', 'id', 'name');
 
-    if (!empty($params['member_of_contact_id'])) {
+    if (CRM_Utils_Array::value('member_of_contact_id', $params)) {
       $fieldName = $params['member_of_contact_id'];
     }
     else {
@@ -730,7 +711,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
 
       if ($previousID) {
         CRM_Member_Form_MembershipType::checkPreviousPriceField($previousID, $priceSetId, $membershipTypeId, $optionsIds);
-        if (!empty($optionsIds['option_id'])) {
+        if (CRM_Utils_Array::value('option_id', $optionsIds)) {
           $optionsIds['id'] = current(CRM_Utils_Array::value('option_id', $optionsIds));
         }
       }
@@ -748,7 +729,7 @@ class CRM_Member_BAO_MembershipType extends CRM_Member_DAO_MembershipType {
    *  @param  integer      financial type id
    */
   static function updateAllPriceFieldValue($membershipTypeId, $params) {
-    if (!empty($params['minimum_fee'])){
+    if (CRM_Utils_Array::value('minimum_fee', $params)){
       $amount = $params['minimum_fee'];
     }
     else {

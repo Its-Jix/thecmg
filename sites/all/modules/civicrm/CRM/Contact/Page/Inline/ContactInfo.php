@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -59,7 +59,8 @@ class CRM_Contact_Page_Inline_ContactInfo extends CRM_Core_Page {
 
     //get the current employer name
     if (CRM_Utils_Array::value('contact_type', $defaults) == 'Individual') {
-      if (!empty($defaults['employer_id']) && !empty($defaults['organization_name'])) {
+      if (CRM_Utils_Array::value('employer_id', $defaults) &&
+        CRM_Utils_Array::value('organization_name', $defaults)) {
         $defaults['current_employer'] = $defaults['organization_name'];
         $defaults['current_employer_id'] = $defaults['employer_id'];
       }

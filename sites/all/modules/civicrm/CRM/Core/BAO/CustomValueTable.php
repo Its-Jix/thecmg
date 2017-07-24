@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,17 +28,12 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Core_BAO_CustomValueTable {
 
-  /**
-   * @param $customParams
-   *
-   * @throws Exception
-   */
   static function create(&$customParams) {
     if (empty($customParams) ||
       !is_array($customParams)
@@ -96,7 +91,7 @@ class CRM_Core_BAO_CustomValueTable {
                   CRM_Utils_Array::lookupValue($states, 'state_province',
                     CRM_Core_PseudoConstant::stateProvince(), TRUE
                   );
-                  if (empty($states['state_province_id'])) {
+                  if (!CRM_Utils_Array::value('state_province_id', $states)) {
                     CRM_Utils_Array::lookupValue($states, 'state_province',
                       CRM_Core_PseudoConstant::stateProvinceAbbreviation(), TRUE
                     );
@@ -133,7 +128,7 @@ class CRM_Core_BAO_CustomValueTable {
                   CRM_Utils_Array::lookupValue($countries, 'country',
                     CRM_Core_PseudoConstant::country(), TRUE
                   );
-                  if (empty($countries['country_id'])) {
+                  if (!CRM_Utils_Array::value('country_id', $countries)) {
                     CRM_Utils_Array::lookupValue($countries, 'country',
                       CRM_Core_PseudoConstant::countryIsoCode(), TRUE
                     );
@@ -255,8 +250,6 @@ class CRM_Core_BAO_CustomValueTable {
    *
    * @param string $type the civicrm type string
    *
-   * @param int $maxLength
-   *
    * @return the mysql data store placeholder
    * @access public
    * @static
@@ -305,11 +298,6 @@ class CRM_Core_BAO_CustomValueTable {
     }
   }
 
-  /**
-   * @param $params
-   * @param $entityTable
-   * @param $entityID
-   */
   static function store(&$params, $entityTable, $entityID) {
     $cvParams = array();
     foreach ($params as $fieldID => $param) {
@@ -332,7 +320,7 @@ class CRM_Core_BAO_CustomValueTable {
           $cvParam['type'] = 'Timestamp';
         }
 
-        if (!empty($customValue['id'])) {
+        if (CRM_Utils_Array::value('id', $customValue)) {
           $cvParam['id'] = $customValue['id'];
         }
         if (!array_key_exists($customValue['table_name'], $cvParams)) {
@@ -351,13 +339,6 @@ class CRM_Core_BAO_CustomValueTable {
     }
   }
 
-  /**
-   * @param $params
-   * @param $customFields
-   * @param $entityTable
-   * @param $entityID
-   * @param $customFieldExtends
-   */
   static function postProcess(&$params, &$customFields, $entityTable, $entityID, $customFieldExtends) {
     $customData = CRM_Core_BAO_CustomField::postProcess($params,
       $customFields,
@@ -373,17 +354,15 @@ class CRM_Core_BAO_CustomValueTable {
   /**
    * Return an array of all custom values associated with an entity.
    *
-   * @param int $entityID Identification number of the entity
-   * @param string $entityType Type of entity that the entityID corresponds to, specified
+   * @param int         $entityID      Identification number of the entity
+   * @param string      $entityType    Type of entity that the entityID corresponds to, specified
    *                                   as a string with format "'<EntityName>'". Comma separated
    *                                   list may be used to specify OR matches. Allowable values
    *                                   are enumerated types in civicrm_custom_group.extends field.
    *                                   Optional. Default value assumes entityID references a
    *                                   contact entity.
-   * @param array $fieldIDs optional list of fieldIDs that we want to retrieve. If this
+   * @param array       $fieldIDs      optional list of fieldIDs that we want to retrieve. If this
    *                                   is set the entityType is ignored
-   *
-   * @param bool $formatMultiRecordField
    *
    * @return array      $fields        Array of custom values for the entity with key=>value
    *                                   pairs specified as civicrm_custom_field.id => custom value.
@@ -420,8 +399,7 @@ SELECT cg.table_name,
        cg.id as groupID,
        cg.is_multiple,
        cf.column_name,
-       cf.id as fieldID,
-       cf.data_type as fieldDataType
+       cf.id as fieldID
 FROM   civicrm_custom_group cg,
        civicrm_custom_field cf
 WHERE  cf.custom_group_id = cg.id
@@ -441,7 +419,6 @@ AND    $cond
       $fields[$dao->table_name][] = $dao->fieldID;
       $select[$dao->table_name][] = "{$dao->column_name} AS custom_{$dao->fieldID}";
       $isMultiple[$dao->table_name] = $dao->is_multiple ? TRUE : FALSE;
-      $file[$dao->table_name][$dao->fieldID] = $dao->fieldDataType;
     }
 
     $result = array();
@@ -453,29 +430,13 @@ AND    $cond
           $fieldName = "custom_{$fieldID}";
           if ($isMultiple[$tableName]) {
             if ($formatMultiRecordField) {
-              if($file[$tableName][$fieldID] == 'File') {
-                if($fileid = $dao->$fieldName) {
-                  $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
-                  $result["{$dao->id}"]["{$fieldID}"] = $fileurl[$dao->$fieldName];
-                }
-              }
-              else {
-                $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
-              }
+              $result["{$dao->id}"]["{$fieldID}"] = $dao->$fieldName;
             } else {
               $result["{$fieldID}_{$dao->id}"] = $dao->$fieldName;
             }
           }
           else {
-            if($file[$tableName][$fieldID] == 'File') {
-              if($fileid = $dao->$fieldName) {
-                $fileurl = CRM_Core_BAO_File::paperIconAttachment($tableName,$entityID);
-                $result[$fieldID] = $fileurl[$dao->$fieldName];
-              }
-            }
-            else {
-              $result[$fieldID] = $dao->$fieldName;
-            }
+            $result[$fieldID] = $dao->$fieldName;
           }
         }
       }
@@ -490,9 +451,6 @@ AND    $cond
    *
    * @array $params
    *
-   * @param $params
-   *
-   * @throws Exception
    * @return array
    * @static
    */
@@ -635,9 +593,6 @@ AND    cf.id IN ( $fieldIDList )
    *
    * @array $params
    *
-   * @param $params
-   *
-   * @throws Exception
    * @return array
    * @static
    */

@@ -1,8 +1,4 @@
 <?php
-
-/**
- * Class CRM_Core_DAO_Factory
- */
 class CRM_Core_DAO_Factory {
 
   static $_classes = array(
@@ -22,12 +18,6 @@ class CRM_Core_DAO_Factory {
 
   static $_suffix = '.php';
 
-  /**
-   * @param $className
-   *
-   * @return mixed
-   * @throws Exception
-   */
   static function &create($className) {
     $type = CRM_Utils_Array::value($className, self::$_classes);
     if (!$type) {

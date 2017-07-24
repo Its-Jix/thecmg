@@ -2,7 +2,7 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
  | Copyright Tech To The People (c) 2010                              |
  +--------------------------------------------------------------------+
@@ -34,12 +34,9 @@
  */
 
 /**
- * @deprecated api notice
- * @return string to indicate this entire api entity is deprecated
+ * Include utility functions
  */
-function _civicrm_api3_survey_respondant_deprecation() {
-  return 'The survey_respondant api is not currently supported.';
-}
+require_once 'api/v3/utils.php';
 
 /**
  * Get the list of signatories

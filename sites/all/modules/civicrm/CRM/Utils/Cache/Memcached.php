@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -81,9 +81,8 @@ class CRM_Utils_Cache_Memcached {
   /**
    * Constructor
    *
-   * @param array $config an array of configuration params
-   *
-   * @return \CRM_Utils_Cache_Memcached
+   * @param array   $config  an array of configuration params
+   * @return void
    */
   function __construct($config) {
     if (isset($config['host'])) {
@@ -108,13 +107,6 @@ class CRM_Utils_Cache_Memcached {
     }
   }
 
-  /**
-   * @param $key
-   * @param $value
-   *
-   * @return bool
-   * @throws Exception
-   */
   function set($key, &$value) {
     $key = $this->cleanKey($key);
     if (!$this->_cache->set($key, $value, $this->_timeout)) {
@@ -125,32 +117,17 @@ class CRM_Utils_Cache_Memcached {
     return TRUE;
   }
 
-  /**
-   * @param $key
-   *
-   * @return mixed
-   */
   function &get($key) {
     $key = $this->cleanKey($key);
     $result = $this->_cache->get($key);
     return $result;
   }
 
-  /**
-   * @param $key
-   *
-   * @return mixed
-   */
   function delete($key) {
     $key = $this->cleanKey($key);
     return $this->_cache->delete($key);
   }
 
-  /**
-   * @param $key
-   *
-   * @return mixed|string
-   */
   function cleanKey($key) {
     $key = preg_replace('/\s+|\W+/', '_', $this->_prefix . $key);
     if ( strlen($key) > self::MAX_KEY_LEN ) {
@@ -161,9 +138,6 @@ class CRM_Utils_Cache_Memcached {
     return $key;
   }
 
-  /**
-   * @return mixed
-   */
   function flush() {
     return $this->_cache->flush();
   }

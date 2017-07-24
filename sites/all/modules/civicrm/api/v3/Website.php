@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Website
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * @version $Id: Website.php 2011-03-16 ErikHommel $
  */
 
@@ -43,8 +43,6 @@
  * {@getfields website_create}
  * @example WebsiteCreate.php
  * {@example WebsiteCreate.php}
- *
- * @param $params
  *
  * @return array of newly created website property values.
  * @access public

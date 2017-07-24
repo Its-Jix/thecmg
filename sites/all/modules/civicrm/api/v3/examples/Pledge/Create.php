@@ -6,9 +6,9 @@
 function pledge_create_example(){
 $params = array(
   'contact_id' => 11,
-  'pledge_create_date' => '20140928',
-  'start_date' => '20140928',
-  'scheduled_date' => '20140930',
+  'pledge_create_date' => '20140213',
+  'start_date' => '20140213',
+  'scheduled_date' => '20140215',
   'amount' => '100',
   'pledge_status_id' => '2',
   'pledge_financial_type_id' => '1',
@@ -63,6 +63,8 @@ function pledge_create_expectedresult(){
           'modified_date' => '',
           'cancel_date' => '',
           'end_date' => '',
+          'honor_contact_id' => '',
+          'honor_type_id' => '',
           'max_reminders' => '',
           'initial_reminder_day' => '',
           'additional_reminder_day' => '',

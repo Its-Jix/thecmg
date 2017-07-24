@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -65,18 +65,6 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    */
   protected $_haveColumnHeader;
 
-  /**
-   * @param $fileName
-   * @param string $seperator
-   * @param $mapper
-   * @param bool $skipColumnHeader
-   * @param int $mode
-   * @param int $contactType
-   * @param int $onDuplicate
-   *
-   * @return mixed
-   * @throws Exception
-   */
   function run($fileName,
     $seperator = ',',
     &$mapper,
@@ -319,13 +307,6 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
     return $params;
   }
 
-  /**
-   * @param $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   */
   function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Member_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
@@ -349,8 +330,6 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
    * Store parser values
    *
    * @param CRM_Core_Session $store
-   *
-   * @param int $mode
    *
    * @return void
    * @access public
@@ -405,11 +384,10 @@ abstract class CRM_Member_Import_Parser extends CRM_Import_Parser {
   /**
    * Export data to a CSV file
    *
-   * @param $fileName
+   * @param string $filename
    * @param array $header
    * @param data $data
    *
-   * @internal param string $filename
    * @return void
    * @access public
    */

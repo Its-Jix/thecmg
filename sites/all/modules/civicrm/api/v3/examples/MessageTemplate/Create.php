@@ -5,13 +5,14 @@
  */
 function message_template_create_example(){
 $params = array(
-  'msg_title' => 'msg_title_131',
-  'msg_subject' => 'msg_subject_131',
-  'msg_text' => 'msg_text_131',
-  'msg_html' => 'msg_html_131',
-  'workflow_id' => 131,
+  'msg_title' => 'msg_title_55',
+  'msg_subject' => 'msg_subject_55',
+  'msg_text' => 'msg_text_55',
+  'msg_html' => 'msg_html_55',
+  'workflow_id' => 55,
   'is_default' => '1',
   'is_reserved' => 1,
+  'pdf_format_id' => '1',
 );
 
 try{
@@ -41,15 +42,15 @@ function message_template_create_expectedresult(){
   'values' => array(
       '2' => array(
           'id' => '2',
-          'msg_title' => 'msg_title_131',
-          'msg_subject' => 'msg_subject_131',
-          'msg_text' => 'msg_text_131',
-          'msg_html' => 'msg_html_131',
+          'msg_title' => 'msg_title_55',
+          'msg_subject' => 'msg_subject_55',
+          'msg_text' => 'msg_text_55',
+          'msg_html' => 'msg_html_55',
           'is_active' => '1',
-          'workflow_id' => '131',
+          'workflow_id' => '55',
           'is_default' => '1',
           'is_reserved' => '1',
-          'pdf_format_id' => '',
+          'pdf_format_id' => '1',
         ),
     ),
 );

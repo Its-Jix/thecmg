@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -63,9 +63,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * process website
    *
    * @param array $params associated array
-   * @param int $contactID contact id
-   *
-   * @param $skipDelete
+   * @param int   $contactID contact id
    *
    * @return void
    * @access public
@@ -88,11 +86,12 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         }
       }
 
-      if (empty($values['id']) &&
+      if (!CRM_Utils_Array::value('id', $values) &&
         is_array($ids) && !empty($ids)
       ) {
         foreach ($ids as $id => $value) {
-          if (($value['website_type_id'] == $values['website_type_id']) && !empty($values['url'])) {
+          if (($value['website_type_id'] == $values['website_type_id'])
+            && CRM_Utils_Array::value('url', $values)) {
             $values['id'] = $id;
             unset($ids[$id]);
             break;
@@ -100,7 +99,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
         }
       }
       $values['contact_id'] = $contactID;
-      if (!empty($values['url'])) {
+      if ( CRM_Utils_Array::value('url', $values) ) {
         self::add($values);
       }
     }
@@ -129,10 +128,7 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Given the list of params in the params array, fetch the object
    * and store the values in the values array
    *
-   * @param $params
-   * @param $values
-   *
-   * @internal param \entityBlock $array input parameters to find object
+   * @param array entityBlock input parameters to find object
    *
    * @return boolean
    * @access public
@@ -160,8 +156,6 @@ class CRM_Core_BAO_Website extends CRM_Core_DAO_Website {
    * Get all the websites for a specified contact_id
    *
    * @param int $id the contact id
-   *
-   * @param bool $updateBlankLocInfo
    *
    * @return array  the array of website details
    * @access public

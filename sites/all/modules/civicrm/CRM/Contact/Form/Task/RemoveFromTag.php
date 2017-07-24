@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -67,7 +67,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_contact');
-    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE);
+    CRM_Core_Form_Tag::buildQuickForm($this, $parentNames, 'civicrm_contact', NULL, TRUE, FALSE, TRUE);
 
     $this->addDefaultButtons(ts('Remove Tags from Contacts'));
   }
@@ -76,12 +76,6 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     $this->addFormRule(array('CRM_Contact_Form_Task_RemoveFromTag', 'formRule'));
   }
 
-  /**
-   * @param $form
-   * @param $rule
-   *
-   * @return array
-   */
   static function formRule($form, $rule) {
     $errors = array();
     if (empty($form['tag']) && empty($form['contact_taglist'])) {
@@ -95,7 +89,7 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     //get the submitted values in an array
@@ -104,12 +98,12 @@ class CRM_Contact_Form_Task_RemoveFromTag extends CRM_Contact_Form_Task {
     $contactTags = $tagList = array();
 
     // check if contact tags exists
-    if (!empty($params['tag'])) {
+    if (CRM_Utils_Array::value('tag', $params)) {
       $contactTags = $params['tag'];
     }
 
     // check if tags are selected from taglists
-    if (!empty($params['contact_taglist'])) {
+    if (CRM_Utils_Array::value('contact_taglist', $params)) {
       foreach ($params['contact_taglist'] as $val) {
         if ($val) {
           if (is_numeric($val)) {

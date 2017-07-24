@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,24 +28,16 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Upgrade_TwoOne_Form_TwoOneTwo extends CRM_Upgrade_Form {
-  /**
-   * @param null|object $version
-   */
   function __construct($version) {
     parent::__construct();
     $this->latestVersion = $version;
   }
 
-  /**
-   * @param $errorMessage
-   *
-   * @return bool
-   */
   function verifyPreDBState(&$errorMessage) {
     $errorMessage = ts('Pre-condition failed for upgrade to 2.1.2.');
     // check if the db is 2.2
@@ -146,11 +138,6 @@ AND civicrm_option_value.label = civicrm_participant.fee_level
     $this->setVersion($this->latestVersion);
   }
 
-  /**
-   * @param $errorMessage
-   *
-   * @return bool
-   */
   function verifyPostDBState(&$errorMessage) {
     $errorMessage = ts('Post-condition failed for upgrade to 2.1.2.');
     return $this->checkVersion($this->latestVersion);

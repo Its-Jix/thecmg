@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                       |
+ | CiviCRM version 4.4                                       |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                    |
+ | Copyright CiviCRM LLC (c) 2004-2013                    |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                      |
  |                                      |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -44,13 +44,6 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   );
 
   public $_drilldownReport = array('event/income' => 'Link to Detail Report');
-
-  /**
-   *
-   */
-  /**
-   *
-   */
   function __construct() {
     $this->_columns = array(
       'civicrm_contact' =>
@@ -168,12 +161,12 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
         'grouping' => 'event-fields',
         'filters' =>
         array(
-          'event_id' => array(
+          'event_id' =>
+          array(
             'name' => 'event_id',
             'title' => ts('Event'),
-            'operatorType' => CRM_Report_Form::OP_ENTITYREF,
-            'type' => CRM_Utils_Type::T_INT,
-            'attributes' => array('entity' => 'event', 'select' => array('minimumInputLength' => 0)),
+            'operatorType' => CRM_Report_Form::OP_MULTISELECT,
+            'options' => $this->getEventFilterOptions(),
           ),
           'sid' =>
           array(
@@ -292,11 +285,6 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
   }
 
   //Add The statistics
-  /**
-   * @param $rows
-   *
-   * @return array
-   */
   function statistics(&$rows) {
 
     $statistics = parent::statistics($rows);
@@ -336,15 +324,17 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_columnHeaders = array();
 
     //add blank column at the Start
-    if (array_key_exists('options', $this->_params) && !empty($this->_params['options']['blank_column_begin'])) {
+    if (array_key_exists('options', $this->_params) && CRM_Utils_Array::value('blank_column_begin', $this->_params['options'])) {
       $select[] = " '' as blankColumnBegin";
       $this->_columnHeaders['blankColumnBegin']['title'] = '_ _ _ _';
     }
     foreach ($this->_columns as $tableName => $table) {
       if (array_key_exists('fields', $table)) {
         foreach ($table['fields'] as $fieldName => $field) {
-          if (!empty($field['required']) || !empty($this->_params['fields'][$fieldName])) {
-            if (!empty($field['statistics'])) {
+          if (CRM_Utils_Array::value('required', $field) ||
+            CRM_Utils_Array::value($fieldName, $this->_params['fields'])
+          ) {
+            if (CRM_Utils_Array::value('statistics', $field)) {
               foreach ($field['statistics'] as $stat => $label) {
                 switch (strtolower($stat)) {
                   case 'sum':
@@ -375,13 +365,6 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_select = "SELECT " . implode(', ', $select) . " ";
   }
 
-  /**
-   * @param $fields
-   * @param $files
-   * @param $self
-   *
-   * @return array
-   */
   static function formRule($fields, $files, $self) {
     $errors = $grouping = array();
     return $errors;
@@ -391,7 +374,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->_from = "
       FROM civicrm_participant {$this->_aliases['civicrm_participant']}
          LEFT JOIN civicrm_event {$this->_aliases['civicrm_event']}
-              ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND {$this->_aliases['civicrm_event']}.is_template = 0
+              ON ({$this->_aliases['civicrm_event']}.id = {$this->_aliases['civicrm_participant']}.event_id ) AND ({$this->_aliases['civicrm_event']}.is_template IS NULL OR {$this->_aliases['civicrm_event']}.is_template = 0)
          LEFT JOIN civicrm_contact {$this->_aliases['civicrm_contact']}
               ON ({$this->_aliases['civicrm_participant']}.contact_id  = {$this->_aliases['civicrm_contact']}.id  )
          {$this->_aclFrom}
@@ -407,7 +390,7 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
               ON {$this->_aliases['civicrm_contact']}.id = {$this->_aliases['civicrm_phone']}.contact_id AND
                 {$this->_aliases['civicrm_phone']}.is_primary = 1
          LEFT JOIN civicrm_line_item {$this->_aliases['civicrm_line_item']}
-              ON {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant' AND {$this->_aliases['civicrm_participant']}.id ={$this->_aliases['civicrm_line_item']}.entity_id";
+              ON {$this->_aliases['civicrm_participant']}.id ={$this->_aliases['civicrm_line_item']}.entity_id AND {$this->_aliases['civicrm_line_item']}.entity_table = 'civicrm_participant'";
   }
 
   function storeWhereHavingClauseArray() {
@@ -417,14 +400,14 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
 
   function groupBy() {
     $this->_groupBy = "";
-    if (!empty($this->_params['group_bys']) &&
+    if (CRM_Utils_Array::value('group_bys', $this->_params) &&
       is_array($this->_params['group_bys']) &&
       !empty($this->_params['group_bys'])
     ) {
       foreach ($this->_columns as $tableName => $table) {
         if (array_key_exists('group_bys', $table)) {
           foreach ($table['group_bys'] as $fieldName => $field) {
-            if (!empty($this->_params['group_bys'][$fieldName])) {
+            if (CRM_Utils_Array::value($fieldName, $this->_params['group_bys'])) {
               $this->_groupBy[] = $field['dbAlias'];
             }
           }
@@ -465,9 +448,6 @@ class CRM_Report_Form_Event_ParticipantListCount extends CRM_Report_Form_Event {
     $this->endPostProcess($rows);
   }
 
-  /**
-   * @param $rows
-   */
   function alterDisplay(&$rows) {
 
     $entryFound = FALSE;

@@ -57,7 +57,6 @@ function uf_field_create_expectedresult(){
           'is_searchable' => '1',
           'location_type_id' => '1',
           'phone_type_id' => '1',
-          'website_type_id' => '',
           'label' => 'Test Phone',
           'field_type' => 'Contact',
           'is_reserved' => '',

@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -96,14 +96,12 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    * @return object
    */
   static function add(&$params, &$ids = array()) {
-    if(empty($params['id'])) {
-      $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
-      $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
-      $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
-      $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
-      $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
-    }
-    if (!empty($params['is_default'])) {
+    $params['is_active'] = CRM_Utils_Array::value('is_active', $params, FALSE);
+    $params['is_deductible'] = CRM_Utils_Array::value('is_deductible', $params, FALSE);
+    $params['is_tax'] = CRM_Utils_Array::value('is_tax', $params, FALSE);
+    $params['is_header_account'] = CRM_Utils_Array::value('is_header_account', $params, FALSE);
+    $params['is_default'] = CRM_Utils_Array::value('is_default', $params, FALSE);
+    if (CRM_Utils_Array::value('is_default', $params)) {
       $query = 'UPDATE civicrm_financial_account SET is_default = 0 WHERE financial_account_type_id = %1';
       $queryParams = array(1 => array($params['financial_account_type_id'], 'Integer'));
       CRM_Core_DAO::executeQuery($query, $queryParams);
@@ -112,9 +110,7 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
     // action is taken depending upon the mode
     $financialAccount = new CRM_Financial_DAO_FinancialAccount();
     $financialAccount->copyValues($params);
-    if (!empty($ids['contributionType'])) {
-      $financialAccount->id = CRM_Utils_Array::value('contributionType', $ids);
-    }
+    $financialAccount->id = CRM_Utils_Array::value('contributionType', $ids);
     $financialAccount->save();
     return $financialAccount;
   }
@@ -160,8 +156,6 @@ class CRM_Financial_BAO_FinancialAccount extends CRM_Financial_DAO_FinancialAcco
    *
    * @financialTypeId int      Financial Type Id
    *
-   * @param $financialTypeId
-   *
    * @return accounting code
    * @static
    */
@@ -187,7 +181,7 @@ WHERE cft.id = %1
    *
    * @param $financialAccountTypeId financial account type id
    *
-   * @param \account|string $accountTypeCode account type code
+   * @param $accountTypeCode account type code
    *
    * @return integer count
    * @static

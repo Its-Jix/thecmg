@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -39,9 +39,7 @@
     <div class="form-item">
         {strip}
   {* handle enable/disable actions*}
-   {include file="CRM/common/enableDisableApi.tpl"}
-   {include file="CRM/common/jsortable.tpl"}
-   {include file="CRM/common/crmeditable.tpl"}
+   {include file="CRM/common/enableDisable.tpl"}
         <table cellpadding="0" cellspacing="0" border="0">
            <thead class="sticky">
             <th>{ts}Name{/ts}</th>
@@ -53,9 +51,9 @@
             <th></th>
           </thead>
          {foreach from=$rows item=row}
-        <tr id="financial_type-{$row.id}" class="crm-entity {cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
-          <td class="crm-editable" data-field="name">{$row.name}</td>
-          <td class="crm-editable" data-field="description" data-type="textarea">{$row.description}</td>
+        <tr id="row_{$row.id}"class="{cycle values="odd-row,even-row"} {$row.class}{if NOT $row.is_active} disabled{/if}">
+          <td>{$row.name}</td>
+          <td>{$row.description}</td>
      <td>{$row.financial_account}</td>
           <td>{if $row.is_deductible eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
           <td>{if $row.is_reserved eq 1} {ts}Yes{/ts} {else} {ts}No{/ts} {/if}</td>
@@ -65,18 +63,19 @@
         {/foreach}
          </table>
         {/strip}
+
+        {if $action ne 1 and $action ne 2}
+      <div class="action-link">
+      <a href="{crmURL q="action=add&reset=1"}" id="newFinancialType" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Type{/ts}</span></a>
+        </div>
+        {/if}
     </div>
 </div>
 {else}
     <div class="messages status no-popup">
         <div class="icon inform-icon"></div>
-      {ts}None found.{/ts}
+        {capture assign=crmURL}{crmURL q="action=add&reset=1"}{/capture}
+        {ts 1=$crmURL}There are no Financial Types entered. You can <a href='%1'>add one</a>.{/ts}
     </div>
 {/if}
-  {if $action ne 1 and $action ne 2}
-    <div class="action-link">
-      <a href="{crmURL q="action=add&reset=1"}" id="newFinancialType" class="button"><span><div class="icon add-icon"></div>{ts}Add Financial Type{/ts}</span></a>
-      <a href="{crmURL p="civicrm/admin" q="reset=1"}" class="button cancel no-popup"><span><div class="icon ui-icon-close"></div> {ts}Done{/ts}</span></a>
-    </div>
-  {/if}
 {/if}

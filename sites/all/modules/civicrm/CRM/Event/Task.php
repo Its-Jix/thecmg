@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -71,59 +71,49 @@ class CRM_Event_Task {
    */
   static function &tasks() {
     if (!(self::$_tasks)) {
-      self::$_tasks = array(1 => array(
-        'title' => ts('Delete Participants'),
+      self::$_tasks = array(1 => array('title' => ts('Delete Participants'),
           'class' => 'CRM_Event_Form_Task_Delete',
           'result' => FALSE,
         ),
-        2 => array(
-          'title' => ts('Print Selected Rows'),
+        2 => array('title' => ts('Print Participants'),
           'class' => 'CRM_Event_Form_Task_Print',
           'result' => FALSE,
         ),
-        3 => array(
-          'title' => ts('Export Participants'),
+        3 => array('title' => ts('Export Participants'),
           'class' => array(
             'CRM_Export_Form_Select',
             'CRM_Export_Form_Map',
           ),
           'result' => FALSE,
         ),
-        4 => array(
-          'title' => ts('Batch Update Participants Via Profile'),
+        4 => array('title' => ts('Batch Update Participants Via Profile'),
           'class' => array(
             'CRM_Event_Form_Task_PickProfile',
             'CRM_Event_Form_Task_Batch',
           ),
           'result' => TRUE,
         ),
-        5 => array(
-          'title' => ts('Cancel Registration'),
+        5 => array('title' => ts('Cancel Registration'),
           'class' => 'CRM_Event_Form_Task_Cancel',
           'result' => FALSE,
         ),
-        6 => array(
-          'title' => ts('Send Email to Contacts'),
+        6 => array('title' => ts('Send Email to Contacts'),
           'class' => 'CRM_Event_Form_Task_Email',
           'result' => TRUE,
         ),
-        13 => array(
-          'title' => ts('New Smart Group'),
+        13 => array('title' => ts('New Smart Group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch',
           'result' => TRUE,
         ),
-        14 => array(
-          'title' => ts('Update Smart Group'),
+        14 => array('title' => ts('Update Smart Group'),
           'class' => 'CRM_Event_Form_Task_SaveSearch_Update',
           'result' => TRUE,
         ),
-        15 => array(
-          'title' => ts('Change Participant Status'),
+        15 => array('title' => ts('Change Participant Status'),
           'class' => 'CRM_Event_Form_Task_ParticipantStatus',
           'result' => TRUE,
         ),
-        16 => array(
-          'title' => ts('Print Event Name Badges'),
+        16 => array('title' => ts('Print Event Name Badges'),
           'class' => 'CRM_Event_Form_Task_Badge',
           'result' => FALSE,
         ),
@@ -152,9 +142,13 @@ class CRM_Event_Task {
     self::tasks();
     $titles = array();
     foreach (self::$_tasks as $id => $value) {
-      // skip Update Smart Group task
-      if ($id != self::SAVE_SEARCH_UPDATE) {
+      // skip Print Participants and Update Smart Group task
+      if (!in_array($id, array(
+        2, 14))) {
         $titles[$id] = $value['title'];
+      }
+      else {
+        continue;
       }
     }
     return $titles;

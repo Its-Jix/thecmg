@@ -183,7 +183,6 @@ class CRM_Utils_SQL_Select {
    *
    * PHP NULL's will be treated as SQL NULL's. The PHP string "null" will be treated as a string.
    *
-   * @throws CRM_Core_Exception
    * @return string SQL expression
    */
   public function interpolate($expr, $args) {

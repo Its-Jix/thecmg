@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -41,7 +41,7 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -67,11 +67,6 @@ class CRM_Admin_Form_Setting_Mail extends CRM_Admin_Form_Setting {
     parent::buildQuickForm($check);
   }
 
-  /**
-   * @param $fields
-   *
-   * @return array|bool
-   */
   static function formRule($fields) {
     $errors = array();
 

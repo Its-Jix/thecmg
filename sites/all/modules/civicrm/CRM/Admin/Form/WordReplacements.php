@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -44,7 +44,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     // but that's no longer the canonical store. Re-sync from canonical store to ensure
     // that we display that latest data. This is inefficient - at some point, we
     // should rewrite this UI.
-    CRM_Core_BAO_WordReplacement::rebuild(FALSE);
+    CRM_Core_BAO_WordReplacement::rebuild();
 
     $this->_soInstance = CRM_Utils_Array::value('instance', $_GET);
     $this->assign('soInstance', $this->_soInstance);
@@ -57,9 +57,6 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     CRM_Utils_System::appendBreadCrumb($breadCrumb);
   }
 
-  /**
-   * @return array
-   */
   public function setDefaultValues() {
     if ($this->_defaults !== NULL) {
       return $this->_defaults;
@@ -113,7 +110,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
   /**
    * Function to actually build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -137,7 +134,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
     if ($this->_soInstance) {
       $soInstances = array($this->_soInstance);
     }
-    elseif (!empty($_POST['old'])) {
+    elseif (CRM_Utils_Array::value('old', $_POST)) {
       $soInstances = $stringOverrideInstances = array_keys($_POST['old']);
     }
     elseif (!empty($this->_defaults) && is_array($this->_defaults)) {
@@ -198,8 +195,8 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
       elseif (!$v && $newValues[$k]) {
         $errors['old[' . $k . ']'] = ts('Please Enter the value for Original Word');
       }
-      elseif ((empty($newValues[$k]) && empty($oldValues[$k]))
-        && (!empty($enabled[$k]) || !empty($exactMatch[$k]))
+      elseif ((!CRM_Utils_Array::value($k, $newValues) && !CRM_Utils_Array::value($k, $oldValues))
+        && (CRM_Utils_Array::value($k, $enabled) || CRM_Utils_Array::value($k, $exactMatch))
       ) {
         $errors['old[' . $k . ']'] = ts('Please Enter the value for Original Word');
         $errors['new[' . $k . ']'] = ts('Please Enter the value for Replacement Word');
@@ -214,7 +211,7 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $params = $this->controller->exportValues($this->_name);
@@ -222,9 +219,13 @@ class CRM_Admin_Form_WordReplacements extends CRM_Core_Form {
 
     $enabled['exactMatch'] = $enabled['wildcardMatch'] = $disabled['exactMatch'] = $disabled['wildcardMatch'] = array();
     for ($i = 1; $i <= $this->_numStrings; $i++) {
-      if (!empty($params['new'][$i]) && !empty($params['old'][$i])) {
-        if (isset($params['enabled']) && !empty($params['enabled'][$i])) {
-          if (!empty($params['cb']) && !empty($params['cb'][$i])) {
+      if (CRM_Utils_Array::value($i, $params['new']) &&
+        CRM_Utils_Array::value($i, $params['old'])
+      ) {
+        if (isset($params['enabled']) && CRM_Utils_Array::value($i, $params['enabled'])) {
+          if (CRM_Utils_Array::value('cb', $params) &&
+            CRM_Utils_Array::value($i, $params['cb'])
+          ) {
             $enabled['exactMatch'] += array($params['old'][$i] => $params['new'][$i]);
           }
           else {

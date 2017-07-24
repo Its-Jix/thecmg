@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -31,7 +31,7 @@
  *
  * @package CiviCRM_APIv3
  * @subpackage API_Grant
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  */
 
 /**
@@ -49,7 +49,10 @@
  * @access public
  */
 function civicrm_api3_grant_create($params) {
-  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'Grant');
+  $values = array();
+  _civicrm_api3_custom_format_params($params, $values, 'Grant');
+  $params = array_merge($values, $params);
+  return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params, 'grant');
 }
 
 /**
@@ -65,16 +68,16 @@ function _civicrm_api3_grant_create_spec(&$params) {
 /**
  * Returns array of grants  matching a set of one or more group properties
  *
- * @param array $params Array of one or more valid
+ * @param array $params  (referance) Array of one or more valid
  *                       property_name=>value pairs. If $params is set
  *                       as null, all grants will be returned
  *
- * @return array Array of matching grants
+ * @return array  (referance) Array of matching grants
  * {@getfields grant_get}
  * @access public
  */
 function civicrm_api3_grant_get($params) {
-  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params, TRUE, 'Grant');
+  return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**

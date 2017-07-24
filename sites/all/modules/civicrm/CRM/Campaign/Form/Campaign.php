@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -119,7 +119,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     }
 
     // when custom data is included in form.
-    if (!empty($_POST['hidden_custom'])) {
+    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
       $this->set('type', 'Campaign');
       $this->set('subType', CRM_Utils_Array::value('campaign_type_id', $_POST));
       $this->set('entityId', $this->_campaignId);
@@ -136,7 +136,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return array
+   * @return None
    */
   function setDefaultValues() {
     $defaults = $this->_values;
@@ -215,6 +215,9 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
       return CRM_Custom_Form_CustomData::buildQuickForm($this);
     }
 
+    //campaign types.
+    $campaignTypes = CRM_Campaign_PseudoConstant::campaignType();
+
     //lets assign custom data type and subtype.
     $this->assign('customDataType', 'Campaign');
     $this->assign('entityID', $this->_campaignId);
@@ -235,36 +238,49 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
     $this->addDateTime('end_date', ts('End Date'), FALSE, array('formatType' => 'activityDateTime'));
 
     // add campaign type
-    $this->addSelect('campaign_type_id', array('onChange' => "CRM.buildCustomData( 'Campaign', this.value );"), TRUE);
+    $this->add('select', 'campaign_type_id', ts('Campaign Type'),
+      array(
+        '' => ts('- select -')) + $campaignTypes, TRUE,
+      array('onChange' => "CRM.buildCustomData( 'Campaign', this.value );")
+    );
 
     // add campaign status
-    $this->addSelect('status_id');
+    $campaignStatus = CRM_Campaign_PseudoConstant::campaignStatus();
+    $this->addElement('select', 'status_id', ts('Campaign Status'),
+      array(
+        '' => ts('- select -')) + $campaignStatus
+    );
 
-    // add External Identifier Element
-    $this->add('text', 'external_identifier', ts('External ID'),
+    // add External Identifire Element
+    $this->add('text', 'external_identifier', ts('External Id'),
       CRM_Core_DAO::getAttribute('CRM_Campaign_DAO_Campaign', 'external_identifier'), FALSE
     );
 
     // add Campaign Parent Id
-    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('parent_id', $this->_values), $this->_campaignId);
+    $campaigns = CRM_Campaign_BAO_Campaign::getCampaigns(CRM_Utils_Array::value('parent_id', $this->_values),
+      $this->_campaignId
+    );
     if (!empty($campaigns)) {
-      $this->addElement('select', 'parent_id', ts('Parent ID'),
-        array('' => ts('- select Parent -')) + $campaigns,
-        array('class' => 'crm-select2')
+      $this->addElement('select', 'parent_id', ts('Parent Id'),
+        array(
+          '' => ts('- select Parent -')) + $campaigns
       );
     }
-    $groups = CRM_Core_PseudoConstant::nestedGroup();
+
     //get the campaign groups.
-    $this->add('select', 'includeGroups',
-      ts('Include Group(s)'),
+    $groups = CRM_Core_PseudoConstant::nestedGroup();
+
+    $inG = &$this->addElement('advmultiselect', 'includeGroups',
+      ts('Include Group(s)') . ' ',
       $groups,
-      FALSE,
       array(
-        'multiple' => TRUE,
-        'class' => 'crm-select2 huge',
-        'placeholder' => ts('- none -'),
+        'size' => 5,
+        'style' => 'width:240px',
+        'class' => 'advmultiselect',
       )
     );
+    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
+    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
 
     $this->addWysiwyg('goal_general', ts('Campaign Goals'), array('rows' => 2, 'cols' => 40));
     $this->add('text', 'goal_revenue', ts('Revenue Goal'), array('size' => 8, 'maxlength' => 12));
@@ -298,11 +314,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    * This function is used to add the rules (mainly global rules) for form.
    * All local rules are added near the element
    *
-   * @param $fields
-   * @param $files
-   * @param $errors
-   *
-   * @return bool|array
+   * @return None
    * @access public
    * @see valid_date
    */
@@ -317,7 +329,7 @@ class CRM_Campaign_Form_Campaign extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     // store the submitted values in an array

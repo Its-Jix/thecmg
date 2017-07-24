@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -128,17 +128,6 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
     );
   }
 
-  /**
-   * This function sets the default values for the form. Note that in edit/view mode
-   * the default values are retrieved from the database
-   *
-   * @access public
-   *
-   * @return void
-   */
-  /**
-   *
-   */
   function setDefaultValues() {
     $defaults = array();
     // check if there is a widget already created
@@ -210,25 +199,22 @@ class CRM_Contribute_Form_ContributionPage_Widget extends CRM_Contribute_Form_Co
    *
    * @param array $params (ref.) an assoc array of name/value pairs
    *
-   * @param $files
-   * @param $self
-   *
    * @return mixed true or array of errors
    * @access public
    * @static
    */
   public static function formRule($params, $files, $self) {
     $errors = array();
-    if (!empty($params['is_active'])) {
-      if (empty($params['title'])) {
+    if (CRM_Utils_Array::value('is_active', $params)) {
+      if (!CRM_Utils_Array::value('title', $params)) {
         $errors['title'] = ts('Title is a required field.');
       }
-      if (empty($params['about'])) {
+      if (!CRM_Utils_Array::value('about', $params)) {
         $errors['about'] = ts('About is a required field.');
       }
 
       foreach ($params as $key => $val) {
-        if (substr($key, 0, 6) == 'color_' && empty($params[$key])) {
+        if (substr($key, 0, 6) == 'color_' && !CRM_Utils_Array::value($key, $params)) {
           $errors[$key] = ts('%1 is a required field.', array(1 => $self->_colorFields[$key][0]));
         }
       }

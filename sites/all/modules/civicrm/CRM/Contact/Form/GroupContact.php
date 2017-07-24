@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -62,7 +62,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -102,7 +102,7 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
         $msg = ts('Add to a group');
       }
 
-      $this->add('select', 'group_id', '', $groupSelect, TRUE, array('class' => 'crm-select2 crm-action-menu action-icon-plus', 'placeholder' => $msg));
+      $this->add('select', 'group_id', $msg, $groupSelect, TRUE);
 
       $this->addButtons(array(
           array(
@@ -119,11 +119,12 @@ class CRM_Contact_Form_GroupContact extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $contactID = array($this->_contactId);
     $groupId   = $this->controller->exportValue('GroupContact', 'group_id');
+    $method    = 'Admin';
     $method    = ($this->_context == 'user') ? 'Web' : 'Admin';
 
     $session = CRM_Core_Session::singleton();

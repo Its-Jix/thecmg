@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -340,7 +340,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
       }
     }
 
-    if (!empty($fields['saveMapping'])) {
+    if (CRM_Utils_Array::value('saveMapping', $fields)) {
       $nameField = CRM_Utils_Array::value('saveMappingName', $fields);
       if (empty($nameField)) {
         $errors['saveMappingName'] = ts('Name is required to save Import Mapping');
@@ -418,12 +418,12 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
 
     $this->set('mapper', $mapper);
     // store mapping Id to display it in the preview page
-    if (!empty($params['mappingId'])) {
+    if (CRM_Utils_Array::value('mappingId', $params)) {
       $this->set('loadMappingId', $params['mappingId']);
     }
 
     //Updating Mapping Records
-    if (!empty($params['updateMapping'])) {
+    if (CRM_Utils_Array::value('updateMapping', $params)) {
 
       $mappingFields = new CRM_Core_DAO_MappingField();
       $mappingFields->mapping_id = $params['mappingId'];
@@ -448,7 +448,7 @@ class CRM_Activity_Import_Form_MapField extends CRM_Import_Form_MapField {
     }
 
     //Saving Mapping Details and Records
-    if (!empty($params['saveMapping'])) {
+    if (CRM_Utils_Array::value('saveMapping', $params)) {
       $mappingParams = array(
         'name' => $params['saveMappingName'],
         'description' => $params['saveMappingDesc'],

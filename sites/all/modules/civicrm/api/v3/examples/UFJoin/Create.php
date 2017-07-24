@@ -47,7 +47,6 @@ function uf_join_create_expectedresult(){
           'entity_id' => '1',
           'weight' => '1',
           'uf_group_id' => '11',
-          'module_data' => '',
         ),
     ),
 );

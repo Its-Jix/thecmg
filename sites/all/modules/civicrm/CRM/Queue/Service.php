@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -40,12 +40,10 @@
  *
  * // Some time later...
  * $item = $queue->claimItem();
- * if ($item) {
- *   if (my_process($item->data)) {
- *     $queue->deleteItem($item);
- *   } else {
- *     $queue->releaseItem($item);
- *   }
+ * if (my_process($item->data)) {
+ *   $myMessage->deleteItem();
+ * } else {
+ *   $myMessage->releaseItem();
  * }
  * @endcode
  */
@@ -58,8 +56,6 @@ class CRM_Queue_Service {
    * becomes available.
    *
    * @param $forceNew bool
-   *
-   * @return \CRM_Queue_Service
    */
   static function &singleton($forceNew = FALSE) {
     if ($forceNew || !self::$_singleton) {
@@ -72,10 +68,6 @@ class CRM_Queue_Service {
    * @var array(queueName => CRM_Queue_Queue)
    */
   var $queues;
-
-  /**
-   *
-   */
   function __construct() {
     $this->queues = array();
   }

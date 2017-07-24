@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,7 @@
  * @package CiviCRM_APIv3
  * @subpackage API_Domain
  *
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * @version $Id: Domain.php 30171 2010-10-14 09:11:27Z mover $
  *
  */
@@ -48,12 +48,9 @@ function civicrm_api3_domain_get($params) {
   unset($params['version']);
 
   $bao = new CRM_Core_BAO_Domain();
-  if (!empty($params['current_domain'])) {
+  if (CRM_Utils_Array::value('current_domain', $params)) {
     $domainBAO = CRM_Core_Config::domainID();
     $params['id'] = $domainBAO;
-  }
-  if (!empty($params['options']) && !empty($params['options']['is_count'])) {
-    return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
   }
 
   _civicrm_api3_dao_set_filter($bao, $params, true, 'domain');
@@ -66,40 +63,38 @@ function civicrm_api3_domain_get($params) {
         'contact_id' => $domain['contact_id']
       );
       $values['location'] = CRM_Core_BAO_Location::getValues($locparams, TRUE);
-
       $address_array = array(
         'street_address', 'supplemental_address_1', 'supplemental_address_2',
         'city', 'state_province_id', 'postal_code', 'country_id',
         'geo_code_1', 'geo_code_2',
       );
 
-      if ( !empty( $values['location']['email'] ) ) {
+      if (!empty($values['location']['email'])) {
         $domain['domain_email'] = CRM_Utils_Array::value('email', $values['location']['email'][1]);
       }
 
-      if ( !empty( $values['location']['phone'] ) ) {
+      if (!empty($values['location']['phone'])) {
         $domain['domain_phone'] = array(
-          'phone_type' => CRM_Core_OptionGroup::getLabel(
-          'phone_type',
-          CRM_Utils_Array::value(
-            'phone_type_id',
-          $values['location']['phone'][1]
-        )
-      ),
-        'phone' => CRM_Utils_Array::value(
-          'phone',
-        $values['location']['phone'][1]
-        )
-    );
-    }
-
-    if ( !empty( $values['location']['address'] ) ) {
-      foreach ($address_array as $value) {
-        $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
-          $values['location']['address'][1]
+          'phone_type' => CRM_Core_PseudoConstant::getLabel('CRM_Core_BAO_Phone', 'phone_type_id',
+            CRM_Utils_Array::value(
+              'phone_type_id',
+              $values['location']['phone'][1]
+            )
+          ),
+          'phone' => CRM_Utils_Array::value(
+            'phone',
+            $values['location']['phone'][1]
+          ),
         );
       }
-    }
+
+      if (!empty($values['location']['address'])) {
+        foreach ($address_array as $value) {
+          $domain['domain_address'][$value] = CRM_Utils_Array::value($value,
+          $values['location']['address'][1]
+          );
+        }
+      }
 
       list($domain['from_name'],
         $domain['from_email']

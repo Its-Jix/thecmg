@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,25 +28,18 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Case_BAO_Query {
 
-  /**
-   * @param bool $excludeActivityFields
-   *
-   * @return array
-   */
-  static function &getFields($excludeActivityFields = FALSE) {
+  static function &getFields() {
     $fields = array();
     $fields = CRM_Case_BAO_Case::exportableFields();
 
     // add activity related fields
-    if (!$excludeActivityFields) {
-      $fields = array_merge($fields, CRM_Activity_BAO_Activity::exportableFields('Case'));
-    }
+    $fields = array_merge($fields, CRM_Activity_BAO_Activity::exportableFields('Case'));
 
     return $fields;
   }
@@ -54,79 +47,79 @@ class CRM_Case_BAO_Query {
   /**
    * build select for Case
    *
-   * @param $query
-   *
    * @return void
    * @access public
    */
   static function select(&$query) {
-    if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) || !empty($query->_returnProperties['case_id'])) {
+    if (($query->_mode & CRM_Contact_BAO_Query::MODE_CASE) ||
+      CRM_Utils_Array::value('case_id', $query->_returnProperties)
+    ) {
       $query->_select['case_id'] = "civicrm_case.id as case_id";
       $query->_element['case_id'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
       $query->_tables['civicrm_case_contact'] = $query->_whereTables['civicrm_case_contact'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_type_id'])) {
-      $query->_select['case_type_id'] = "civicrm_case_type.id as case_type_id";
+    if (CRM_Utils_Array::value('case_type_id', $query->_returnProperties)) {
+      $query->_select['case_type_id'] = "case_type.id as case_type_id";
       $query->_element['case_type_id'] = 1;
       $query->_tables['case_type'] = $query->_whereTables['case_type'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_type'])) {
-      $query->_select['case_type'] = "civicrm_case_type.title as case_type";
+    if (CRM_Utils_Array::value('case_type', $query->_returnProperties)) {
+      $query->_select['case_type'] = "case_type.label as case_type";
       $query->_element['case_type'] = 1;
       $query->_tables['case_type'] = $query->_whereTables['case_type'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_start_date'])) {
+    if (CRM_Utils_Array::value('case_start_date', $query->_returnProperties)) {
       $query->_select['case_start_date'] = "civicrm_case.start_date as case_start_date";
       $query->_element['case_start_date'] = 1;
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_end_date'])) {
+    if (CRM_Utils_Array::value('case_end_date', $query->_returnProperties)) {
       $query->_select['case_end_date'] = "civicrm_case.end_date as case_end_date";
       $query->_element['case_end_date'] = 1;
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_status_id'])) {
+    if (CRM_Utils_Array::value('case_status_id', $query->_returnProperties)) {
       $query->_select['case_status_id'] = "case_status.id as case_status_id";
       $query->_element['case_status_id'] = 1;
       $query->_tables['case_status_id'] = $query->_whereTables['case_status_id'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_status'])) {
+    if (CRM_Utils_Array::value('case_status', $query->_returnProperties)) {
       $query->_select['case_status'] = "case_status.label as case_status";
       $query->_element['case_status'] = 1;
       $query->_tables['case_status_id'] = $query->_whereTables['case_status_id'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_deleted'])) {
+    if (CRM_Utils_Array::value('case_deleted', $query->_returnProperties)) {
       $query->_select['case_deleted'] = "civicrm_case.is_deleted as case_deleted";
       $query->_element['case_deleted'] = 1;
       $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_role'])) {
+    if (CRM_Utils_Array::value('case_role', $query->_returnProperties)) {
       $query->_select['case_role'] = "case_relation_type.label_b_a as case_role";
       $query->_element['case_role'] = 1;
       $query->_tables['case_relationship'] = $query->_whereTables['case_relationship'] = 1;
       $query->_tables['case_relation_type'] = $query->_whereTables['case_relation_type'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_recent_activity_date'])) {
+    if (CRM_Utils_Array::value('case_recent_activity_date', $query->_returnProperties)) {
       $query->_select['case_recent_activity_date'] = "case_activity.activity_date_time as case_recent_activity_date";
       $query->_element['case_recent_activity_date'] = 1;
       $query->_tables['case_activity'] = $query->_whereTables['case_activity'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_activity_subject'])) {
+    if (CRM_Utils_Array::value('case_activity_subject', $query->_returnProperties)) {
       $query->_select['case_activity_subject'] = "case_activity.subject as case_activity_subject";
       $query->_element['case_activity_subject'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -134,14 +127,14 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_subject'])) {
+    if (CRM_Utils_Array::value('case_subject', $query->_returnProperties)) {
       $query->_select['case_subject'] = "civicrm_case.subject as case_subject";
       $query->_element['case_subject'] = 1;
       $query->_tables['civicrm_case_contact'] = 1;
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_source_contact_id'])) {
+    if (CRM_Utils_Array::value('case_source_contact_id', $query->_returnProperties)) {
       $query->_select['case_source_contact_id'] = "civicrm_case_reporter.sort_name as case_source_contact_id";
       $query->_element['case_source_contact_id'] = 1;
       $query->_tables['civicrm_case_reporter'] = 1;
@@ -150,7 +143,7 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_activity_status_id'])) {
+    if (CRM_Utils_Array::value('case_activity_status_id', $query->_returnProperties)) {
       $query->_select['case_activity_status_id'] = "rec_activity_status.id as case_activity_status_id";
       $query->_element['case_activity_status_id'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -159,7 +152,7 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_activity_status'])) {
+    if (CRM_Utils_Array::value('case_activity_status', $query->_returnProperties)) {
       $query->_select['case_activity_status'] = "rec_activity_status.label as case_activity_status";
       $query->_element['case_activity_status'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -168,7 +161,7 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_activity_duration'])) {
+    if (CRM_Utils_Array::value('case_activity_duration', $query->_returnProperties)) {
       $query->_select['case_activity_duration'] = "case_activity.duration as case_activity_duration";
       $query->_element['case_activity_duration'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -176,7 +169,7 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_activity_medium_id'])) {
+    if (CRM_Utils_Array::value('case_activity_medium_id', $query->_returnProperties)) {
       $query->_select['case_activity_medium_id'] = "recent_activity_medium.label as case_activity_medium_id";
       $query->_element['case_activity_medium_id'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -185,7 +178,7 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_activity_details'])) {
+    if (CRM_Utils_Array::value('case_activity_details', $query->_returnProperties)) {
       $query->_select['case_activity_details'] = "case_activity.details as case_activity_details";
       $query->_element['case_activity_details'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -193,7 +186,7 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_activity_is_auto'])) {
+    if (CRM_Utils_Array::value('case_activity_is_auto', $query->_returnProperties)) {
       $query->_select['case_activity_is_auto'] = "case_activity.is_auto as case_activity_is_auto";
       $query->_element['case_activity_is_auto'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -201,14 +194,14 @@ class CRM_Case_BAO_Query {
       $query->_tables['civicrm_case'] = 1;
     }
 
-    if (!empty($query->_returnProperties['case_scheduled_activity_date'])) {
+    if (CRM_Utils_Array::value('case_scheduled_activity_date', $query->_returnProperties)) {
       $query->_select['case_scheduled_activity_date'] = "case_activity.activity_date_time as case_scheduled_activity_date";
       $query->_element['case_scheduled_activity_date'] = 1;
       $query->_tables['case_activity'] = 1;
       $query->_tables['civicrm_case_contact'] = 1;
       $query->_tables['civicrm_case'] = 1;
     }
-    if (!empty($query->_returnProperties['case_recent_activity_type'])) {
+    if (CRM_Utils_Array::value('case_recent_activity_type', $query->_returnProperties)) {
       $query->_select['case_recent_activity_type'] = "rec_activity_type.label as case_recent_activity_type";
       $query->_element['case_recent_activity_type'] = 1;
       $query->_tables['case_activity'] = 1;
@@ -221,8 +214,6 @@ class CRM_Case_BAO_Query {
   /**
    * Given a list of conditions in query generate the required
    * where clause
-   *
-   * @param $query
    *
    * @return void
    * @access public
@@ -245,9 +236,6 @@ class CRM_Case_BAO_Query {
 
   /**
    * where clause for a single field
-   *
-   * @param $values
-   * @param $query
    *
    * @return void
    * @access public
@@ -281,7 +269,7 @@ class CRM_Case_BAO_Query {
         return;
 
       case 'case_type_id':
-        $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
+        $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
 
         if (is_array($value)) {
           foreach ($value as $k => $v) {
@@ -300,7 +288,11 @@ class CRM_Case_BAO_Query {
           $names[] = $caseTypes[$caseTypeId];
         }
 
-        $query->_where[$grouping][] = "(civicrm_case.case_type_id IN (" . implode(',', $val) . "))";
+        $value = CRM_Core_DAO::VALUE_SEPARATOR . implode(CRM_Core_DAO::VALUE_SEPARATOR . "%' OR civicrm_case.case_type_id LIKE '%" .
+          CRM_Core_DAO::VALUE_SEPARATOR, $val
+        ) . CRM_Core_DAO::VALUE_SEPARATOR;
+
+        $query->_where[$grouping][] = "(civicrm_case.case_type_id LIKE '%{$value}%')";
 
         $query->_qill[$grouping][] = ts('Case Type is %1', array(1 => implode(' ' . ts('or') . ' ', $names)));
         $query->_tables['civicrm_case'] = $query->_whereTables['civicrm_case'] = 1;
@@ -520,13 +512,6 @@ class CRM_Case_BAO_Query {
     }
   }
 
-  /**
-   * @param $name
-   * @param $mode
-   * @param $side
-   *
-   * @return string
-   */
   static function from($name, $mode, $side) {
     $from = "";
 
@@ -552,7 +537,8 @@ class CRM_Case_BAO_Query {
         break;
 
       case 'case_type':
-        $from .= " $side JOIN civicrm_case_type ON civicrm_case.case_type_id = civicrm_case_type.id ";
+        $from .= " $side JOIN civicrm_option_group option_group_case_type ON (option_group_case_type.name = 'case_type')";
+        $from .= " $side JOIN civicrm_option_value case_type ON (civicrm_case.case_type_id = case_type.value AND option_group_case_type.id = case_type.option_group_id ) ";
         break;
 
       case 'case_activity_type':
@@ -604,12 +590,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     return (isset($this->_qill)) ? $this->_qill : "";
   }
 
-  /**
-   * @param $mode
-   * @param bool $includeCustomFields
-   *
-   * @return array|null
-   */
   static function defaultReturnProperties($mode,
     $includeCustomFields = TRUE
   ) {
@@ -673,15 +653,12 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     return $properties;
   }
 
-  /**
-   * @param $tables
-   */
   static function tableNames(&$tables) {
-    if (!empty($tables['civicrm_case'])) {
+    if (CRM_Utils_Array::value('civicrm_case', $tables)) {
       $tables = array_merge(array('civicrm_case_contact' => 1), $tables);
     }
 
-    if (!empty($tables['case_relation_type'])) {
+    if (CRM_Utils_Array::value('case_relation_type', $tables)) {
       $tables = array_merge(array('case_relationship' => 1), $tables);
     }
   }
@@ -690,8 +667,6 @@ case_relation_type.id = case_relationship.relationship_type_id )";
    * add all the elements shared between case search and advanaced search
    *
    * @access public
-   *
-   * @param $form
    *
    * @return void
    * @static
@@ -703,7 +678,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $configured = CRM_Case_BAO_Case::isCaseConfigured();
     $form->assign('notConfigured', !$configured['configured']);
 
-    $caseTypes = CRM_Case_PseudoConstant::caseType('title', FALSE);
+    $caseTypes = CRM_Case_PseudoConstant::caseType('label', FALSE);
     foreach ($caseTypes as $id => $name) {
       $form->addElement('checkbox', "case_type_id[$id]", NULL, $name);
     }
@@ -736,7 +711,7 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     }
 
     $parentNames = CRM_Core_BAO_Tag::getTagSet('civicrm_case');
-    CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_case', NULL, TRUE, FALSE);
+    CRM_Core_Form_Tag::buildQuickForm($form, $parentNames, 'civicrm_case', NULL, TRUE, FALSE, TRUE);
 
     if (CRM_Core_Permission::check('administer CiviCRM')) {
       $form->addElement('checkbox', 'case_deleted', ts('Deleted Cases'));
@@ -762,10 +737,11 @@ case_relation_type.id = case_relationship.relationship_type_id )";
     $form->setDefaults(array('case_owner' => 1));
   }
 
-  /**
-   * @param $row
-   * @param $id
-   */
   static function searchAction(&$row, $id) {}
+
+  static function addShowHide(&$showHide) {
+    $showHide->addHide('caseForm');
+    $showHide->addShow('caseForm_show');
+  }
 }
 

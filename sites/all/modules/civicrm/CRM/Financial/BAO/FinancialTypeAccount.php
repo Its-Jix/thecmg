@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -56,10 +56,8 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * of time. This is the inverse function of create. It also stores all the retrieved
    * values in the default array
    *
-   * @param array $params (reference ) an assoc array of name/value pairs
+   * @param array $params   (reference ) an assoc array of name/value pairs
    * @param array $defaults (reference ) an assoc array to hold the flattened values
-   *
-   * @param array $allValues
    *
    * @return object CRM_Contribute_BAO_ContributionType object
    * @access public
@@ -97,7 +95,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
     else {
       $financialTypeAccount->id = CRM_Utils_Array::value('entityFinancialAccount', $ids);
     }
-    if (!empty($ids['entityFinancialAccount'])) {
+    if (CRM_Utils_Array::value('entityFinancialAccount', $ids)) {
       $financialTypeAccount->id = $ids['entityFinancialAccount'];
     }
     $financialTypeAccount->copyValues($params);
@@ -108,10 +106,7 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
   /**
    * Function to delete financial Types
    *
-   * @param $financialTypeAccountId
-   * @param null $accountId
-   *
-   * @internal param int $contributionTypeId
+   * @param int $contributionTypeId
    * @static
    */
   static function del($financialTypeAccountId, $accountId = null) {
@@ -170,8 +165,6 @@ class CRM_Financial_BAO_FinancialTypeAccount extends CRM_Financial_DAO_EntityFin
    * @param string $entityTable
    *
    * @param string $columnName Column to fetch
-   *
-   * @return null|string
    * @static
    */
   static function getFinancialAccount($entityId, $entityTable, $columnName = 'name') {
@@ -195,7 +188,6 @@ AND entity_id = %2";
    *
    * @param int $paymentInstrumentValue payment instrument value
    *
-   * @return array|null|string
    * @static
    */
   static function getInstrumentFinancialAccount($paymentInstrumentValue = NULL) {
@@ -227,10 +219,7 @@ WHERE cog.name = 'payment_instrument' ";
    * for financial type
    * CRM-12470
    *
-   * @param $financialType
-   *
-   * @return array
-   * @internal param int $financialTypeId financial type id
+   * @param int $financialTypeId financial type id
    *
    * @static
    */
@@ -239,72 +228,52 @@ WHERE cog.name = 'payment_instrument' ";
     $financialAccountTypeID = CRM_Core_PseudoConstant::accountOptionValues('financial_account_type');
     $accountRelationship = CRM_Core_PseudoConstant::accountOptionValues('account_relationship');
     $relationships = array (
-      array_search('Accounts Receivable Account is', $accountRelationship) => array_search('Asset', $financialAccountTypeID),
-      array_search('Expense Account is', $accountRelationship) => array_search('Expenses', $financialAccountTypeID),
-      array_search('Cost of Sales Account is', $accountRelationship) => array_search('Cost of Sales', $financialAccountTypeID),
-      array_search('Income Account is', $accountRelationship) => array_search('Revenue', $financialAccountTypeID),
+      array_search(ts('Accounts Receivable Account is'), $accountRelationship) => array_search(ts('Asset'), $financialAccountTypeID),
+      array_search(ts('Expense Account is'), $accountRelationship) => array_search(ts('Expenses'), $financialAccountTypeID),
+      array_search(ts('Cost of Sales Account is'), $accountRelationship) => array_search(ts('Cost of Sales'), $financialAccountTypeID),
+      array_search(ts('Income Account is'), $accountRelationship) => array_search(ts('Revenue'), $financialAccountTypeID),
     );
-    
-    $dao =  CRM_Core_DAO::executeQuery('SELECT id, financial_account_type_id FROM civicrm_financial_account WHERE name LIKE %1', 
-      array(1 => array($financialType->name, 'String'))
+    $params = array(
+      'name' => $financialType->name,
+      'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
+      'financial_account_type_id' => array_search(ts('Revenue'), $financialAccountTypeID),
+      'description' => $financialType->description,
+      'account_type_code' => 'INC',
+      'is_active' => 1,
     );
-    $dao->fetch();
-    $existingFinancialAccount = array();
-    if (!$dao->N) {
-      $params = array(
-        'name' => $financialType->name,
-        'contact_id' => CRM_Core_DAO::getFieldValue('CRM_Core_DAO_Domain', CRM_Core_Config::domainID(), 'contact_id'),
-        'financial_account_type_id' => array_search('Revenue', $financialAccountTypeID),
-        'description' => $financialType->description,
-        'account_type_code' => 'INC',
-        'is_active' => 1,
-      );
-      $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, CRM_Core_DAO::$_nullArray);
-    }
-    else {
-      $existingFinancialAccount[$dao->financial_account_type_id] = $dao->id;
-    }
+    $financialAccount = CRM_Financial_BAO_FinancialAccount::add($params, CRM_Core_DAO::$_nullArray);
     $params = array (
       'entity_table' => 'civicrm_financial_type',
       'entity_id' => $financialType->id,
     );
     foreach ($relationships as $key => $value) {
-      if (!array_key_exists($value, $existingFinancialAccount)) {
-        if ($accountRelationship[$key] == 'Accounts Receivable Account is') {
-          $params['financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', 'Accounts Receivable', 'id', 'name');
-          if (!empty($params['financial_account_id'])) {
-            $titles[] = 'Accounts Receivable';
-          }
-          else {
-            $query = "SELECT financial_account_id, name FROM civicrm_entity_financial_account
-            LEFT JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id
-            WHERE account_relationship = {$key} AND entity_table = 'civicrm_financial_type' LIMIT 1";
-            $dao = CRM_Core_DAO::executeQuery($query);
-            $dao->fetch();
-            $params['financial_account_id'] = $dao->financial_account_id;
-            $titles[] = $dao->name;
-          }
-        }
-        elseif ($accountRelationship[$key] == 'Income Account is' && empty($existingFinancialAccount)) {
-          $params['financial_account_id'] = $financialAccount->id;
+      if ($accountRelationship[$key] == ts('Accounts Receivable Account is')) {
+        $params['financial_account_id'] = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', ts('Accounts Receivable'), 'id', 'name');
+        if (!empty($params['financial_account_id'])) {
+          $titles[] = ts('Accounts Receivable');
         }
         else {
-          $query = "SELECT id, name FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = {$value}";
+          $query = "SELECT financial_account_id, name FROM civicrm_entity_financial_account
+            LEFT JOIN civicrm_financial_account ON civicrm_financial_account.id = civicrm_entity_financial_account.financial_account_id
+            WHERE account_relationship = {$key} AND entity_table = 'civicrm_financial_type' LIMIT 1";
           $dao = CRM_Core_DAO::executeQuery($query);
           $dao->fetch();
-          $params['financial_account_id'] = $dao->id;
+          $params['financial_account_id'] = $dao->financial_account_id;
           $titles[] = $dao->name;
         }
       }
+      elseif ($accountRelationship[$key] == ts('Income Account is')) {
+        $params['financial_account_id'] = $financialAccount->id;
+      }
       else {
-         $params['financial_account_id'] = $existingFinancialAccount[$value];
-         $titles[] = $financialType->name;
+        $query = "SELECT id, name FROM civicrm_financial_account WHERE is_default = 1 AND financial_account_type_id = {$value}";
+        $dao = CRM_Core_DAO::executeQuery($query);
+        $dao->fetch();
+        $params['financial_account_id'] = $dao->id;
+        $titles[] = $dao->name;
       }
       $params['account_relationship'] = $key;
       self::add($params);
-    }
-    if (!empty($existingFinancialAccount)) {
-      $titles = array();
     }
     return $titles;
   }

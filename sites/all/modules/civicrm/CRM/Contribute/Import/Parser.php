@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -115,18 +115,6 @@ abstract class CRM_Contribute_Import_Parser extends CRM_Import_Parser {
    */
   protected $_haveColumnHeader;
 
-  /**
-   * @param $fileName
-   * @param string $seperator
-   * @param $mapper
-   * @param bool $skipColumnHeader
-   * @param int $mode
-   * @param int $contactType
-   * @param int $onDuplicate
-   *
-   * @return mixed
-   * @throws Exception
-   */
   function run($fileName,
     $seperator = ',',
     &$mapper,
@@ -426,23 +414,12 @@ pppp   * @return void
     }
   }
 
-  /**
-   * @param $elements
-   */
   function setActiveFieldSoftCredit($elements) {
     for ($i = 0; $i < count($elements); $i++) {
       $this->_activeFields[$i]->_softCreditField = $elements[$i];
     }
   }
 
-  /**
-   * @param $elements
-   */
-  function setActiveFieldSoftCreditType($elements) {
-    for ($i = 0; $i < count($elements); $i++) {
-      $this->_activeFields[$i]->_softCreditType = $elements[$i];
-    }
-  }
   /**
    * function to format the field values for input to the api
    *
@@ -457,10 +434,7 @@ pppp   * @return void
           if (!isset($params[$this->_activeFields[$i]->_name])) {
             $params[$this->_activeFields[$i]->_name] = array();
           }
-          $params[$this->_activeFields[$i]->_name][$i][$this->_activeFields[$i]->_softCreditField] = $this->_activeFields[$i]->_value;
-          if(isset($this->_activeFields[$i]->_softCreditType)){
-            $params[$this->_activeFields[$i]->_name][$i]['soft_credit_type_id'] = $this->_activeFields[$i]->_softCreditType;
-          }
+          $params[$this->_activeFields[$i]->_name][$this->_activeFields[$i]->_softCreditField] = $this->_activeFields[$i]->_value;
         }
 
         if (!isset($params[$this->_activeFields[$i]->_name])) {
@@ -473,13 +447,6 @@ pppp   * @return void
     return $params;
   }
 
-  /**
-   * @param $name
-   * @param $title
-   * @param int $type
-   * @param string $headerPattern
-   * @param string $dataPattern
-   */
   function addField($name, $title, $type = CRM_Utils_Type::T_INT, $headerPattern = '//', $dataPattern = '//') {
     if (empty($name)) {
       $this->_fields['doNotImport'] = new CRM_Contribute_Import_Field($name, $title, $type, $headerPattern, $dataPattern);
@@ -501,8 +468,6 @@ pppp   * @return void
    * Store parser values
    *
    * @param CRM_Core_Session $store
-   *
-   * @param int $mode
    *
    * @return void
    * @access public
@@ -570,11 +535,10 @@ pppp   * @return void
   /**
    * Export data to a CSV file
    *
-   * @param $fileName
+   * @param string $filename
    * @param array $header
    * @param data $data
    *
-   * @internal param string $filename
    * @return void
    * @access public
    */
@@ -590,7 +554,7 @@ pppp   * @return void
 
     foreach ($data as $datum) {
       foreach ($datum as $key => $value) {
-        if (isset($value[0]) && is_array($value)) {
+        if (is_array($value[0])) {
           foreach ($value[0] as $k1 => $v1) {
             if ($k1 == 'location_type_id') {
               continue;
@@ -608,18 +572,6 @@ pppp   * @return void
     fclose($fd);
   }
 
-  /**
-   * Determines the file extension based on error code
-   *
-   * @var $type error code constant
-   * @return string
-   * @static
-   */
-  /**
-   * @param error $type
-   *
-   * @return string
-   */
   static function errorFileName($type) {
     $fileName = NULL;
     if (empty($type)) {
@@ -646,18 +598,6 @@ pppp   * @return void
     return $fileName;
   }
 
-  /**
-   * Determines the file name based on error code
-   *
-   * @var $type error code constant
-   * @return string
-   * @static
-   */
-  /**
-   * @param error $type
-   *
-   * @return string
-   */
   static function saveFileName($type) {
     $fileName = NULL;
     if (empty($type)) {

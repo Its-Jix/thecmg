@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -37,7 +37,7 @@
 {/if}
     {if $rows}
         <div class="report-pager">
-            {include file="CRM/common/pager.tpl" location="top"}
+            {include file="CRM/common/pager.tpl" location="top" noForm=0}
         </div>
 
         {* pre-compile section header here, rather than doing it every time under foreach *}
@@ -173,7 +173,7 @@
         {/foreach}
 
   <div class="report-pager">
-            {include file="CRM/common/pager.tpl"}
+            {include file="CRM/common/pager.tpl" noForm=0}
         </div>
         <br />
         {if $grandStat}

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -48,8 +48,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    * sets the title of the page
    *
    * @param string $title title  for page
-   * @param $pageTitle
-   *
    * @paqram string $pageTitle
    *
    * @return void
@@ -193,7 +191,6 @@ class CRM_Utils_System_Soap extends CRM_Utils_System_Base {
    *
    * @param string $destination - if present, add destination to querystring (works for Drupal only)
    *
-   * @throws Exception
    * @return string - loginURL for the current CMS
    * @static
    */

@@ -28,7 +28,7 @@ function activity_type_get_expectedresult(){
   $expectedResult = array(
   'is_error' => 0,
   'version' => 3,
-  'count' => 48,
+  'count' => 45,
   'values' => array(
       '1' => 'Meeting',
       '2' => 'Phone Call',
@@ -75,9 +75,6 @@ function activity_type_get_expectedresult(){
       '43' => 'Edit Batch',
       '44' => 'SMS delivery',
       '45' => 'Inbound SMS',
-      '46' => 'Payment',
-      '47' => 'Refund',
-      '48' => 'Change Registration',
     ),
 );
 

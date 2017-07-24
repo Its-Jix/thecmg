@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -139,18 +139,15 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * Class constructor
    *
-   * @param array $queryParams array of parameters for query
-   * @param \const|int $action - action of search basic or advanced.
-   * @param string $surveyClause if the caller wants to further restrict the search.
-   * @param boolean $single are we dealing only with one contact?
-   * @param int $limit how many voters do we want returned
+   * @param array    $queryParams array of parameters for query
+   * @param int      $action - action of search basic or advanced.
+   * @param string   $surveyClause if the caller wants to further restrict the search.
+   * @param boolean  $single are we dealing only with one contact?
+   * @param int      $limit  how many voters do we want returned
    *
-   * @param string $context
-   *
-   * @return \CRM_Campaign_Selector_Search
-  @access public
-   */
-  function __construct(&$queryParams,
+   * @return CRM_Contact_Selector
+   * @access public
+   */ function __construct(&$queryParams,
     $action       = CRM_Core_Action::NONE,
     $surveyClause = NULL,
     $single       = FALSE,
@@ -198,10 +195,7 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
   /**
    * getter for array of the parameters required for creating pager.
    *
-   * @param $action
-   * @param $params
-   *
-   * @internal param $
+   * @param
    * @access public
    */
   function getPagerParams($action, &$params) {
@@ -273,9 +267,6 @@ class CRM_Campaign_Selector_Search extends CRM_Core_Selector_Base implements CRM
     return $rows;
   }
 
-  /**
-   * @param $sort
-   */
   function buildPrevNextCache($sort) {
     //for prev/next pagination
     $crmPID = CRM_Utils_Request::retrieve('crmPID', 'Integer', CRM_Core_DAO::$_nullObject);
@@ -297,9 +288,9 @@ INSERT INTO civicrm_prevnext_cache ( entity_table, entity_id1, entity_id2, cache
 SELECT 'civicrm_contact', contact_a.id, contact_a.id, '$cacheKey', contact_a.display_name
 FROM {$from}
 ";
-      $errorScope = CRM_Core_TemporaryErrorScope::ignoreException();
+      CRM_Core_Error::ignoreException();
       $result = CRM_Core_DAO::executeQuery($insertSQL);
-      unset($errorScope);
+      CRM_Core_Error::setCallback();
 
       if (is_a($result, 'DB_Error')) {
         return;
@@ -363,9 +354,6 @@ FROM {$from}
     return self::$_columnHeaders;
   }
 
-  /**
-   * @return string
-   */
   function &getQuery() {
     return $this->_query;
   }

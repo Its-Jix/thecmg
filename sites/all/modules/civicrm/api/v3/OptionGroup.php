@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @param $params
- *
- * @return array
- */
 function civicrm_api3_option_group_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
@@ -43,10 +38,10 @@ function _civicrm_api3_option_group_create_spec(&$params) {
  * This method is used to delete any existing Option Group. id of the group
  * to be deleted is required field in $params array
  *
- * @param array $params array containing id of the group
+ * @param array $params  (reference) array containing id of the group
  *                       to be deleted
  *
- * @return array API Result Array
+ * @return array  (reference) returns flag true if successfull, error
  *                message otherwise
  * {@getfields OptionGroup_delete}
  * @access public

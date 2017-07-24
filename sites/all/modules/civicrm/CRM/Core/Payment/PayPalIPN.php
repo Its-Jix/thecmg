@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,29 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
 
   static $_paymentProcessor = NULL;
-
-  /**
-   * Constructor
-   */
   function __construct() {
     parent::__construct();
   }
 
-  /**
-   * @param $name
-   * @param $type
-   * @param string $location
-   * @param bool $abort
-   *
-   * @return mixed
-   */
   static function retrieve($name, $type, $location = 'POST', $abort = TRUE) {
     static $store = NULL;
     $value = CRM_Utils_Request::retrieve($name, $type, $store,
@@ -64,12 +52,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     return $value;
   }
 
-  /**
-   * @param $input
-   * @param $ids
-   * @param $objects
-   * @param $first
-   */
   function recur(&$input, &$ids, &$objects, $first) {
     if (!isset($input['txnType'])) {
       CRM_Core_Error::debug_log_message("Could not find txn_type in input request");
@@ -209,6 +191,8 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
       $contribution->currency = $objects['contribution']->currency;
       $contribution->payment_instrument_id = $objects['contribution']->payment_instrument_id;
       $contribution->amount_level = $objects['contribution']->amount_level;
+      $contribution->honor_contact_id = $objects['contribution']->honor_contact_id;
+      $contribution->honor_type_id = $objects['contribution']->honor_type_id;
       $contribution->campaign_id = $objects['contribution']->campaign_id;
 
       $objects['contribution'] = &$contribution;
@@ -219,13 +203,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     );
   }
 
-  /**
-   * @param $input
-   * @param $ids
-   * @param $objects
-   * @param bool $recur
-   * @param bool $first
-   */
   function single(&$input, &$ids, &$objects,
     $recur = FALSE,
     $first = FALSE
@@ -340,10 +317,6 @@ class CRM_Core_Payment_PayPalIPN extends CRM_Core_Payment_BaseIPN {
     }
   }
 
-  /**
-   * @param $input
-   * @param $ids
-   */
   function getInput(&$input, &$ids) {
     if (!$this->getBillingID($ids)) {
       return FALSE;

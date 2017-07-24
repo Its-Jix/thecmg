@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -63,7 +63,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('max_reminders', CRM_Utils_Array::value('max_reminders', $this->_values));
     $this->assign('initial_reminder_day', CRM_Utils_Array::value('initial_reminder_day', $this->_values));
     CRM_Utils_System::setTitle(CRM_Utils_Array::value('thankyou_title', $this->_values));
-    // Make the contributionPageID available to the template
+    // Make the contributionPageID avilable to the template
     $this->assign('contributionPageID', $this->_id);
     $this->assign('isShare', $this->_values['is_share']);
 
@@ -119,17 +119,22 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $this->assign('useForMember', $this->get('useForMember'));
 
     $params = $this->_params;
-    if ($this->_honor_block_is_active && !empty($params['soft_credit_type_id'])) {
-      $honorName = null;
-      $softCreditTypes = CRM_Core_OptionGroup::values("soft_credit_type", FALSE);
+    $honor_block_is_active = $this->get('honor_block_is_active');
+    if ($honor_block_is_active &&
+      ((!empty($params["honor_first_name"]) && !empty($params["honor_last_name"])) ||
+        (!empty($params["honor_email"]))
+      )
+    ) {
+      $this->assign('honor_block_is_active', $honor_block_is_active);
+      $this->assign('honor_block_title', CRM_Utils_Array::value('honor_block_title', $this->_values));
 
-      $this->assign('honor_block_is_active', $this->_honor_block_is_active);
-      $this->assign('soft_credit_type', $softCreditTypes[$params['soft_credit_type_id']]);
-      CRM_Contribute_BAO_ContributionSoft::formatHonoreeProfileFields($this, $params['honor'], $params['honoree_profile_id']);
-
-      $fieldTypes = array('Contact');
-      $fieldTypes[]  = CRM_Core_BAO_UFGroup::getContactType($params['honoree_profile_id']);
-      $this->buildCustom($params['honoree_profile_id'], 'honoreeProfileFields', TRUE, 'honor', $fieldTypes);
+      $prefix = CRM_Core_PseudoConstant::get('CRM_Contact_DAO_Contact', 'prefix_id');
+      $honor = CRM_Core_PseudoConstant::get('CRM_Contribute_DAO_Contribution', 'honor_type_id');
+      $this->assign('honor_type', $honor[$params["honor_type_id"]]);
+      $this->assign('honor_prefix', ($params["honor_prefix_id"]) ? $prefix[$params["honor_prefix_id"]] : ' ');
+      $this->assign('honor_first_name', $params["honor_first_name"]);
+      $this->assign('honor_last_name', $params["honor_last_name"]);
+      $this->assign('honor_email', $params["honor_email"]);
     }
 
     $qParams = "reset=1&amp;id={$this->_id}";
@@ -139,7 +144,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
       $this->assign('pcpBlock', TRUE);
       foreach (array(
         'pcp_display_in_roll', 'pcp_is_anonymous', 'pcp_roll_nickname', 'pcp_personal_note') as $val) {
-        if (!empty($this->_params[$val])) {
+        if (CRM_Utils_Array::value($val, $this->_params)) {
           $this->assign($val, $this->_params[$val]);
         }
       }
@@ -170,7 +175,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
 
     $this->buildCustom($this->_values['custom_pre_id'], 'customPre', TRUE);
     $this->buildCustom($this->_values['custom_post_id'], 'customPost', TRUE);
-    if (!empty($params['hidden_onbehalf_profile'])) {
+    if (CRM_Utils_Array::value('hidden_onbehalf_profile', $params)) {
       $ufJoinParams = array(
         'module' => 'onBehalf',
         'entity_table' => 'civicrm_contribution_page',
@@ -189,7 +194,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         $fieldTypes = array_merge($fieldTypes, array('Contribution'));
       }
 
-      $this->buildCustom($profileId, 'onbehalfProfile', TRUE, 'onbehalf', $fieldTypes);
+      $this->buildCustom($profileId, 'onbehalfProfile', TRUE, TRUE, $fieldTypes);
     }
 
     $this->assign('trxn_id',
@@ -204,7 +209,12 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $defaults = array();
     $fields = array();
     foreach ($this->_fields as $name => $dontCare) {
-      if ($name != 'onbehalf' || $name != 'honor') {
+      if ($name == 'onbehalf') {
+        foreach ($dontCare as $key => $value) {
+          $fields['onbehalf'][$key] = 1;
+        }
+      }
+      else {
         $fields[$name] = 1;
       }
     }
@@ -212,7 +222,19 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
     $contact = $this->_params = $this->controller->exportValues('Main');
 
     foreach ($fields as $name => $dontCare) {
-      if (isset($contact[$name])) {
+      if ($name == 'onbehalf') {
+        foreach ($dontCare as $key => $value) {
+          //$defaults[$key] = $contact['onbehalf'][$key];
+          if (isset($contact['onbehalf'][$key])) {
+          $defaults[$key] = $contact['onbehalf'][$key];
+        }
+          if (isset($contact['onbehalf']["{$key}_id"])) {
+            $defaults["{$key}_id"] = $contact['onbehalf']["{$key}_id"];
+      }
+
+        }
+      }
+      elseif (isset($contact[$name])) {
         $defaults[$name] = $contact[$name];
         if (substr($name, 0, 7) == 'custom_') {
           $timeField = "{$name}_time";
@@ -220,11 +242,16 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
             $defaults[$timeField] = $contact[$timeField];
           }
         }
-        elseif (in_array($name, array('addressee', 'email_greeting', 'postal_greeting')) && !empty($contact[$name . '_custom'])) {
+        elseif (in_array($name, array('addressee', 'email_greeting', 'postal_greeting'))
+          && CRM_Utils_Array::value($name . '_custom', $contact)
+        ) {
           $defaults[$name . '_custom'] = $contact[$name . '_custom'];
         }
       }
     }
+
+    // now fix all state country selectors
+    CRM_Core_BAO_Address::fixAllStateSelects($this, $defaults);
 
     $this->_submitValues = array_merge($this->_submitValues, $defaults);
     $this->setDefaults($defaults);
@@ -241,7 +268,7 @@ class CRM_Contribute_Form_Contribution_ThankYou extends CRM_Contribute_Form_Cont
         $tellAFriend = TRUE;
       }
     }
-    elseif (!empty($data['is_active'])) {
+    elseif (CRM_Utils_Array::value('is_active', $data)) {
       $friendText = $data['title'];
       $this->assign('friendText', $friendText);
       $subUrl = "eid={$this->_id}&pcomponent=contribute";

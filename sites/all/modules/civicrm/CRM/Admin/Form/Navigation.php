@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -52,7 +52,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -116,13 +116,10 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
     }
   }
 
-  /**
-   * @return array
-   */
   public function setDefaultValues() {
     $defaults = $this->_defaults;
     if (isset($this->_id)) {
-      if (!empty($this->_defaults['permission'])) {
+      if (CRM_Utils_Array::value('permission', $this->_defaults)) {
         foreach (explode(',', $this->_defaults['permission']) as $value) {
           $components[$value] = $value;
         }
@@ -147,7 +144,7 @@ class CRM_Admin_Form_Navigation extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     // get the submitted form values.

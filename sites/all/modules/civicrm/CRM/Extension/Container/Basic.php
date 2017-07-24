@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,7 +27,7 @@
 
 /**
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  */
 
@@ -169,10 +169,8 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Determine the relative path of an extension directory
    *
-   * @param $key
-   *
-   * @throws CRM_Extension_Exception_MissingException
    * @return string
+   * @throws CRM_Extension_Exception
    */
   protected function getRelPath($key) {
     $keypaths = $this->getRelPaths();
@@ -219,10 +217,8 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Determine the relative path of an extension directory
    *
-   * @param $key
-   *
-   * @throws CRM_Extension_Exception_MissingException
    * @return string
+   * @throws CRM_Extension_Exception
    */
   protected function getRelUrl($key) {
     $relUrls = $this->getRelUrls();
@@ -235,7 +231,7 @@ class CRM_Extension_Container_Basic implements CRM_Extension_Container_Interface
   /**
    * Scan $basedir for a list of extension-keys
    *
-   * @internal param string $dirSep the local system's directory separator
+   * @param string $dirSep the local system's directory separator
    * @return array($key => $relUrl)
    */
   protected function getRelUrls() {

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -159,13 +159,13 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
       foreach ($this->_fields as $name => $field) {
         if ($customFieldID = CRM_Core_BAO_CustomField::getKeyID($name)) {
           $customValue = CRM_Utils_Array::value($customFieldID, $customFields);
-          if (!empty($customValue['extends_entity_column_value'])) {
+          if (CRM_Utils_Array::value('extends_entity_column_value', $customValue)) {
             $entityColumnValue = explode(CRM_Core_DAO::VALUE_SEPARATOR,
               $customValue['extends_entity_column_value']
             );
           }
 
-          if (!empty($entityColumnValue[$typeId]) ||
+          if (CRM_Utils_Array::value($typeId, $entityColumnValue) ||
             CRM_Utils_System::isNull($entityColumnValue[$typeId])
           ) {
             CRM_Core_BAO_UFGroup::buildProfile($this, $field, NULL, $contributionId);
@@ -195,7 +195,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     if (empty($this->_fields)) {
@@ -216,7 +216,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $params = $this->exportValues();
@@ -241,15 +241,15 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
             $value[$val] = CRM_Utils_Date::processDate($value[$val]);
           }
         }
-        if (!empty($value['financial_type'])) {
+        if (CRM_Utils_Array::value('financial_type', $value)) {
           $value['financial_type_id'] = $value['financial_type'];
         }
 
-        if (!empty($value['payment_instrument'])) {
+        if (CRM_Utils_Array::value('payment_instrument', $value)) {
           $value['payment_instrument_id'] = $value['payment_instrument'];
         }
 
-        if (!empty($value['contribution_source'])) {
+        if (CRM_Utils_Array::value('contribution_source', $value)) {
           $value['source'] = $value['contribution_source'];
         }
 
@@ -258,7 +258,7 @@ class CRM_Contribute_Form_Task_Batch extends CRM_Contribute_Form_Task {
         $contribution = CRM_Contribute_BAO_Contribution::add($value, $ids);
 
         // add custom field values
-        if (!empty($value['custom']) &&
+        if (CRM_Utils_Array::value('custom', $value) &&
           is_array($value['custom'])
         ) {
           CRM_Core_BAO_CustomValueTable::store($value['custom'], 'civicrm_contribution', $contribution->id);

@@ -1,9 +1,9 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.5                                                |
+  | CiviCRM version 4.4                                                |
   +--------------------------------------------------------------------+
-  | Copyright CiviCRM LLC (c) 2004-2014                                |
+  | Copyright CiviCRM LLC (c) 2004-2013                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -73,7 +73,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   function setDefaultValues() {
     $defaults = array();
@@ -168,13 +168,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
         $this->_mailingID,
         'subject'
       );
-
-      $mailingKey = $this->_mailingID;
-      if ($hash = CRM_Mailing_BAO_Mailing::getMailingHash($mailingKey)) {
-        $mailingKey = $hash;
-      }
-
-      $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$mailingKey}");
+      $preview['viewURL'] = CRM_Utils_System::url('civicrm/mailing/view', "reset=1&id={$this->_mailingID}");
 
       $preview['attachment'] = CRM_Core_BAO_File::attachmentInfo('civicrm_mailing', $this->_mailingID);
 
@@ -189,10 +183,7 @@ class CRM_Mailing_Form_Schedule extends CRM_Core_Form {
    * Warning: if you make changes here, be sure to also make them in
    * Retry.php
    *
-   * @param array $params The form values
-   *
-   * @param $files
-   * @param $self
+   * @param array $params     The form values
    *
    * @return boolean          True if either we deliver immediately, or the
    *                          date is properly set.

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  * @package CRM
  * @author Alan Dixon
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -51,11 +51,9 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param $paymentProcessor
-   *
-   * @return \CRM_Core_Payment_Moneris
+   * @return void
    */
-  function __construct($mode, &$paymentProcessor, &$paymentForm = NULL, $force = FALSE) {
+  function __construct($mode, &$paymentProcessor) {
     $this->_mode = $mode;
     $this->_paymentProcessor = $paymentProcessor;
     $this->_processorName = ts('Moneris');
@@ -83,10 +81,9 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
    *
    * @param string $mode the mode of operation: live or test
    *
-   * @param object $paymentProcessor
-   *
    * @return object
    * @static
+   *
    */
   static function &singleton($mode, &$paymentProcessor) {
     $processorName = $paymentProcessor['name'];
@@ -96,15 +93,6 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return self::$_singleton[$processorName];
   }
 
-  /**
-   * This function collects all the information from a web/api form and invokes
-   * the relevant payment processor specific functions to perform the transaction
-   *
-   * @param  array $params assoc array of input parameters for this transaction
-   *
-   * @return array the result in an nice formatted array (or an error object)
-   * @abstract
-   */
   function doDirectPayment(&$params) {
     //make sure i've been called correctly ...
     if (!$this->_profile) {
@@ -249,11 +237,6 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return $params;
   }
 
-  /**
-   * @param $response
-   *
-   * @return bool
-   */
   function isError(&$response) {
     $responseCode = $response->getResponseCode();
     if (is_null($responseCode)) {
@@ -269,11 +252,6 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
   }
 
   // ignore for now, more elaborate error handling later.
-  /**
-   * @param $response
-   *
-   * @return object
-   */
   function &checkResult(&$response) {
     return $response;
 
@@ -300,11 +278,6 @@ class CRM_Core_Payment_Moneris extends CRM_Core_Payment {
     return $e;
   }
 
-  /**
-   * @param null $error
-   *
-   * @return object
-   */
   function &error($error = NULL) {
     $e = CRM_Core_Error::singleton();
     if (is_object($error)) {

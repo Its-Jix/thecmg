@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
  *
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -93,7 +93,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -168,7 +168,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     //get the button.
@@ -204,7 +204,7 @@ class CRM_Event_Form_Registration_ParticipantConfirm extends CRM_Event_Form_Regi
         $statusMessage = ts("Your event registration has been cancelled.");
       }
 
-      if (!empty($results['mailedParticipants'])) {
+      if (CRM_Utils_Array::value('mailedParticipants', $results)) {
         foreach ($results['mailedParticipants'] as $key => $displayName) {
           $statusMessage .= "<br />" . ts("Email has been sent to : %1", array(1 => $displayName));
         }

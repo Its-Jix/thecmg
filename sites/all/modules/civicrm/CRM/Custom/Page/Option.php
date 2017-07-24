@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -42,8 +42,6 @@
  *
  */
 class CRM_Custom_Page_Option extends CRM_Core_Page {
-
-  public $useLivePageJS = TRUE;
 
   /**
    * The Group id of the option
@@ -94,12 +92,14 @@ class CRM_Custom_Page_Option extends CRM_Core_Page {
         ),
         CRM_Core_Action::DISABLE => array(
           'name' => ts('Disable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'enable-disable' . '\' );"',
+          'ref' => 'disable-action',
           'title' => ts('Disable Mutliple Choice Option'),
         ),
         CRM_Core_Action::ENABLE => array(
           'name' => ts('Enable'),
-          'ref' => 'crm-enable-disable',
+          'extra' => 'onclick = "enableDisable( %%id%%,\'' . 'CRM_Core_BAO_OptionValue' . '\',\'' . 'disable-enable' . '\' );"',
+          'ref' => 'enable-action',
           'title' => ts('Enable Mutliple Choice Option'),
         ),
         CRM_Core_Action::DELETE => array(
@@ -217,12 +217,7 @@ ORDER BY weight, label
           'id' => $dao->id,
           'fid' => $this->_fid,
           'gid' => $this->_gid,
-        ),
-        ts('more'),
-        FALSE,
-        'customOption.row.actions',
-        'customOption',
-        $dao->id
+        )
       );
     }
 

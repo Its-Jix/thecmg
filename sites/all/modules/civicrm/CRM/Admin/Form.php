@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,13 +28,14 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
 
 /**
- * Base class for admin forms
+ * This class generates form components generic to Mobile provider
+ *
  */
 class CRM_Admin_Form extends CRM_Core_Form {
 
@@ -59,9 +60,6 @@ class CRM_Admin_Form extends CRM_Core_Form {
    */
   protected $_BAOName;
 
-  /**
-   * Basic setup
-   */
   function preProcess() {
     $this->_id      = $this->get('id');
     $this->_BAOName = $this->get('BAOName');
@@ -75,12 +73,12 @@ class CRM_Admin_Form extends CRM_Core_Form {
   }
 
   /**
-   * This function sets the default values for the form. Note that in edit/view mode
+   * This function sets the default values for the form. MobileProvider that in edit/view mode
    * the default values are retrieved from the database
    *
    * @access public
    *
-   * @return array
+   * @return None
    */
   function setDefaultValues() {
     if (isset($this->_id) && empty($this->_values)) {
@@ -99,25 +97,29 @@ class CRM_Admin_Form extends CRM_Core_Form {
 
     // its ok if there is no element called is_active
     $defaults['is_active'] = ($this->_id) ? CRM_Utils_Array::value('is_active', $defaults) : 1;
-    if (!empty($defaults['parent_id'])) {
+    if (CRM_Utils_Array::value('parent_id', $defaults)) {
       $this->assign('is_parent', TRUE);
     }
     return $defaults;
   }
 
   /**
-   * Add standard buttons
+   * Function to actually build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
-    if ($this->_action & CRM_Core_Action::VIEW || $this->_action & CRM_Core_Action::PREVIEW) {
+    if ($this->_action & CRM_Core_Action::DELETE) {
       $this->addButtons(array(
           array(
-            'type' => 'cancel',
-            'name' => ts('Done'),
+            'type' => 'next',
+            'name' => ts('Delete'),
             'isDefault' => TRUE,
+          ),
+          array(
+            'type' => 'cancel',
+            'name' => ts('Cancel'),
           ),
         )
       );
@@ -126,7 +128,7 @@ class CRM_Admin_Form extends CRM_Core_Form {
       $this->addButtons(array(
           array(
             'type' => 'next',
-            'name' => $this->_action & CRM_Core_Action::DELETE ? ts('Delete') : ts('Save'),
+            'name' => ts('Save'),
             'isDefault' => TRUE,
           ),
           array(

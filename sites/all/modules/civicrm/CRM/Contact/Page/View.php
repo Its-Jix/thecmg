@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -259,8 +259,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
   /**
    * Get meta details of the contact.
    *
-   * @param $contactId
-   *
    * @return array contact fields in fixed order
    * @access public
    */
@@ -276,10 +274,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     );
   }
 
-  /**
-   * @param $page
-   * @param null $contactID
-   */
   static function checkUserPermission($page, $contactID = NULL) {
     // check for permissions
     $page->_permission = NULL;
@@ -315,12 +309,6 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
   }
 
-  /**
-   * @param $contactId
-   * @param bool $isDeleted
-   *
-   * @return string
-   */
   static function setTitle($contactId, $isDeleted = FALSE) {
     static $contactDetails;
     $displayName = $contactImage = NULL;
@@ -350,19 +338,47 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
 
   /**
    * Add urls for display in the actions menu
-   * @param CRM_Core_Page $obj
-   * @param integer $cid
    */
   static function addUrls(&$obj, $cid) {
-     $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
+    // TODO rewrite without so many hard-coded CMS bits; use abstractions like CRM_Core_Permission::check('cms:...') and CRM_Utils_System
 
+    $config = CRM_Core_Config::singleton();
+    $session = CRM_Core_Session::singleton();
+    $uid = CRM_Core_BAO_UFMatch::getUFId($cid);
+    $userRecordUrl = NULL;
     if ($uid) {
-      $userRecordUrl = CRM_Core_Config::singleton()->userSystem->getUserRecordUrl($cid);
+      if ($config->userSystem->is_drupal == '1' &&
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users', 'cms:view user account')))
+      ) {
+        $userRecordUrl = CRM_Utils_System::url('user/' . $uid);
+      }
+      elseif ($config->userFramework == 'Joomla') {
+        $userRecordUrl = NULL;
+        // if logged in user is super user, then he can view other users joomla profile
+        if (JFactory::getUser()->authorise('core.admin')) {
+          $userRecordUrl = $config->userFrameworkBaseURL . "index.php?option=com_users&view=user&task=user.edit&id=" . $uid;
+        }
+        elseif ($session->get('userID') == $cid) {
+          $userRecordUrl = $config->userFrameworkBaseURL . "index.php?option=com_admin&view=profile&layout=edit&id=" . $uid;
+        }
+      }
+      // For WordPress, provide link to user profile is contact belongs to logged in user OR user has administrator role
+      elseif ($config->userFramework == 'WordPress' &&
+        ($session->get('userID') == $cid || CRM_Core_Permission::checkAnyPerm(array('cms:administer users')))
+        ) {
+          $userRecordUrl = $config->userFrameworkBaseURL . "wp-admin/user-edit.php?user_id=" . $uid;
+      }
       $obj->assign('userRecordUrl', $userRecordUrl);
       $obj->assign('userRecordId', $uid);
     }
-    elseif (CRM_Core_Config::singleton()->userSystem->checkPermissionAddUser()) {
-      $userAddUrl = CRM_Utils_System::url('civicrm/contact/view/useradd', 'reset=1&action=add&cid=' . $cid);
+    elseif (($config->userSystem->is_drupal == '1' && CRM_Core_Permission::check('administer users')) ||
+      ($config->userFramework == 'Joomla' &&
+        JFactory::getUser()->authorise('core.create', 'com_users')
+      )
+    ) {
+      $userAddUrl = CRM_Utils_System::url('civicrm/contact/view/useradd',
+        'reset=1&action=add&cid=' . $cid
+      );
       $obj->assign('userAddUrl', $userAddUrl);
     }
 
@@ -374,11 +390,9 @@ class CRM_Contact_Page_View extends CRM_Core_Page {
     }
 
     // See if other modules want to add links to the activtity bar
-    $hookLinks = array();
-    CRM_Utils_Hook::links('view.contact.activity',
+    $hookLinks = CRM_Utils_Hook::links('view.contact.activity',
       'Contact',
       $cid,
-      $hookLinks,
       CRM_Core_DAO::$_nullObject,
       CRM_Core_DAO::$_nullObject
     );

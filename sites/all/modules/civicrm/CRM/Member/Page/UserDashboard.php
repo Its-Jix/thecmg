@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -61,7 +61,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
         'status', 'membership_type') as $fld) {
         $membership[$dao->id][$fld] = CRM_Utils_Array::value($fld, $statusANDType[$dao->id]);
       }
-      if (!empty($statusANDType[$dao->id]['is_current_member'])) {
+      if (CRM_Utils_Array::value('is_current_member', $statusANDType[$dao->id])) {
         $membership[$dao->id]['active'] = TRUE;
       }
 
@@ -72,14 +72,7 @@ class CRM_Member_Page_UserDashboard extends CRM_Contact_Page_View_UserDashBoard 
           'default_renewal_contribution_page'
         );
         if ($defaultRenewPageId) {
-          //CRM-14831 - check if membership type is present in contrib page
-          $memBlock = CRM_Member_BAO_Membership::getMembershipBlock($defaultRenewPageId);
-          if ( !empty($memBlock['membership_types']) ) {
-            $memTypes = explode(',', $memBlock['membership_types']);
-            if ( in_array($dao->membership_type_id, $memTypes) ) {
-              $membership[$dao->id]['renewPageId'] = $defaultRenewPageId;
-            }
-          }
+          $membership[$dao->id]['renewPageId'] = $defaultRenewPageId;
         }
       }
     }

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -41,13 +41,12 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
 
   protected $_settings = array(
     'search_autocomplete_count' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
-    'enable_innodb_fts' => CRM_Core_BAO_Setting::SEARCH_PREFERENCES_NAME,
   );
 
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -68,7 +67,8 @@ class CRM_Admin_Form_Setting_Search extends CRM_Admin_Form_Setting {
     $profiles = CRM_Core_BAO_UFGroup::getProfiles($types);
 
     $this->add('select', 'defaultSearchProfileID', ts('Default Contact Search Profile'),
-      array('' => ts('- none -')) + $profiles, FALSE, array('class' => 'crm-select2 huge')
+      array(
+        '' => ts('- select -')) + $profiles
     );
 
     // Autocomplete for Contact Search (quick search etc.)

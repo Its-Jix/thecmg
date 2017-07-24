@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -27,20 +27,21 @@
 <script  type="text/javascript">
 {literal}
 
-CRM.$(function($) {
+cj( function($) {
   // hide all the selects that contains only one option
-  $('.crm-message-select select').each(function (){
-    if ($(this).find('option').size() == 1) {
-      $(this).parent().parent().hide();
+  cj('.crm-message-select select').each(function (){
+    if (cj(this).find('option').size() == 1) {
+      cj(this).parent().parent().hide();
     }
   });
-  if (!$('#override_verp').prop('checked')){
-    $('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').hide();
+  if (!cj('#override_verp').attr('checked')){
+    cj('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').hide();
   }
-  $('#override_verp').click(function(){
-      $('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').toggle();
-       if (!$('#override_verp').prop('checked')) {
-             $('#forward_replies, #auto_responder').prop('checked', false);
+  cj('#override_verp').click(function(){
+      cj('.crm-mailing-settings-form-block-forward_replies,.crm-mailing-settings-form-block-auto_responder').toggle();
+       if (!cj('#override_verp').attr('checked')) {
+             cj('#forward_replies').attr('checked',false);
+             cj('#auto_responder').attr('checked',false);
            }
     });
 
@@ -111,5 +112,8 @@ CRM.$(function($) {
   </fieldset>
   <div class="crm-submit-buttons">{include file="CRM/common/formButtons.tpl"}</div>
 </div>
+
+{* include jscript to warn if unsaved form field changes *}
+{include file="CRM/common/formNavigate.tpl"}
 </div>
 

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -89,40 +89,11 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     }
   }
 
-  /**
-   * This virtual function is used to set the default values of
-   * various form elements
-   *
-   * access        public
-   *
-   * @return array reference to the array of default values
-   *
-   */
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     if (method_exists($this->_customSearchClass, 'setDefaultValues')) {
       return $this->_customClass->setDefaultValues();
     }
     return $this->_formValues;
-  }
-
-  /**
-   * Builds the list of tasks or actions that a searcher can perform on a result set.
-   *
-   * @return array
-   */
-  function buildTaskList() {
-    // call the parent method to populate $this->_taskList for the custom search
-    parent::buildTaskList();
-
-    // @todo: When CRM_Contact_Form_Search_Interface is updated in 4.6, remove this check
-    if (is_callable(array($this->_customClass, 'buildTaskList'))) {
-      return $this->_customClass->buildTaskList($this);
-    } else {
-      return $this->_taskList;
-    }
   }
 
   function buildQuickForm() {
@@ -131,15 +102,6 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     parent::buildQuickForm();
   }
 
-  /**
-   * Use the form name to create the tpl file name
-   *
-   * @return string
-   * @access public
-   */
-  /**
-   * @return string
-   */
   function getTemplateFileName() {
 
     $ext = CRM_Extension_System::singleton()->getMapper();
@@ -173,24 +135,10 @@ class CRM_Contact_Form_Search_Custom extends CRM_Contact_Form_Search {
     parent::postProcess();
   }
 
-  /**
-   * Return a descriptive name for the page, used in wizard header
-   *
-   * @return string
-   * @access public
-   */
-  /**
-   * @return string
-   */
   public function getTitle() {
     return ts('Custom Search');
   }
 
-  /**
-   * @param $components
-   *
-   * @return bool
-   */
   function isPermissioned($components) {
     if (empty($components)) {
       return TRUE;

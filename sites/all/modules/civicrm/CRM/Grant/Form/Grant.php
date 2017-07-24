@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -90,8 +90,6 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       CRM_Core_Error::fatal(ts('You do not have permission to access this page'));
     }
 
-    $this->setPageTitle(ts('Grant'));
-
     if ($this->_action & CRM_Core_Action::DELETE) {
       return;
     }
@@ -107,7 +105,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     // when custom data is included in this page
-    if (!empty($_POST['hidden_custom'])) {
+    if (CRM_Utils_Array::value('hidden_custom', $_POST)) {
       $this->set('type', 'Grant');
       $this->set('subType', CRM_Utils_Array::value('grant_type_id', $_POST));
       $this->set('entityId', $this->_id);
@@ -117,14 +115,12 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
   }
 
-  /**
-   * @return array
-   */
   function setDefaultValues() {
     if ($this->_cdType) {
       return CRM_Custom_Form_CustomData::setDefaultValues($this);
     }
 
+    $defaults = array();
     $defaults = parent::setDefaultValues();
 
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -157,7 +153,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
       );
 
       foreach ($dates as $key) {
-        if (!empty($defaults[$key])) {
+        if (CRM_Utils_Array::value($key, $defaults)) {
           list($defaults[$key]) = CRM_Utils_Date::setDateDefaults($defaults[$key]);
         }
       }
@@ -172,7 +168,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
@@ -198,14 +194,23 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     }
 
     $attributes = CRM_Core_DAO::getAttribute('CRM_Grant_DAO_Grant');
-    $this->addSelect('grant_type_id', array('onChange' => "CRM.buildCustomData( 'Grant', this.value );"), TRUE);
+    $grantType = CRM_Core_OptionGroup::values('grant_type');
+    $this->add('select', 'grant_type_id', ts('Grant Type'),
+      array(
+        '' => ts('- select -')) + $grantType, TRUE,
+      array('onChange' => "CRM.buildCustomData( 'Grant', this.value );")
+    );
 
     //need to assign custom data type and subtype to the template
     $this->assign('customDataType', 'Grant');
     $this->assign('customDataSubType', $this->_grantType);
     $this->assign('entityID', $this->_id);
 
-    $this->addSelect('status_id', array(), TRUE);
+    $grantStatus = CRM_Core_OptionGroup::values('grant_status');
+    $this->add('select', 'status_id', ts('Grant Status'),
+      array(
+        '' => ts('- select -')) + $grantStatus, TRUE
+    );
 
     $this->addDate('application_received_date', ts('Application Received'), FALSE, array('formatType' => 'custom'));
     $this->addDate('decision_date', ts('Grant Decision'), FALSE, array('formatType' => 'custom'));
@@ -254,8 +259,31 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     );
 
     if ($this->_context == 'standalone') {
-      $this->addEntityRef('contact_id', ts('Applicant'), array('create' => TRUE), TRUE);
+      CRM_Contact_Form_NewContact::buildQuickForm($this);
+      $this->addFormRule(array('CRM_Grant_Form_Grant', 'formRule'), $this);
     }
+  }
+
+  /**
+   * global form rule
+   *
+   * @param array $fields  the input form values
+   * @param array $files   the uploaded files if any
+   * @param array $options additional user data
+   *
+   * @return true if no errors, else array of errors
+   * @access public
+   * @static
+   */
+  static function formRule($fields, $files, $self) {
+    $errors = array();
+
+    //check if contact is selected in standalone mode
+    if (isset($fields['contact_select_id'][1]) && !$fields['contact_select_id'][1]) {
+      $errors['contact[1]'] = ts('Please select a contact or create new contact');
+    }
+
+    return $errors;
   }
 
   /**
@@ -263,7 +291,7 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     if ($this->_action & CRM_Core_Action::DELETE) {
@@ -278,13 +306,13 @@ class CRM_Grant_Form_Grant extends CRM_Core_Form {
     // get the submitted form values.
     $params = $this->controller->exportValues($this->_name);
 
-    if (empty($params['grant_report_received'])) {
+    if (!CRM_Utils_Array::value('grant_report_received', $params)) {
       $params['grant_report_received'] = "null";
     }
 
     // set the contact, when contact is selected
-    if ($this->_context == 'standalone') {
-      $this->_contactID = $params['contact_id'];
+    if (CRM_Utils_Array::value('contact_select_id', $params)) {
+      $this->_contactID = $params['contact_select_id'][1];
     }
 
     $params['contact_id'] = $this->_contactID;

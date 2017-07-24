@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -60,13 +60,13 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @access public
    */
   static function create(&$params, $ids = NULL, $context = NULL) {
-    if (empty($params['id'])) {
+    if (!CRM_Utils_Array::value('id', $params)) {
       $params['name'] = CRM_Utils_String::titleToVar($params['title']);
     }
 
     $batch = new CRM_Batch_DAO_Batch();
     $batch->copyValues($params);
-    if ($context == 'financialBatch' && !empty($ids['batchID'])) {
+    if ($context == 'financialBatch' && CRM_Utils_Array::value('batchID', $ids)) {
       $batch->id = $ids['batchID'];
     }
     $batch->save();
@@ -217,11 +217,10 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
         $batch['check'] = $value['check'];
       }
       $batch['batch_name'] = $value['title'];
-      $batch['total'] = '';
+      $batch['total'] = $batch['item_count'] = '';
       $batch['payment_instrument'] = $value['payment_instrument'];
       $batch['item_count'] = CRM_Utils_Array::value('item_count', $value);
-      $batch['type'] = $value['batch_type'];
-      if (!empty($value['total'])) {
+      if (CRM_Utils_Array::value('total', $value)) {
         $batch['total'] = CRM_Utils_Money::format($value['total']);
       }
 
@@ -241,9 +240,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get list of batches
    *
-   * @param  array $params associated array for params
-   *
-   * @return array
+   * @param  array   $params associated array for params
    * @access public
    */
   static function getBatchList(&$params) {
@@ -269,7 +266,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     {$limit}";
 
     $object = CRM_Core_DAO::executeQuery($query, $params, TRUE, 'CRM_Batch_DAO_Batch');
-    if (!empty($params['context'])) {
+    if (CRM_Utils_Array::value('context', $params)) {
       $links = self::links($params['context']);
     }
     else {
@@ -311,7 +308,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
             CRM_Utils_Array::remove($newLinks, 'close', 'edit', 'reopen', 'export');
         }
       }
-      if (!empty($values['type_id'])) {
+      if (CRM_Utils_Array::value('type_id', $values)) {
         $values['batch_type'] = $batchTypes[$values['type_id']];
       }
       $values['batch_status'] = $batchStatus[$values['status_id']];
@@ -331,12 +328,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
       $values['action'] = CRM_Core_Action::formLink(
         $newLinks,
         $action,
-        $tokens,
-        ts('more'),
-        FALSE,
-        'batch.selector.row',
-        'Batch',
-        $object->id
+        $tokens
       );
       $results[$object->id] = $values;
     }
@@ -347,9 +339,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Get count of batches
    *
-   * @param  array $params associated array for params
-   *
-   * @return null|string
+   * @param  array   $params associated array for params
    * @access public
    */
   public static function getBatchCount(&$params) {
@@ -364,9 +354,7 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
   /**
    * Format where clause for getting lists of batches
    *
-   * @param  array $params associated array for params
-   *
-   * @return string
+   * @param  array   $params associated array for params
    * @access public
    */
   public static function whereClause($params) {
@@ -411,8 +399,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
 
   /**
    * Function to define action links
-   *
-   * @param null $context
    *
    * @return array $links array of action links
    * @access public
@@ -606,10 +592,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
     }
   }
 
-  /**
-   * @param array $batchIds
-   * @param $status
-   */
   static function closeReOpen($batchIds = array(), $status) {
     $batchStatus = CRM_Core_PseudoConstant::get('CRM_Batch_DAO_Batch', 'status_id');
     $params['status_id'] = CRM_Utils_Array::key( $status, $batchStatus );
@@ -631,8 +613,6 @@ class CRM_Batch_BAO_Batch extends CRM_Batch_DAO_Batch {
    * @param array $returnValues
    * @param null $notPresent
    * @param null $params
-   * @param bool $getCount
-   *
    * @return Object
    */
   static function getBatchFinancialItems($entityID, $returnValues, $notPresent = NULL, $params = NULL, $getCount = FALSE) {

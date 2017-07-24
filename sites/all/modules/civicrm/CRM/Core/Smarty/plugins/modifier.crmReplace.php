@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -47,6 +47,9 @@
  * @access public
  */
 function smarty_modifier_crmReplace($string, $attribute, $value) {
+  static $endOfElement = '/>';
+
+  // if we know what attribute we need to replace
   // we need to search and replace the string: $attribute=XXX or $attribute="XXX"
   // with $attribute=\"$value\"
   $pattern = '/' . $attribute . '="([^"]+?)"/';

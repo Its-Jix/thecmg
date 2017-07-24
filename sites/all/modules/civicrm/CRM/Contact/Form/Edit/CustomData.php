@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -40,8 +40,6 @@ class CRM_Contact_Form_Edit_CustomData {
 
   /**
    * build all the data structures needed to build the form
-   *
-   * @param $form
    *
    * @return void
    * @access public
@@ -91,7 +89,9 @@ class CRM_Contact_Form_Edit_CustomData {
 
     //build custom data.
     $contactSubType = NULL;
-    if (!empty($_POST["hidden_custom"]) && !empty($_POST['contact_sub_type'])) {
+    if (CRM_Utils_Array::value("hidden_custom", $_POST) &&
+      CRM_Utils_Array::value('contact_sub_type', $_POST)
+    ) {
       $contactSubType = $_POST['contact_sub_type'];
     }
     else {
@@ -107,10 +107,7 @@ class CRM_Contact_Form_Edit_CustomData {
    *
    * @access public
    *
-   * @param $form
-   * @param $defaults
-   *
-   * @return void
+   * @return None
    */
   static function setDefaultValues(&$form, &$defaults) {
     $defaults += CRM_Custom_Form_CustomData::setDefaultValues($form);

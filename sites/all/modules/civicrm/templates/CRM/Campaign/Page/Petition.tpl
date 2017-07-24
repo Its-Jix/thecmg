@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,8 +29,7 @@
   <div class="action-link">
     <a href="{$addSurveyUrl}" class="button"><span>&raquo; {ts}Add Survey{/ts}</span></a>
   </div>
- {include file="CRM/common/enableDisableApi.tpl"}
- {include file="CRM/common/crmeditable.tpl"}
+ {include file="CRM/common/enableDisable.tpl"}
  {include file="CRM/common/jsortable.tpl"}
   <div id="surveyList">
     <table id="options" class="display">
@@ -48,7 +47,7 @@
         </tr>
       </thead>
       {foreach from=$surveys item=survey}
-        <tr id="survey-{$survey.id}" class="crm-entity {if $survey.is_active neq 1} disabled{/if}">
+        <tr id="row_{$survey.id}" {if $survey.is_active neq 1}class="disabled"{/if}>
     <td>{$survey.title}</td>
           <td>{$survey.campaign_id}</td>
           <td>{$survey.activity_type_id}</td>

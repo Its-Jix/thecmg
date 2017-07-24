@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -106,8 +106,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
     $this->_id = CRM_Utils_Request::retrieve('id', 'Positive', $this);
     if ($this->_gid) {
       $this->_title = CRM_Core_DAO::getFieldValue('CRM_Core_DAO_UFGroup', $this->_gid, 'title');
-
-      $this->setPageTitle(ts('Profile Field'));
+      CRM_Utils_System::setTitle($this->_title . ' - ' . ts('CiviCRM Profile Fields'));
 
       $url = CRM_Utils_System::url('civicrm/admin/uf/group/field',
         "reset=1&action=browse&gid={$this->_gid}"
@@ -148,10 +147,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     if (CRM_Core_Permission::access('CiviEvent')) {
       $this->_fields = array_merge(CRM_Event_BAO_Query::getParticipantFields(), $this->_fields);
-    }
-
-    if (CRM_Core_Permission::access('CiviCase')) {
-      $this->_fields = array_merge(CRM_Case_BAO_Query::getFields(), $this->_fields);
     }
 
     $this->_fields = array_merge($this->_fields, CRM_Contact_BAO_Query_Hook::singleton()->getFields());
@@ -225,7 +220,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $defaults['field_name'] = array(
         $defaults['field_type'],
         ($defaults['field_type'] == "Formatting" ? "" : $defaults['field_name']),
-        ($defaults['field_name'] == "url") ? $defaults['website_type_id'] : $defaults['location_type_id'],
+        $defaults['location_type_id'],
         CRM_Utils_Array::value('phone_type_id', $defaults),
       );
       $this->_gid = $defaults['uf_group_id'];
@@ -253,7 +248,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $fields = CRM_Core_BAO_UFField::getAvailableFields($this->_gid, $defaults);
 
-    $noSearchable = $hasWebsiteTypes = array();
+    $noSearchable = array();
     $addressCustomFields = array_keys(CRM_Core_BAO_CustomField::getFieldsForImport('Address'));
 
     foreach ($fields as $key => $value) {
@@ -271,7 +266,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
           $this->_mapperFields[$key][$key1] = $value1['title'];
         }
         $hasLocationTypes[$key][$key1] = CRM_Utils_Array::value('hasLocationType', $value1);
-        $hasWebsiteTypes[$key][$key1] = CRM_Utils_Array::value('hasWebsiteType', $value1);
+
         // hide the 'is searchable' field for 'File' custom data
         if (isset($value1['data_type']) &&
           isset($value1['html_type']) &&
@@ -289,7 +284,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     $this->_location_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Address', 'location_type_id');
     $defaultLocationType = CRM_Core_BAO_LocationType::getDefault();
-    $this->_website_types = CRM_Core_PseudoConstant::get('CRM_Core_DAO_Website', 'website_type_id');
 
     /**
      * FIXME: dirty hack to make the default option show up first.  This
@@ -329,10 +323,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $sel1['Membership'] = 'Membership';
     }
 
-    if (!empty($fields['Case'])) {
-      $sel1['Case'] = 'Case';
-    }
-
     if (!empty($fields['Formatting'])) {
       $sel1['Formatting'] = 'Formatting';
     }
@@ -362,9 +352,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
             if ($hasLocationTypes[$k][$key]) {
               $sel3[$k][$key] = $this->_location_types;
             }
-            elseif ($hasWebsiteTypes[$k][$key]) {
-              $sel3[$k][$key] = $this->_website_types;
-            }
             else {
               $sel3[$key] = NULL;
             }
@@ -389,19 +376,21 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
     if (empty($formValues)) {
       for ($k = 1; $k < 4; $k++) {
-        if (!isset($defaults['field_name'][$k])) {
+        if (!$defaults['field_name'][$k]) {
           $js .= "{$formName}['field_name[$k]'].style.display = 'none';\n";
         }
       }
     }
     else {
       if (!empty($formValues['field_name'])) {
-        for ($key = 1; $key < 4; $key++) {
-          if (!isset($formValues['field_name'][$key])) {
-            $js .= "{$formName}['field_name[$key]'].style.display = 'none';\n";
-          }
-          else {
-            $js .= "{$formName}['field_name[$key]'].style.display = '';\n";
+        foreach ($formValues['field_name'] as $value) {
+          for ($k = 1; $k < 4; $k++) {
+            if (!isset($formValues['field_name'][$k]) || !$formValues['field_name'][$k]) {
+              $js .= "{$formName}['field_name[$k]'].style.display = 'none';\n";
+            }
+            else {
+              $js .= "{$formName}['field_name[$k]'].style.display = '';\n";
+            }
           }
         }
       }
@@ -501,6 +490,10 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       );
     }
 
+    if (isset($defaults['field_name']) && CRM_Utils_Array::value(1, $defaults['field_name']) == 'url-1') {
+      $defaults['field_name'][1] = 'url';
+    }
+
     $this->setDefaults($defaults);
   }
 
@@ -550,6 +543,11 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $params['field_name'][1] = 'formatting_' . rand(1000, 9999);
     }
 
+    // temporary hack to for website
+    if ($params['field_name'][1] == 'url') {
+      $params['field_name'][1] = 'url-1';
+    }
+
     //check for duplicate fields
     if ($params["field_name"][0] != "Formatting" && CRM_Core_BAO_UFField::duplicateField($params, $ids)) {
       CRM_Core_Session::setStatus(ts('The selected field already exists in this profile.'), ts('Field Not Added'), 'error');
@@ -561,7 +559,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
 
       //reset other field is searchable and in selector settings, CRM-4363
       if ($this->_hasSearchableORInSelector &&
-        in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity', 'Case'))
+        in_array($ufField->field_type, array('Participant', 'Contribution', 'Membership', 'Activity'))
       ) {
         CRM_Core_BAO_UFField::resetInSelectorANDSearchable($this->_gid);
       }
@@ -676,11 +674,13 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   static function formRuleCustomDataExtentColumnValue($customField, $gid, $fieldType, &$errors) {
     // fix me : check object $customField
     if (in_array($fieldType, array(
-          'Participant', 'Contribution', 'Membership', 'Activity', 'Case'))) {
+      'Participant', 'Contribution', 'Membership', 'Activity'))) {
       $params = array('id' => $customField->custom_group_id);
       $customGroup = array();
       CRM_Core_BAO_CustomGroup::retrieve($params, $customGroup);
-      if (($fieldType != CRM_Utils_Array::value('extends', $customGroup)) || empty($customGroup['extends_entity_column_value'])) {
+      if (($fieldType != CRM_Utils_Array::value('extends', $customGroup)) ||
+        !CRM_Utils_Array::value('extends_entity_column_value', $customGroup)
+      ) {
         return $errors;
       }
 
@@ -696,7 +696,7 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       }
 
       $fieldTypeValues = CRM_Core_BAO_UFGroup::groupTypeValues($gid, $fieldType);
-      if (empty($fieldTypeValues[$fieldType])) {
+      if (!CRM_Utils_Array::value($fieldType, $fieldTypeValues)) {
         return;
       }
 
@@ -708,51 +708,9 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
   }
 
   /**
-   * Validation rule to prevent multiple fields of primary location type within the same communication type.
-   *
-   * @param Array   $fields            Submitted fields
-   * @param String  $profileFieldName  Group Id.
-   * @param Array   $groupFields       List of fields already in the group
-   * @param Array   $errors            Collect errors
-   *
-   * @static
-   * @access public
-   */
-  static function formRulePrimaryCheck($fields, $profileFieldName, $groupFields, &$errors) {
-    //FIXME: This may need to also apply to website fields if they are refactored to allow more than one per profile
-    $checkPrimary = array('phone' => 'civicrm_phone.phone', 'phone_and_ext' => 'civicrm_phone.phone');
-    $whereCheck = NULL;
-    $primaryOfSameTypeFound = NULL;
-    $fieldID = empty($fields['field_id']) ? 0 : $fields['field_id'];
-    // Is this a primary location type field of interest
-    if (array_key_exists($profileFieldName, $checkPrimary)) {
-      $whereCheck = $checkPrimary[$profileFieldName];
-    }
-    $potentialLocationType = CRM_Utils_Array::value(2, $fields['field_name']);
-
-    if ($whereCheck && $potentialLocationType == 0) {
-      $primaryOfSameTypeFound = '';
-
-      foreach ($groupFields as $groupField) {
-        // if it is a phone
-        if ($groupField['where'] == $whereCheck && is_null($groupField['location_type_id']) && $groupField['field_id']  != $fieldID) {
-          $primaryOfSameTypeFound = $groupField['title'];
-          break;
-        }
-      }
-      if ($primaryOfSameTypeFound) {
-        $errors['field_name'] = ts('You have already added a primary location field of this type: %1', $primaryOfSameTypeFound);
-      }
-    }
-  }
-
-  /**
    * global validation rules for the form
    *
    * @param array $fields posted values of the form
-   *
-   * @param $files
-   * @param $self
    *
    * @return array list of errors to be posted back to the form
    * @static
@@ -773,14 +731,14 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
       $errors['is_view'] = ts('A View Only field cannot be required');
     }
 
-    $entityName = $fields['field_name'][0];
-    if (!$entityName) {
+    $fieldName = $fields['field_name'][0];
+    if (!$fieldName) {
       $errors['field_name'] = ts('Please select a field name');
     }
 
-    if ($in_selector && in_array($entityName, array(
+    if ($in_selector && in_array($fieldName, array(
       'Contribution', 'Participant', 'Membership', 'Activity'))) {
-      $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $entityName));
+      $errors['in_selector'] = ts("'In Selector' cannot be checked for %1 fields.", array(1 => $fieldName));
     }
 
     $isCustomField = FALSE;
@@ -808,11 +766,6 @@ class CRM_UF_Form_Field extends CRM_Core_Form {
         }
       }
     }
-
-    // Get list of fields already in the group
-    $groupFields = CRM_Core_BAO_UFGroup::getFields($fields['group_id'], FALSE, NULL, NULL, NULL, TRUE, NULL, TRUE);
-    // Check if we already added a primary field of the same communication type
-    self::formRulePrimaryCheck($fields, $profileFieldName, $groupFields, $errors);
 
     //check profile is configured for double option process
     //adding group field, email field should be present in the group

@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2013
  * $Id$
  *
  */
@@ -48,7 +48,7 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   /**
    * Function to pre processing
    *
-   * @return void
+   * @return None
    * @access public
    */
   function preProcess() {
@@ -58,14 +58,17 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
   /**
    * Function to build the form
    *
-   * @return void
+   * @return None
    * @access public
    */
   public function buildQuickForm() {
 
     $groupList = array('' => ts('- All Contacts -')) + CRM_Core_PseudoConstant::nestedGroup();
+//    $groupList = CRM_Core_PseudoConstant::group();
+//    $groupList[''] = ts('- All Contacts -');
+//    asort($groupList);
 
-    $this->add('select', 'group_id', ts('Select Group'), $groupList, FALSE, array('class' => 'crm-select2 huge'));
+    $this->add('select', 'group_id', ts('Select Group'), $groupList);
     $this->addButtons(array(
         array(
           'type' => 'next',
@@ -90,11 +93,11 @@ class CRM_Contact_Form_DedupeFind extends CRM_Admin_Form {
    *
    * @access public
    *
-   * @return void
+   * @return None
    */
   public function postProcess() {
     $values = $this->exportValues();
-    if (!empty($_POST['_qf_DedupeFind_submit'])) {
+    if (CRM_Utils_Array::value('_qf_DedupeFind_submit', $_POST)) {
       //used for cancel button
       CRM_Utils_System::redirect(CRM_Utils_System::url('civicrm/contact/deduperules', 'reset=1'));
       return;
