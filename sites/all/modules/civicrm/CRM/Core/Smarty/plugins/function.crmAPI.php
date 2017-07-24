@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.4                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2013                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,7 +23,7 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
  *
@@ -34,41 +34,44 @@
  */
 
 /**
- * @param $params
- * @param $smarty
- * @return string|void
  */
 function smarty_function_crmAPI($params, &$smarty) {
+  if (!array_key_exists('action', $params)) {
+    $params['action'] = "get";
+  }
+  if (!array_key_exists('sequential', $params)) {
+    $params['sequential'] = 1;
+  }
   if (!array_key_exists('entity', $params)) {
     $smarty->trigger_error("assign: missing 'entity' parameter");
     return "crmAPI: missing 'entity' parameter";
   }
-  $errorScope = CRM_Core_TemporaryErrorScope::create(array('CRM_Utils_REST', 'fatal'));
+  CRM_Core_Error::setCallback(array('CRM_Utils_REST', 'fatal'));
+  $action = $params['action'];
   $entity = $params['entity'];
-  $action = CRM_Utils_Array::value('action', $params, 'get');
-  $params['sequential'] = CRM_Utils_Array::value('sequential', $params, 1);
-  $var = CRM_Utils_Array::value('var', $params);
-  CRM_Utils_Array::remove($params, 'entity', 'action', 'var');
+  unset($params['entity']);
+  unset($params['method']);
+  unset($params['assign']);
   $params['version'] = 3;
   require_once 'api/api.php';
   $result = civicrm_api($entity, $action, $params);
-  unset($errorScope);
+  CRM_Core_Error::setCallback();
   if ($result === FALSE) {
     $smarty->trigger_error("Unkown error");
     return;
   }
 
-  if (!empty($result['is_error'])) {
-    $smarty->trigger_error("{crmAPI} " . $result["error_message"]);
-  }
-
-  if (!$var) {
+  if (!array_key_exists('var', $params)) {
     return json_encode($result);
   }
   if (!empty($params['json'])) {
-    $smarty->assign($var, json_encode($result));
+    $smarty->assign($params["var"], json_encode($result));
   }
   else {
-    $smarty->assign($var, $result);
+    $smarty->assign($params["var"], $result);
   }
 }
+
+
+
+

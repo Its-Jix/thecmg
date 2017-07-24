@@ -1,9 +1,10 @@
 <?php
+
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.6                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2015                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -23,44 +24,59 @@
  | GNU Affero General Public License or the licensing of CiviCRM,     |
  | see the CiviCRM license FAQ at http://civicrm.org/licensing        |
  +--------------------------------------------------------------------+
- */
+*/
 
 /**
- * This api exposes CiviCRM FinancialAccount.
+ * File for the CiviCRM APIv3 financial_account functions
  *
  * @package CiviCRM_APIv3
+ * @subpackage API_financial_account
+ *
  */
 
 /**
- * Save a FinancialAccount.
+ * Save a financial_account
  *
- * @param array $params
+ * Allowed @params array keys are:
+ * {@getfields financial_account_create}
+ * @example financial_accountCreate.php
  *
- * @return array
+ * @param $params
+ *
+ * @return array of newly created financial_account property values.
+ * @access public
  */
 function civicrm_api3_financial_account_create($params) {
   return _civicrm_api3_basic_create(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Get a FinancialAccount.
+ * Get a financial_account
  *
- * @param array $params
+ * Allowed @params array keys are:
+ * {@getfields financial_account_get}
+ * @example financial_accountCreate.php
  *
- * @return array
- *   Array of retrieved FinancialAccount property values.
+ * @param $params
+ *
+ * @return array of retrieved financial_account property values.
+ * @access public
  */
 function civicrm_api3_financial_account_get($params) {
   return _civicrm_api3_basic_get(_civicrm_api3_get_BAO(__FUNCTION__), $params);
 }
 
 /**
- * Delete a FinancialAccount.
+ * Delete a financial_account
  *
- * @param array $params
+ * Allowed @params array keys are:
+ * {@getfields financial_account_delete}
+ * @example financial_accountCreate.php
  *
- * @return array
- *   Array of deleted values.
+ * @param $params
+ *
+ * @return array of deleted values.
+ * @access public
  */
 function civicrm_api3_financial_account_delete($params) {
   return _civicrm_api3_basic_delete(_civicrm_api3_get_BAO(__FUNCTION__), $params);

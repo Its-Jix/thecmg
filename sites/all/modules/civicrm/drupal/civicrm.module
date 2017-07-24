@@ -26,7 +26,7 @@
  * Drupal module file.
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2015
+ * @copyright CiviCRM LLC (c) 2004-2014
  */
 require_once 'civicrm_user.inc';
 
@@ -60,16 +60,11 @@ function civicrm_permission() {
 
   CRM_Core_Config::singleton();
 
-  $permissions = CRM_Core_Permission::basicPermissions(FALSE, TRUE);
+  $permissions = CRM_Core_Permission::basicPermissions();
   $perms_array = array();
-  foreach ($permissions as $perm => $attr) {
-    $title = array_shift($attr);
-    $description = array_shift($attr);
+  foreach ($permissions as $perm => $title) {
     //order matters here, but we deal with that later
     $perms_array[$perm] = array('title' => $title);
-    if ($description) {
-      $perms_array[$perm]['description'] = $description;
-    }
   }
   return $perms_array;
 }
@@ -269,8 +264,10 @@ function civicrm_initialize() {
  * them and we need them for language switching and generating urls for metadata.
  */
 function _civicrm_get_url_parameters() {
-  $excludes = array('q', 'IDS_request_uri', 'IDS_user_agent');
-  return drupal_get_query_parameters(NULL, $excludes);
+  $query = $_REQUEST;
+  unset($query['IDS_request_uri']);
+  unset($query['IDS_user_agent']);
+  return $query;
 }
 
 /**
@@ -284,9 +281,14 @@ function _civicrm_get_url_parameters() {
  *   String of url parameters e.g '?reset=1&id=2'.
  */
 function _civicrm_get_url_parameters_as_url_string() {
-  $string = drupal_http_build_query(_civicrm_get_url_parameters());
-  if (!empty($string)) {
-    $string = '?' . $string;
+  $string = '';
+  foreach (_civicrm_get_url_parameters() as $key => $value) {
+    if (empty($string)) {
+      $string = '?' . $key . '=' . $value;
+    }
+    else {
+      $string .= '&' . $key . '=' . $value;
+    }
   }
   return $string;
 }
@@ -887,7 +889,6 @@ function civicrm_add_jquery(&$html) {
 function civicrm_form_alter(&$form, $formValues, $formID) {
   switch ($formID) {
     case 'user_admin_permissions':
-      $form['#submit'][] = 'civicrm_user_admin_permissions_submit';
     case 'system_clean_url_settings':
       if (!empty($formValues['input'])) {
         // reset navigation for permissions changed and clean url
@@ -1427,8 +1428,7 @@ function civicrm_modules_uninstalled($modules) {
  * @param array $cid_parts
  */
 function civicrm_metatag_page_cache_cid_parts_alter(&$cid_parts) {
-  // Avoid substr() because it will not work with Drupal language prefixes.
-  if (!empty($cid_parts['path']) && strpos($cid_parts['path'], 'civicrm') !== FALSE) {
+  if (!empty($cid_parts['path']) && substr($cid_parts['path'], 0, 7) == 'civicrm') {
     $get = $_GET;
     ksort($get);
     $cid_parts['path'] .= '/' . md5(print_r($get, TRUE));
