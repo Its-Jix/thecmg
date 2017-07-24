@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -189,8 +189,8 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
    * delete the entire cache if group is not specified
    *
    * @param string $group The group name of the entries to be deleted
-   * @param string $path  path of the item that needs to be deleted
-   * @param booleab $clearAll clear all caches
+   * @param string $path path of the item that needs to be deleted
+   * @param bool|\booleab $clearAll clear all caches
    *
    * @return void
    * @static
@@ -278,6 +278,9 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
      * @access private
      */
 
+  /**
+   * @param $names
+   */
   static function restoreSessionFromCache($names) {
     foreach ($names as $key => $sessionName) {
       if (is_array($sessionName)) {
@@ -302,6 +305,10 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
   /**
    * Do periodic cleanup of the CiviCRM session table. Also delete all session cache entries
    * which are a couple of days old. This keeps the session cache to a manageable size
+   *
+   * @param bool $session
+   * @param bool $table
+   * @param bool $prevNext
    *
    * @return void
    * @static
@@ -328,11 +335,34 @@ class CRM_Core_BAO_Cache extends CRM_Core_DAO_Cache {
       CRM_Core_BAO_PrevNextCache::cleanupCache();
     }
 
-    if ($table) {
-      CRM_Core_Config::clearTempTables($timeIntervalDays. ' day');
+    if ( $table ) {
+      // also delete all the action temp tables
+      // that were created the same interval ago
+      $dao = new CRM_Core_DAO();
+      $query = "
+SELECT TABLE_NAME as tableName
+FROM   INFORMATION_SCHEMA.TABLES
+WHERE  TABLE_SCHEMA = %1
+AND    ( TABLE_NAME LIKE 'civicrm_task_action_temp_%'
+ OR      TABLE_NAME LIKE 'civicrm_export_temp_%'
+ OR      TABLE_NAME LIKE 'civicrm_import_job_%' )
+AND    CREATE_TIME < date_sub( NOW( ), INTERVAL $timeIntervalDays day )
+";
+
+      $params   = array(1 => array($dao->database(), 'String'));
+      $tableDAO = CRM_Core_DAO::executeQuery($query, $params);
+      $tables   = array();
+      while ($tableDAO->fetch()) {
+        $tables[] = $tableDAO->tableName;
+      }
+      if (!empty($tables)) {
+        $table = implode(',', $tables);
+        // drop leftover temporary tables
+        CRM_Core_DAO::executeQuery("DROP TABLE $table");
+      }
     }
 
-    if ($session) {
+    if ( $session ) {
       // first delete all sessions which are related to any potential transaction
       // page
       $transactionPages = array(

@@ -516,27 +516,23 @@ function _civicrm_member_roles_sync($ext_uid = NULL, $cid = NULL) {
     //Get all memberships of contact
     $memParams = array(
       'contact_id' => $cid,
-      'options' => array('limit' => 0),
+      'version' => 3,
     );
-    $memberships = civicrm_api3('membership', 'get', $memParams);
+    $memberships = civicrm_api('membership', 'get', $memParams);
 
     $contactMemberships = CRM_Utils_Array::value('values', $memberships);
     $addRoles           = array();
     $expRoles           = array();
 
+    $roleCondition = is_array($rid) ? 'IN' : '=';
+
     if (empty($contactMemberships) && !empty($rid)) {
-      if (is_array($rid)) {
-        $rid = implode(",", $rid);
-      }
-      db_delete('users_roles')->condition('uid', $uid)->condition('rid', $rid)->execute();
+      db_delete('users_roles')->condition('uid', $uid)->condition('rid', $rid, $roleCondition)->execute();
     }
     else {
       foreach ($contactMemberships as $membership) {
         if (!empty($rid)) {
-          if (is_array($rid)) {
-            $rid = implode(",", $rid);
-          }
-          db_delete('users_roles')->condition('uid', $uid)->condition('rid', $rid)->execute();
+          db_delete('users_roles')->condition('uid', $uid)->condition('rid', $rid, $roleCondition)->execute();
         }
         if (is_array($memberroles[$membership['membership_type_id']])) {
           foreach ($memberroles[$membership['membership_type_id']] as $rolerule) {

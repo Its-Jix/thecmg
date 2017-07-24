@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -37,6 +37,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
   protected $_formValues;
   public $_permissionedComponent;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_permissionedComponent = array('CiviContribute', 'CiviEvent');
@@ -55,6 +58,9 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     /**
@@ -171,15 +177,14 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     return $sql;
   }
 
+  /**
+   * @return string
+   */
   function from() {
-    $this->buildACLClause('contact_a');
-    $from = "
+    return "
         civicrm_participant_payment
         left join civicrm_participant
         on civicrm_participant_payment.participant_id=civicrm_participant.id
-
-        left join civicrm_contact contact_a
-        on civicrm_participant.contact_id = contact_a.id
 
         left join civicrm_event on
         civicrm_participant.event_id = civicrm_event.id
@@ -188,15 +193,18 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
         on civicrm_contribution.id = civicrm_participant_payment.contribution_id
 
         left join civicrm_option_value on
-        ( civicrm_option_value.value = civicrm_event.event_type_id AND civicrm_option_value.option_group_id = 14) {$this->_aclFrom}";
-
-    return $from;
+        ( civicrm_option_value.value = civicrm_event.event_type_id AND civicrm_option_value.option_group_id = 14)";
   }
 
   /*
      * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
      *
      */
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
@@ -243,14 +251,14 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
       $event_type_ids = implode(',', array_keys($this->_formValues['event_type_id']));
       $clauses[] = "civicrm_event.event_type_id IN ( $event_type_ids )";
     }
-    if ($this->_aclWhere) {
-      $clauses[] = "{$this->_aclWhere}";
-    }
     return implode(' AND ', $clauses);
   }
 
 
   /* This function does a query to get totals for some of the search result columns and returns a totals array. */
+  /**
+   * @return array
+   */
   function summary() {
     $totalSelect = "
         SUM(civicrm_contribution.total_amount) as payment_amount,COUNT(civicrm_participant.id) as participant_count,
@@ -303,14 +311,28 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
     return $dao->N;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   *
+   * @return string
+   */
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = TRUE) {
     return $this->all($offset, $rowcount, $sort);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -319,12 +341,5 @@ class CRM_Contact_Form_Search_Custom_EventAggregate extends CRM_Contact_Form_Sea
       CRM_Utils_System::setTitle(ts('Search'));
     }
   }
-
-  /**
-   * @param string $tableAlias
-   */
-  public function buildAclClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
-  }
-
 }
+

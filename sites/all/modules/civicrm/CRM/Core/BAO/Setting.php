@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -49,6 +49,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
   CONST
     ADDRESS_STANDARDIZATION_PREFERENCES_NAME = 'Address Standardization Preferences',
     CAMPAIGN_PREFERENCES_NAME = 'Campaign Preferences',
+    DEVELOPER_PREFERENCES_NAME = 'Developer Preferences',
     DIRECTORY_PREFERENCES_NAME = 'Directory Preferences',
     EVENT_PREFERENCES_NAME = 'Event Preferences',
     MAILING_PREFERENCES_NAME = 'Mailing Preferences',
@@ -66,10 +67,13 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Checks whether an item is present in the in-memory cache table
    *
    * @param string $group (required) The group name of the item
-   * @param string $name  (required) The name of the setting
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
-   * @param int    $contactID    If set, this is a contactID specific setting, else its a global setting
-   * @param int    $load  if true, load from local cache (typically memcache)
+   * @param string $name (required) The name of the setting
+   * @param int $componentID The optional component ID (so components can share the same name space)
+   * @param int $contactID If set, this is a contactID specific setting, else its a global setting
+   * @param bool|int $load if true, load from local cache (typically memcache)
+   *
+   * @param null $domainID
+   * @param bool $force
    *
    * @return boolean true if item is already in cache
    * @static
@@ -116,6 +120,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $globalCache->delete($cacheKey);
   }
 
+  /**
+   * @param $values
+   * @param $group
+   * @param null $componentID
+   * @param null $contactID
+   * @param null $domainID
+   *
+   * @return string
+   */
   static function setCache($values,
     $group,
     $componentID = NULL,
@@ -136,6 +149,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return $cacheKey;
   }
 
+  /**
+   * @param $group
+   * @param null $name
+   * @param null $componentID
+   * @param null $contactID
+   * @param null $domainID
+   *
+   * @return CRM_Core_DAO_Domain|CRM_Core_DAO_Setting
+   */
   static function dao($group,
     $name        = NULL,
     $componentID = NULL,
@@ -176,11 +198,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Retrieve the value of a setting from the DB table
    *
    * @param string $group (required) The group name of the item
-   * @param string $name  (required) The name under which this item is stored
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
+   * @param string $name (required) The name under which this item is stored
+   * @param int $componentID The optional component ID (so componenets can share the same name space)
    * @param string $defaultValue The default value to return for this setting if not present in DB
-   * @param int    $contactID    If set, this is a contactID specific setting, else its a global setting
-
+   * @param int $contactID If set, this is a contactID specific setting, else its a global setting
+   *
+   * @param null $domainID
    *
    * @return object The data if present in the setting table, else null
    * @static
@@ -194,28 +217,15 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     $contactID    = NULL,
     $domainID     = NULL
   ) {
-    $override_group = array();
+
     if (NULL !== ($override = self::getOverride($group, $name, NULL))) {
-      if ( isset($name) ) {
-        return $override;
-      }
-      else {
-        $override_group = $override;
-      }
+      return $override;
     }
 
     if (empty($domainID)) {
       $domainID = CRM_Core_Config::domainID();
     }
     $cacheKey = self::inCache($group, $name, $componentID, $contactID, TRUE, $domainID);
-
-    if ( $group && !isset($name) && $cacheKey) {
-      // check value against the cache, and unset key if values are different
-      $valueDifference = array_diff($override_group, self::$_cache[$cacheKey] );
-      if ( !empty($valueDifference)) {
-        $cacheKey = '';
-      }
-    }
     if (!$cacheKey) {
       $dao = self::dao($group, NULL, $componentID, $contactID, $domainID);
       $dao->find();
@@ -234,15 +244,6 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       }
       $dao->free();
 
-      if ( ! isset($name) ) {
-        // merge db and override group values
-        /* When no $name is present, the getItem() function should return an array 
-           consisting of the sum of all override settings + all settings present in 
-           the database for the given $group (with the overrides taking precedence,
-           and applying even if the setting is not defined in the database).
-        */
-        $values = array_merge($values, $override_group);
-      }
       $cacheKey = self::setCache($values, $group, $componentID, $contactID, $domainID);
     }
     return $name ? CRM_Utils_Array::value($name, self::$_cache[$cacheKey], $defaultValue) : self::$_cache[$cacheKey];
@@ -252,6 +253,9 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * Store multiple items in the setting table
    *
    * @param array $params (required) An api formatted array of keys and values
+   * @param null $domains
+   * @param $settingsToReturn
+   *
    * @domains array an array of domains to get settings for. Default is the current domain
    * @return void
    * @static
@@ -318,9 +322,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @param object $value (required) The value that will be serialized and stored
    * @param string $group (required) The group name of the item
-   * @param string $name  (required) The name of the setting
-   * @param int    $componentID The optional component ID (so componenets can share the same name space)
-   * @param int    $createdID   An optional ID to assign the creator to. If not set, retrieved from session
+   * @param string $name (required) The name of the setting
+   * @param int $componentID The optional component ID (so componenets can share the same name space)
+   * @param null $contactID
+   * @param int $createdID An optional ID to assign the creator to. If not set, retrieved from session
+   *
+   * @param null $domainID
    *
    * @return void
    * @static
@@ -433,8 +440,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * _setItem() is the common logic shared by setItem() and setItems().
    *
    * @param array $params (required) An api formatted array of keys and values
+   * @param null $domains
+   *
+   * @throws api_Exception
    * @domains array an array of domains to get settings for. Default is the current domain
-   * @return void
+   * @return array
    * @static
    * @access public
    */
@@ -497,10 +507,12 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    * gets metadata about the settings fields (from getfields) based on the fields being passed in
    *
    * This function filters on the fields like 'version' & 'debug' that are not settings
+   *
    * @param array $params Parameters as passed into API
    * @param array $fields empty array to be populated with fields metadata
    * @param bool $createMode
    *
+   * @throws api_Exception
    * @return array $fieldstoset name => value array of the fields to be set (with extraneous removed)
    */
   static function validateSettingsInput($params, &$fields, $createMode = TRUE) {
@@ -531,7 +543,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
       list($name) = array_keys($settingParams);
       $getFieldsParams['name'] = $name;
     }
-    $fields = civicrm_api('setting','getfields', $getFieldsParams);
+    $fields = civicrm_api3('setting','getfields', $getFieldsParams);
     $invalidParams = (array_diff_key($settingParams, $fields['values']));
     if (!empty($invalidParams)) {
       throw new api_Exception(implode(',', $invalidParams) . " not valid settings");
@@ -631,6 +643,11 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
    *
    * @params string $name Name of specific setting e.g customCSSURL
    * @params integer $componentID id of relevant component.
+   *
+   * @param null $componentID
+   * @param array $filters
+   * @param null $domainID
+   * @param null $profile
    *
    * @return array $result - the following information as appropriate for each setting
    * - name
@@ -812,6 +829,18 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  /**
+   * @param $group
+   * @param $name
+   * @param bool $system
+   * @param null $userID
+   * @param bool $localize
+   * @param string $returnField
+   * @param bool $returnNameANDLabels
+   * @param null $condition
+   *
+   * @return array
+   */
   static function valueOptions($group,
     $name,
     $system              = TRUE,
@@ -862,6 +891,14 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     return ($returnNameANDLabels) ? $nameAndLabels : $returnValues;
   }
 
+  /**
+   * @param $group
+   * @param $name
+   * @param $value
+   * @param bool $system
+   * @param null $userID
+   * @param string $keyField
+   */
   static function setValueOption($group,
     $name,
     $value,
@@ -877,7 +914,7 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
 
       $cbValues = array();
       foreach ($groupValues as $key => $val) {
-        if (CRM_Utils_Array::value($val, $value)) {
+        if (!empty($value[$val])) {
           $cbValues[$key] = 1;
         }
       }
@@ -898,6 +935,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     self::setItem($optionValue, $group, $name);
   }
 
+  /**
+   * @param $params
+   * @param null $domainID
+   */
   static function fixAndStoreDirAndURL(&$params, $domainID = NULL) {
     if (self::isUpgradeFromPreFourOneAlpha1()) {
       return;
@@ -969,6 +1010,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  /**
+   * @param $params
+   * @param $group
+   */
   static function storeDirectoryOrURLPreferences(&$params, $group) {
     foreach ($params as $name => $value) {
       // always try to store relative directory or url from CMS root
@@ -978,6 +1023,10 @@ class CRM_Core_BAO_Setting extends CRM_Core_DAO_Setting {
     }
   }
 
+  /**
+   * @param $params
+   * @param bool $setInConfig
+   */
   static function retrieveDirectoryAndURLPreferences(&$params, $setInConfig = FALSE) {
     if (CRM_Core_Config::isUpgradeMode()) {
       $isJoomla = (defined('CIVICRM_UF') && CIVICRM_UF == 'Joomla') ? TRUE : FALSE;
@@ -1034,7 +1083,7 @@ AND domain_id = %3
         }
       }
       // CRM-10931, If DB doesn't have any value, carry on with any default value thats already available
-      if (!isset($value) && CRM_Utils_Array::value($dao->name, $params)) {
+      if (!isset($value) && !empty($params[$dao->name])) {
         $value = $params[$dao->name];
       }
       $params[$dao->name] = $value;
@@ -1049,15 +1098,18 @@ AND domain_id = %3
    * Determine what, if any, overrides have been provided
    * for a setting.
    *
+   * @param $group
+   * @param $name
+   * @param $default
+   *
    * @return mixed, NULL or an overriden value
    */
   protected static function getOverride($group, $name, $default) {
     global $civicrm_setting;
     if ($group && $name && isset($civicrm_setting[$group][$name])) {
       return $civicrm_setting[$group][$name];
-    } else if ($group && !isset($name) && isset($civicrm_setting[$group])) {
-      return $civicrm_setting[$group];
-    } else {
+    }
+    else {
       return $default;
     }
   }
