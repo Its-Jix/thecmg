@@ -95,6 +95,13 @@
       '#default_value' => variable_get('civicrm_events_event_types', 0),
       '#description' => t('Filter the types of event to be shown on the calendar.'),
     );
+
+    $form['civicrm_events_event_is_public'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Show Only Public Events'),
+      '#default_value' => variable_get('civicrm_events_event_is_public', 0),
+      '#description' => t('Filter showing  public events.'),
+    );
    
     return system_settings_form($form);
   }
@@ -109,10 +116,13 @@
       return;
     }
   
+    //get fullcalendar path.
+    $fullcalendar_path = libraries_get_path('civicrm_events');
     drupal_add_js(drupal_get_path('module', 'civicrm_events') . '/js/civicrm_events.js');
     drupal_add_css(drupal_get_path('module', 'civicrm_events') . '/css/civicrm_events.css');
-    drupal_add_js(drupal_get_path('module', 'civicrm_events') . '/js/fullcalendar.js');		
-    drupal_add_css(drupal_get_path('module', 'civicrm_events') . '/css/fullcalendar.css');
+    drupal_add_js($fullcalendar_path. '/fullcalendar.js');		
+    drupal_add_css( $fullcalendar_path. '/fullcalendar.css');
+    
     $whereCondition = '';
     $eventTypes = variable_get('civicrm_events_event_types', 0);
     if($eventTypes) {
@@ -130,7 +140,12 @@
       $monthEventsDate = date("Y-m-d h:i:s",strtotime(date("Y-m-d h:i:s", strtotime($currentDate)) . "+".$monthEvents." month"));
       $whereCondition .= " AND civicrm_event.start_date < '" .$monthEventsDate . "'";
     }
-  
+
+    $ispublicEvents = variable_get('civicrm_events_event_is_public', 0);
+    if($ispublicEvents) {
+      $whereCondition .= " AND civicrm_event.is_public > '" .$ispublicEvents. "'";
+    }
+
     $query = "SELECT `id`, `title`, `start_date` as start, `end_date`  as end FROM `civicrm_event` WHERE civicrm_event.is_active = 1 AND civicrm_event.is_template = 0";
   
     $query .= $whereCondition; 
@@ -143,15 +158,12 @@
  
     while ( $dao->fetch( ) ) {
       if ( $dao->title ) { 
-
-if (isset($dao->start_date)){
-        $startDate = date("Y,n,j", strtotime( $dao->start_date ) );
-	$endDate   = date("Y,n,j", strtotime( $dao->end_date ) );
-} elseif ($dao->start){
-        $startDate = date("Y,n,j", strtotime( $dao->start ) );
-	$endDate   = date("Y,n,j", strtotime( $dao->end ) );
-}        
-
+        if( isset($startDate) ) {
+          $startDate = date("Y,n,j", strtotime( $dao->start_date ) );
+        }
+        if( isset($endDate) ) {
+	  $endDate   = date("Y,n,j", strtotime( $dao->end_date ) );
+        }
 	$dao->url =   CRM_Utils_System::url( 'civicrm/event/info', 'id=' . $dao->id );
       }
       $eventData = array();
@@ -165,3 +177,4 @@ if (isset($dao->start_date)){
   
     return "<div id='calendar'></div>";
 }
+

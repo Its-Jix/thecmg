@@ -18,6 +18,7 @@
     variable_set('civicrm_events_event_types', $events);
     variable_set('civicrm_events_event_past', 1);
     variable_set('civicrm_events_event_end_date', 1);
+    variable_set('civicrm_events_event_is_public', 1);
   }
 
   /**
