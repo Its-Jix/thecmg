@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,17 +28,18 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_TagContributions extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
-  protected $_aclFrom;
-  protected $_aclWhere;
   public $_permissionedComponent;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
     $this->_permissionedComponent = 'CiviContribute';
@@ -47,7 +48,7 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
      * Define the columns for search result rows
      */
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Full Name') => 'sort_name',
       ts('First Name') => 'first_name',
       ts('Last Name') => 'last_name',
@@ -56,6 +57,9 @@ class CRM_Contact_Form_Search_Custom_TagContributions implements CRM_Contact_For
     );
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     /**
@@ -118,42 +122,46 @@ SELECT $select
 FROM   $from
 WHERE  $where
 ";
-    //for only contact ids ignore order and group by.
-    if (!$onlyIDs) {
-      $sql .= " GROUP BY contact_a.id";
-      // Define ORDER BY for query in $sort, with default value
-      if (!empty($sort)) {
-        if (is_string($sort)) {
-          $sort = CRM_Utils_Type::escape($sort, 'String');
-          $sql .= " ORDER BY $sort ";
-        }
-        else {
-          $sql .= " ORDER BY " . trim($sort->orderBy());
-        }
+
+    $sql .= " GROUP BY contact_a.id";
+    // Define ORDER BY for query in $sort, with default value
+    if (!empty($sort)) {
+      if (is_string($sort)) {
+        $sort = CRM_Utils_Type::escape($sort, 'String');
+        $sql .= " ORDER BY $sort ";
       }
       else {
-        $sql .= "";
+        $sql .= " ORDER BY " . trim($sort->orderBy());
       }
+    }
+    else {
+      $sql .= "";
     }
     return $sql;
   }
 
+  /**
+   * @return string
+   */
   function from() {
-    $this->buildACLClause('contact_a');
-    $from = "
+    return "
       civicrm_contribution,
       civicrm_contact contact_a
       LEFT JOIN civicrm_entity_tag ON ( civicrm_entity_tag.entity_table = 'civicrm_contact' AND
                                         civicrm_entity_tag.entity_id = contact_a.id )
-      LEFT JOIN civicrm_tag ON civicrm_tag.id = civicrm_entity_tag.tag_id {$this->aclFrom}
+      LEFT JOIN civicrm_tag ON civicrm_tag.id = civicrm_entity_tag.tag_id
 ";
-    return $from;
   }
 
   /*
   * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
   *
   */
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
@@ -194,9 +202,6 @@ WHERE  $where
         $clauses[] = "contact_a.id IN ( $contactIDs )";
       }
     }
-    if ($this->_aclWhere) {
-      $clauses[] = " {$this->_aclWhere} ";
-    }
     return implode(' AND ', $clauses);
   }
 
@@ -204,6 +209,9 @@ WHERE  $where
   /*
      * Functions below generally don't need to be modified
      */
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
@@ -213,14 +221,28 @@ WHERE  $where
     return $dao->N;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   *
+   * @return string
+   */
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = TRUE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -230,15 +252,11 @@ WHERE  $where
     }
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
-
-  /**
-   * @param string $tableAlias
-   */
-  public function buildAclClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
-  }
-
 }
+

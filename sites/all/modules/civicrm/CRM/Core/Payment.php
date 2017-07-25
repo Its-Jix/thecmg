@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -78,17 +78,20 @@ abstract class CRM_Core_Payment {
 
   protected $_paymentProcessor;
 
+  /**
+   * @var CRM_Core_Form
+   */
   protected $_paymentForm = NULL;
 
   /**
    * singleton function used to manage this object
    *
    * @param string  $mode the mode of operation: live or test
-   * @param object  $paymentProcessor the details of the payment processor being invoked
+   * @param array  $paymentProcessor the details of the payment processor being invoked
    * @param object  $paymentForm      reference to the form object if available
    * @param boolean $force            should we force a reload of this payment object
    *
-   * @return object
+   * @return CRM_Core_Payment
    * @static
    *
    */
@@ -125,9 +128,27 @@ abstract class CRM_Core_Payment {
   }
 
   /**
+   * @param $params
+   *
+   * @return mixed
+   */
+  public static function logPaymentNotification($params) {
+    $message = 'payment_notification ';
+    if (!empty($params['processor_name'])) {
+      $message .= 'processor_name=' . $params['processor_name'];
+    }
+    if (!empty($params['processor_id'])) {
+      $message .= 'processor_id=' . $params['processor_id'];
+    }
+
+    $log = new CRM_Utils_SystemLogger();
+    $log->alert($message, $_REQUEST);
+  }
+
+  /**
    * Setter for the payment form that wants to use the processor
    *
-   * @param obj $paymentForm
+   * @param CRM_Core_Form $paymentForm
    *
    */
   function setForm(&$paymentForm) {
@@ -137,7 +158,7 @@ abstract class CRM_Core_Payment {
   /**
    * Getter for payment form that is using the processor
    *
-   * @return obj  A form object
+   * @return CRM_Core_Form  A form object
    */
   function getForm() {
     return $this->_paymentForm;
@@ -165,13 +186,18 @@ abstract class CRM_Core_Payment {
   /**
    * This function checks to see if we have the right config values
    *
-   * @param  string $mode the mode we are operating in (live or test)
+   * @internal param string $mode the mode we are operating in (live or test)
    *
    * @return string the error message if any
    * @public
    */
   abstract function checkConfig();
 
+  /**
+   * @param $paymentProcessor
+   *
+   * @return bool
+   */
   static function paypalRedirect(&$paymentProcessor) {
     if (!$paymentProcessor) {
       return FALSE;
@@ -199,7 +225,6 @@ abstract class CRM_Core_Payment {
         'processor_name' => @$_GET['processor_name'],
         'processor_id' => @$_GET['processor_id'],
         'mode' => @$_GET['mode'],
-        'q' => @$_GET['q'],
       )
     );
   }
@@ -211,46 +236,42 @@ abstract class CRM_Core_Payment {
    * Load requested payment processor and call that processor's handle<$method> method
    *
    * @public
+   * @param $method
+   * @param array $params
    */
-  static function handlePaymentMethod($method, $params = array( )) {
+  static function handlePaymentMethod($method, $params = array()) {
     if (!isset($params['processor_id']) && !isset($params['processor_name'])) {
-      $q = explode('/', CRM_Utils_Array::value('q', $params, ''));
-      $lastParam = array_pop($q);
-      if (is_numeric($lastParam)) {
-        $params['processor_id'] = $_GET['processor_id'] = $lastParam;
-      }
-      else {
-        throw new CRM_Core_Exception("Either 'processor_id' (recommended) or 'processor_name' (deprecated) is required for payment callback.");
-      }
+      CRM_Core_Error::fatal("Either 'processor_id' or 'processor_name' param is required for payment callback");
     }
+    self::logPaymentNotification($params);
 
-    $mode = CRM_Utils_Array::value('mode', $params);
-    $is_test = ($mode == 'test') ? 1 : 0;
+    // Query db for processor ..
+    $mode = @$params['mode'];
 
     $sql = "SELECT ppt.class_name, ppt.name as processor_name, pp.id AS processor_id
               FROM civicrm_payment_processor_type ppt
         INNER JOIN civicrm_payment_processor pp
                 ON pp.payment_processor_type_id = ppt.id
-               AND pp.is_active";
+               AND pp.is_active
+               AND pp.is_test = %1";
+    $args[1] = array($mode == 'test' ? 1 : 0, 'Integer');
 
     if (isset($params['processor_id'])) {
       $sql .= " WHERE pp.id = %2";
       $args[2] = array($params['processor_id'], 'Integer');
-      $notFound = ts("No active instances of payment processor %1 were found.", array(1 => $params['processor_id']));
+      $notfound = "No active instances of payment processor ID#'{$params['processor_id']}'  were found.";
     }
     else {
-      // This is called when processor_name is passed - passing processor_id instead is recommended.
-      $sql .= " WHERE ppt.name = %2 AND pp.is_test = %1";
-      $args[1] = array($is_test, 'Integer');
+      $sql .= " WHERE ppt.name = %2";
       $args[2] = array($params['processor_name'], 'String');
-      $notFound = ts("No active instances of payment processor '%1' were found.", array(1 => $params['processor_name']));
+      $notfound = "No active instances of the '{$params['processor_name']}' payment processor were found.";
     }
 
     $dao = CRM_Core_DAO::executeQuery($sql, $args);
 
     // Check whether we found anything at all ..
     if (!$dao->N) {
-      CRM_Core_Error::fatal($notFound);
+      CRM_Core_Error::fatal($notfound);
     }
 
     $method = 'handle' . $method;
@@ -268,7 +289,10 @@ abstract class CRM_Core_Payment {
       }
       else {
         // Legacy or extension as module instance
-        $paymentClass = 'CRM_Core_' . $dao->class_name;
+        if (empty($paymentClass)) {
+          $paymentClass = 'CRM_Core_' . $dao->class_name;
+
+        }
       }
 
       $paymentProcessor = CRM_Financial_BAO_PaymentProcessor::getPayment($dao->processor_id, $mode);
@@ -295,12 +319,11 @@ abstract class CRM_Core_Payment {
       $extension_instance_found = TRUE;
     }
 
-    if (!$extension_instance_found) {
-      $message = "No extension instances of the '%1' payment processor were found.<br />" .
-        "%2 method is unsupported in legacy payment processors.";
-      CRM_Core_Error::fatal(ts($message, array(1 => $params['processor_name'], 2 => $method)));
-    }
-    
+    if (!$extension_instance_found) CRM_Core_Error::fatal(
+      "No extension instances of the '{$params['processor_name']}' payment processor were found.<br />" .
+      "$method method is unsupported in legacy payment processors."
+    );
+
     // Exit here on web requests, allowing just the plain text response to be echoed
     if ($method == 'handlePaymentNotification') {
       CRM_Utils_System::civiExit();
@@ -319,13 +342,19 @@ abstract class CRM_Core_Payment {
     return method_exists(CRM_Utils_System::getClassName($this), $method);
   }
 
+  /**
+   * @param null $entityID
+   * @param null $entity
+   * @param string $action
+   *
+   * @return string
+   */
   function subscriptionURL($entityID = NULL, $entity = NULL, $action = 'cancel') {
     // Set URL
     switch ($action) {
       case 'cancel' :
         $url = 'civicrm/contribute/unsubscribe';
         break;
-
       case 'billing' :
         //in notify mode don't return the update billing url
         if (!$this->isSupported('updateSubscriptionBillingInfo')) {
@@ -333,7 +362,6 @@ abstract class CRM_Core_Payment {
         }
         $url = 'civicrm/contribute/updatebilling';
         break;
-
       case 'update' :
         $url = 'civicrm/contribute/updaterecur';
         break;
@@ -388,24 +416,4 @@ INNER JOIN civicrm_contribution con ON ( con.contribution_recur_id = rec.id )
     // Else default
     return $this->_paymentProcessor['url_recur'];
   }
-
-  /**
-   * Check for presence of type 1 or type 3 enabled processors (means we can do back-office submit credit/debit card trxns)
-   * @public
-   */
-  static function allowBackofficeCreditCard($template = NULL, $variableName = 'newCredit') {
-    $newCredit = FALSE;
-    // restrict to type=1 (credit card) payment processor payment_types and only include billing mode types 1 and 3
-    $processors = CRM_Core_PseudoConstant::paymentProcessor(FALSE, FALSE,
-      "billing_mode IN ( 1, 3 ) AND payment_type = 1"
-    );
-    if (count($processors) > 0) {
-      $newCredit = TRUE;
-    }
-    if ($template) {
-      $template->assign($variableName, $newCredit);
-    }
-    return $newCredit;
-  }
-
 }

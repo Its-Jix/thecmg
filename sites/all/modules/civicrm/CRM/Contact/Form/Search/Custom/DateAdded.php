@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,17 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
 class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_debug = 0;
-  protected $_aclFrom = NULL;
-  protected $_aclWhere = NULL;
 
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     parent::__construct($formValues);
 
@@ -45,40 +46,42 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     $this->_excludeGroups = CRM_Utils_Array::value('excludeGroups', $formValues, array());
 
     $this->_columns = array(
-      ts('Contact Id') => 'contact_id',
+      ts('Contact ID') => 'contact_id',
       ts('Contact Type') => 'contact_type',
       ts('Name') => 'sort_name',
       ts('Date Added') => 'date_added',
     );
   }
 
+  /**
+   * @param CRM_Core_Form $form
+   */
   function buildForm(&$form) {
     $form->addDate('start_date', ts('Start Date'), FALSE, array('formatType' => 'custom'));
     $form->addDate('end_date', ts('End Date'), FALSE, array('formatType' => 'custom'));
 
     $groups = CRM_Core_PseudoConstant::nestedGroup();
-    $inG = &$form->addElement('advmultiselect', 'includeGroups',
-      ts('Include Group(s)') . ' ', $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+
+    $select2style = array(
+      'multiple' => TRUE,
+      'style' => 'width: 100%; max-width: 60em;',
+      'class' => 'crm-select2',
+      'placeholder' => ts('- select -'),
     );
 
-    $outG = &$form->addElement('advmultiselect', 'excludeGroups',
-      ts('Exclude Group(s)') . ' ', $groups,
-      array(
-        'size' => 5,
-        'style' => 'width:240px',
-        'class' => 'advmultiselect',
-      )
+    $form->add('select', 'includeGroups',
+      ts('Include Group(s)'),
+      $groups,
+      FALSE,
+      $select2style
     );
 
-    $inG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $outG->setButtonAttributes('add', array('value' => ts('Add >>')));
-    $inG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
-    $outG->setButtonAttributes('remove', array('value' => ts('<< Remove')));
+    $form->add('select', 'excludeGroups',
+      ts('Exclude Group(s)'),
+      $groups,
+      FALSE,
+      $select2style
+    );
 
     $this->setTitle('Search by date added to CiviCRM');
 
@@ -98,10 +101,26 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     $form->assign('elements', array('start_date', 'end_date', 'includeGroups', 'excludeGroups'));
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
 
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = FALSE) {
+    return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
+  }
+
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param bool $includeContactIDs
+   * @param bool $justIDs
+   *
+   * @return string
+   */
   function all($offset = 0, $rowcount = 0, $sort = NULL,
     $includeContactIDs = FALSE, $justIDs = FALSE
   ) {
@@ -124,22 +143,27 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
 
     if ($justIDs) {
-      $select = "contact_a.id as contact_id";
+      $selectClause = "contact_a.id as contact_id";
+      $groupBy = " GROUP BY contact_a.id";
+      $sort = "contact_a.id";
     }
     else {
       $selectClause = "contact_a.id  as contact_id,
                        contact_a.contact_type as contact_type,
                        contact_a.sort_name    as sort_name,
                       d.date_added           as date_added";
+      $groupBy = " GROUP BY contact_id ";
     }
 
-    $groupBy = " GROUP BY contact_id ";
     return $this->sql($selectClause,
       $offset, $rowcount, $sort,
       $includeContactIDs, $groupBy
     );
   }
 
+  /**
+   * @return string
+   */
   function from() {
     //define table name
     $randomNum = md5(uniqid());
@@ -340,12 +364,12 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       }
     }
     // end if( $this->_groups ) condition
-    $this->buildACLClause('contact_a');
+
     $from = "FROM civicrm_contact contact_a";
 
     /* We need to join to this again to get the date_added value */
 
-    $from .= " INNER JOIN dates_{$this->_tableName} d ON (contact_a.id = d.id) {$this->_aclFrom}";
+    $from .= " INNER JOIN dates_{$this->_tableName} d ON (contact_a.id = d.id)";
 
     // Only include groups in the search query of one or more Include OR Exclude groups has been selected.
     // CRM-6356
@@ -356,18 +380,25 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     return $from;
   }
 
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
-    $where = '(1)';
-    if ($this->_aclWhere) {
-      $where .= " AND {$this->_aclWhere} ";
-    }
-    return $where;
+    return '(1)';
   }
 
+  /**
+   * @return string
+   */
   function templateFile() {
     return 'CRM/Contact/Form/Search/Custom.tpl';
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -377,6 +408,9 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
     }
   }
 
+  /**
+   * @return mixed
+   */
   function count() {
     $sql = $this->all();
 
@@ -398,12 +432,5 @@ class CRM_Contact_Form_Search_Custom_DateAdded extends CRM_Contact_Form_Search_C
       CRM_Core_DAO::executeQuery($sql, CRM_Core_DAO::$_nullArray);
     }
   }
-
-  /**
-   * @param string $tableAlias
-   */
-  public function buildAclClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
-  }
-
 }
+
