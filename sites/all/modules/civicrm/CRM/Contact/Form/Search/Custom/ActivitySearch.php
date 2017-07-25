@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,16 +28,20 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
-class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_Search_Interface {
+class CRM_Contact_Form_Search_Custom_ActivitySearch extends CRM_Contact_Form_Search_Custom_Base implements CRM_Contact_Form_Search_Interface {
 
   protected $_formValues;
-  protected $_aclFrom = NULL;
-  protected $_aclWhere = NULL;
 
+  /**
+   * @param $formValues
+   */
+  /**
+   * @param $formValues
+   */
   function __construct(&$formValues) {
     $this->_formValues = $formValues;
 
@@ -85,6 +89,9 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     //end custom fields
   }
 
+  /**
+   * @param $form
+   */
   function buildForm(&$form) {
 
     /**
@@ -189,7 +196,7 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     $groupTree = CRM_Core_BAO_CustomGroup::getTree('Activity', $form, NULL, NULL, '', NULL);
 
     foreach ($groupTree as $key) {
-      if ($key['extends'] == 'Activity') {
+      if (!empty($key['extends']) && $key['extends'] == 'Activity') {
         $select .= ", " . $key['table_name'] . ".*";
         $from .= " LEFT JOIN " . $key['table_name'] . " ON " . $key['table_name'] . ".entity_id = activity.id";
       }
@@ -214,6 +221,12 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
         $sql .= 'ORDER BY contact_a.sort_name, activity.activity_date_time DESC, activity.activity_type_id, activity.status_id, activity.subject';
       }
     }
+    else {
+      //CRM-14107, since there could be multiple activities against same contact,
+      //we need to provide GROUP BY on contact id to prevent duplicacy on prev/next entries
+      $sql .= 'GROUP BY contact_a.id
+ORDER BY contact_a.sort_name';
+    }
 
     if ($rowcount > 0 && $offset >= 0) {
       $offset = CRM_Utils_Type::escape($offset, 'Int');
@@ -225,19 +238,24 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
 
   // Alters the date display in the Activity Date Column. We do this after we already have
   // the result so that sorting on the date column stays pertinent to the numeric date value
+  /**
+   * @param $row
+   */
   function alterRow(&$row) {
     $row['activity_date'] = CRM_Utils_Date::customFormat($row['activity_date'], '%B %E%f, %Y %l:%M %P');
   }
 
   // Regular JOIN statements here to limit results to contacts who have activities.
+  /**
+   * @return string
+   */
   function from() {
-    $this->buildACLClause('contact_a');
     $activityContacts = CRM_Core_OptionGroup::values('activity_contacts', FALSE, FALSE, FALSE, NULL, 'name');
     $assigneeID = CRM_Utils_Array::key('Activity Assignees', $activityContacts);
     $targetID = CRM_Utils_Array::key('Activity Targets', $activityContacts);
     $sourceID = CRM_Utils_Array::key('Activity Source', $activityContacts);
 
-    $from = "
+    return "
         civicrm_activity activity
             LEFT JOIN civicrm_activity_contact target
                  ON activity.id = target.activity_id AND target.record_type_id = {$targetID}
@@ -256,15 +274,18 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
             LEFT JOIN civicrm_activity_contact assignment
                  ON activity.id = assignment.activity_id AND assignment.record_type_id = {$assigneeID}
             LEFT JOIN civicrm_contact contact_c
-                 ON assignment.contact_id = contact_c.id {$this->_aclFrom}";
-
-    return $from;
+                 ON assignment.contact_id = contact_c.id ";
   }
 
   /*
      * WHERE clause is an array built from any required JOINS plus conditional filters based on search criteria field values
      *
      */
+  /**
+   * @param bool $includeContactIDs
+   *
+   * @return string
+   */
   function where($includeContactIDs = FALSE) {
     $clauses = array();
 
@@ -332,14 +353,12 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
       }
     }
 
-    if ($this->_aclWhere) {
-      $clauses[] = " {$this->_aclWhere}";
-    }
     return implode(' AND ', $clauses);
   }
 
-  /*
+  /**
    * Functions below generally don't need to be modified
+   * @return integer
    */
   function count() {
     $sql = $this->all();
@@ -350,14 +369,28 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     return $dao->N;
   }
 
-  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL) {
+  /**
+   * @param int $offset
+   * @param int $rowcount
+   * @param null $sort
+   * @param boolean $returnSQL Not used; included for consistency with parent; SQL is always returned
+   *
+   * @return string
+   */
+  function contactIDs($offset = 0, $rowcount = 0, $sort = NULL, $returnSQL = TRUE) {
     return $this->all($offset, $rowcount, $sort, FALSE, TRUE);
   }
 
+  /**
+   * @return array
+   */
   function &columns() {
     return $this->_columns;
   }
 
+  /**
+   * @param $title
+   */
   function setTitle($title) {
     if ($title) {
       CRM_Utils_System::setTitle($title);
@@ -367,15 +400,11 @@ class CRM_Contact_Form_Search_Custom_ActivitySearch implements CRM_Contact_Form_
     }
   }
 
+  /**
+   * @return null
+   */
   function summary() {
     return NULL;
   }
-
-  /**
-   * @param string $tableAlias
-   */
-  public function buildAclClause($tableAlias = 'contact') {
-    list($this->_aclFrom, $this->_aclWhere) = CRM_Contact_BAO_Contact_Permission::cacheClause($tableAlias);
-  }
-
 }
+

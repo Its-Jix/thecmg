@@ -2,9 +2,9 @@
 
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.5                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2014                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -29,7 +29,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2014
  * $Id$
  *
  */
@@ -43,7 +43,10 @@ class CRM_Financial_Page_AJAX {
    * $financialAccountType array with key account relationship and value financial account type option groups
    *
    */
-  function jqFinancial($config) {
+  /**
+   * @param $config
+   */
+  static function jqFinancial($config) {
     if (!isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
@@ -90,7 +93,10 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($elements);
   }
 
-  function jqFinancialRelation($config) {
+  /**
+   * @param $config
+   */
+  static function jqFinancialRelation($config) {
     if (!isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
@@ -106,8 +112,7 @@ class CRM_Financial_Page_AJAX {
         '3' => array(1, 9), //revenue
         '4' => array(7), //cost of sales
       );
-      $financialAccountId = CRM_Utils_Request::retrieve('_value', 'Positive', CRM_Core_DAO::$_nullObject);
-      $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $financialAccountId, 'financial_account_type_id');
+      $financialAccountTypeId = CRM_Core_DAO::getFieldValue('CRM_Financial_DAO_FinancialAccount', $_GET['_value'], 'financial_account_type_id');
       $result = CRM_Core_PseudoConstant::get('CRM_Financial_DAO_EntityFinancialAccount', 'account_relationship');
     }
 
@@ -147,13 +152,16 @@ class CRM_Financial_Page_AJAX {
     CRM_Utils_JSON::output($elements);
   }
 
-  function jqFinancialType($config) {
+  /**
+   * @param $config
+   */
+  static function jqFinancialType($config) {
     if (! isset($_GET['_value']) ||
       empty($_GET['_value'])) {
       CRM_Utils_System::civiExit();
     }
-    $productId = CRM_Utils_Request::retrieve('_value', 'Positive', CRM_Core_DAO::$_nullObject);
-    $elements = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $productId, 'financial_type_id');
+
+    $elements = CRM_Core_DAO::getFieldValue('CRM_Contribute_DAO_Product', $_GET['_value'], 'financial_type_id');
     CRM_Utils_JSON::output($elements);
   }
 
@@ -170,7 +178,7 @@ class CRM_Financial_Page_AJAX {
       }
     }
 
-    $entityID = CRM_Utils_Request::retrieve('entityID', 'Positive', CRM_Core_DAO::$_nullObject, FALSE, NULL, 'POST');
+    $entityID  = CRM_Utils_Array::value('entityID', $_POST);
     $methods = array(
       'assign' => 'addBatchEntity',
       'remove' => 'removeBatchEntity',
@@ -374,19 +382,58 @@ class CRM_Financial_Page_AJAX {
         if (isset($notPresent)) {
           $js = "enableActions('x')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_x_". $financialItem->id."' name='mark_x_". $financialItem->id."' value='1' onclick={$js}></input>";
-          $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(CRM_Financial_Form_BatchTransaction::links(), null, array('id' => $financialItem->id, 'contid' => $financialItem->contributionID, 'cid' => $financialItem->contact_id));
+          $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
+            CRM_Financial_Form_BatchTransaction::links(),
+            null,
+            array(
+              'id' => $financialItem->id,
+              'contid' => $financialItem->contributionID,
+              'cid' => $financialItem->contact_id
+            ),
+            ts('more'),
+            FALSE,
+            'financialItem.batch.row',
+            'FinancialItem',
+            $financialItem->id
+          );
         }
         else {
           $js = "enableActions('y')";
           $row[$financialItem->id]['check'] = "<input type='checkbox' id='mark_y_". $financialItem->id."' name='mark_y_". $financialItem->id."' value='1' onclick={$js}></input>";
-          $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(CRM_Financial_Page_BatchTransaction::links(), null, array('id' => $financialItem->id, 'contid' => $financialItem->contributionID, 'cid' => $financialItem->contact_id));
+          $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
+            CRM_Financial_Page_BatchTransaction::links(),
+            null,
+            array(
+              'id' => $financialItem->id,
+              'contid' => $financialItem->contributionID,
+              'cid' => $financialItem->contact_id
+            ),
+            ts('more'),
+            FALSE,
+            'financialItem.batch.row',
+            'FinancialItem',
+            $financialItem->id
+          );
         }
       }
       else {
         $row[$financialItem->id]['check'] = NULL;
         $links = CRM_Financial_Page_BatchTransaction::links();
         unset($links['remove']);
-        $row[$financialItem->id]['action'] = CRM_Core_Action::formLink($links, null, array('id' => $financialItem->id, 'contid' => $financialItem->contributionID, 'cid' => $financialItem->contact_id));
+        $row[$financialItem->id]['action'] = CRM_Core_Action::formLink(
+          $links,
+          null,
+          array(
+            'id' => $financialItem->id,
+            'contid' => $financialItem->contributionID,
+            'cid' => $financialItem->contact_id
+          ),
+          ts('more'),
+          FALSE,
+          'financialItem.batch.row',
+          'FinancialItem',
+          $financialItem->id
+        );
       }
       $row[$financialItem->id]['contact_type'] = CRM_Contact_BAO_Contact_Utils::getImage(CRM_Utils_Array::value('contact_sub_type',$row[$financialItem->id]) ? CRM_Utils_Array::value('contact_sub_type',$row[$financialItem->id]) : CRM_Utils_Array::value('contact_type',$row[$financialItem->id]) ,false, $financialItem->contact_id);
       $financialitems = $row;
@@ -399,7 +446,6 @@ class CRM_Financial_Page_AJAX {
         'amount', 'trxn_id', 'transaction_date', 'payment_method', 'status', 'name', 'action',
       );
 
-    header('Content-Type: application/json');
     echo CRM_Utils_JSON::encodeDataTableSelector($financialitems, $sEcho, $iTotal, $iFilteredTotal, $selectorElements);
     CRM_Utils_System::civiExit();
   }
