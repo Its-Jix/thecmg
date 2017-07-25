@@ -1,9 +1,9 @@
 <?php
 /*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.4                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2013                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -28,7 +28,7 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2013
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
@@ -372,10 +372,20 @@ function _civicrm_install_db($dbuser, $dbpass, $dbhost, $dbname,
   $siteRoot = drush_get_context('DRUSH_DRUPAL_SITE_ROOT', FALSE);
 
   $sqlPath = "$modPath/civicrm/sql";
-  $conn = @mysql_connect($dbhost, $dbuser, $dbpass);
-  if (!@mysql_select_db($dbname) &&
-    !@mysql_query("CREATE DATABASE $database")
-  ) {
+
+  if (function_exists('mysqli_connect')) {
+    $dbhostParts = explode(':', $dbhost);
+    $conn = @mysqli_connect($dbhostParts[0], $dbuser, $dbpass, '', isset($dbhostParts[1]) ? $dbhostParts[1] : NULL);
+    $dbOK = ($a = @mysqli_select_db($conn, $dbname)) || ($b = @mysqli_query($conn, "CREATE DATABASE $dbname"));
+  }
+  elseif (function_exists('mysql_connect')) {
+    $conn = @mysql_connect($dbhost, $dbuser, $dbpass);
+    $dbOK = @mysql_select_db($dbname, $conn) || @mysql_query("CREATE DATABASE $dbname", $conn);
+  }
+  else {
+    $dbOK = FALSE;
+  }
+  if (!$dbOK) {
     drush_die(dt('CiviCRM database was not found. Failed to create one.'));
   }
 
@@ -684,10 +694,16 @@ function drush_civicrm_upgrade_db_validate() {
 function drush_civicrm_upgrade_db() {
   if (class_exists('CRM_Upgrade_Headless')) {
     // Note: CRM_Upgrade_Headless introduced in 4.2 -- at the same time as class auto-loading
+    $codeVer = CRM_Utils_System::version();
+    $dbVer = CRM_Core_BAO_Domain::version();
+    if (version_compare($codeVer, $dbVer) == 0) {
+      drush_print(dt("You are already upgraded to CiviCRM @version", array('@version' => $codeVer)));
+      return TRUE;
+    }
     $upgradeHeadless = new CRM_Upgrade_Headless();
     // FIXME Exception handling?
     $result = $upgradeHeadless->run();
-    drush_print("Upgrade outputs: " . "\"" . $result['message'] . "\"");
+    drush_print("Upgrade outputs:\n" . $result['text']);
   }
   else {
     require_once 'CRM/Core/Smarty.php';
@@ -788,7 +804,7 @@ function drush_civicrm_cacheclear() {
   $result = civicrm_api('System', 'flush', $params);
 
   if ($result['is_error']) {
-    drush_log(dt('An error occured: !message', array('!message' => $result['error_message'])), 'error');
+    drush_log(dt('An error occurred: !message', array('!message' => $result['error_message'])), 'error');
     return;
   }
 
@@ -812,7 +828,7 @@ function drush_civicrm_enable_debug() {
     $result = civicrm_api('Setting', 'create', array('version' => 3, $key => $val));
 
     if ($result['is_error']) {
-      drush_log(dt('An error occured: !message', array('!message' => $result['error_message'])), 'error');
+      drush_log(dt('An error occurred: !message', array('!message' => $result['error_message'])), 'error');
       return;
     }
   }
@@ -837,7 +853,7 @@ function drush_civicrm_disable_debug() {
     $result = civicrm_api('Setting', 'create', array('version' => 3, $key => $val));
 
     if ($result['is_error']) {
-      drush_log(dt('An error occured: !message', array('!message' => $result['error_message'])), 'error');
+      drush_log(dt('An error occurred: !message', array('!message' => $result['error_message'])), 'error');
       return;
     }
   }

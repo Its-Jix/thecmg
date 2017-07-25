@@ -1,9 +1,9 @@
 <?php
 /*
 +--------------------------------------------------------------------+
-| CiviCRM version 4.5                                                |
+| CiviCRM version 4.6                                                |
 +--------------------------------------------------------------------+
-| Copyright CiviCRM LLC (c) 2004-2014                                |
+| Copyright CiviCRM LLC (c) 2004-2015                                |
 +--------------------------------------------------------------------+
 | This file is a part of CiviCRM.                                    |
 |                                                                    |
@@ -27,16 +27,15 @@
 /**
  *
  * @package CRM
- * @copyright CiviCRM LLC (c) 2004-2014
+ * @copyright CiviCRM LLC (c) 2004-2015
  * $Id$
  *
  */
-class CRM_Core_DAO_AllCoreTables
-{
+class CRM_Core_DAO_AllCoreTables {
   static private $tables = null;
   static private $daoToClass = null;
-  static private function init($fresh = FALSE)
-  {
+  static private $entityTypes = null;
+  static public function init($fresh = FALSE) {
     static $init = FALSE;
     if ($init && !$fresh) return;
     $entityTypes = array(
@@ -115,6 +114,11 @@ class CRM_Core_DAO_AllCoreTables
         'class' => 'CRM_Core_DAO_ActionMapping',
         'table' => 'civicrm_action_mapping',
       ) ,
+      'CRM_Core_DAO_RecurringEntity' => array(
+        'name' => 'RecurringEntity',
+        'class' => 'CRM_Core_DAO_RecurringEntity',
+        'table' => 'civicrm_recurring_entity',
+      ) ,
       'CRM_ACL_DAO_ACL' => array(
         'name' => 'ACL',
         'class' => 'CRM_ACL_DAO_ACL',
@@ -164,6 +168,11 @@ class CRM_Core_DAO_AllCoreTables
         'name' => 'Component',
         'class' => 'CRM_Mailing_DAO_Component',
         'table' => 'civicrm_mailing_component',
+      ) ,
+      'CRM_Mailing_DAO_MailingAB' => array(
+        'name' => 'MailingAB',
+        'class' => 'CRM_Mailing_DAO_MailingAB',
+        'table' => 'civicrm_mailing_abtest',
       ) ,
       'CRM_Mailing_DAO_BounceType' => array(
         'name' => 'BounceType',
@@ -289,6 +298,11 @@ class CRM_Core_DAO_AllCoreTables
         'name' => 'PCP',
         'class' => 'CRM_PCP_DAO_PCP',
         'table' => 'civicrm_pcp',
+      ) ,
+      'CRM_Cxn_DAO_Cxn' => array(
+        'name' => 'Cxn',
+        'class' => 'CRM_Cxn_DAO_Cxn',
+        'table' => 'civicrm_cxn',
       ) ,
       'CRM_Core_DAO_Cache' => array(
         'name' => 'Cache',
@@ -560,6 +574,11 @@ class CRM_Core_DAO_AllCoreTables
         'class' => 'CRM_Financial_DAO_PaymentProcessor',
         'table' => 'civicrm_payment_processor',
       ) ,
+      'CRM_Financial_DAO_PaymentToken' => array(
+        'name' => 'PaymentToken',
+        'class' => 'CRM_Financial_DAO_PaymentToken',
+        'table' => 'civicrm_payment_token',
+      ) ,
       'CRM_Member_DAO_MembershipType' => array(
         'name' => 'MembershipType',
         'class' => 'CRM_Member_DAO_MembershipType',
@@ -777,6 +796,7 @@ class CRM_Core_DAO_AllCoreTables
       ) ,
     );
     CRM_Utils_Hook::entityTypes($entityTypes);
+    self::$entityTypes = array();
     self::$tables = array();
     self::$daoToClass = array();
     foreach($entityTypes as $entityType) {
@@ -784,59 +804,59 @@ class CRM_Core_DAO_AllCoreTables
     }
     $init = TRUE;
   }
-  static private function registerEntityType($daoName, $className, $tableName)
-  {
+  /**
+   * (Quasi-Private) Do not call externally (except for unit-testing)
+   */
+  static public function registerEntityType($daoName, $className, $tableName) {
     self::$daoToClass[$daoName] = $className;
     self::$tables[$tableName] = $className;
+    self::$entityTypes[$className] = array(
+      'name' => $daoName,
+      'class' => $className,
+      'table' => $tableName,
+    );
   }
-  static public function tables()
-  {
+  static public function get() {
+    self::init();
+    return self::$entityTypes;
+  }
+  static public function tables() {
     self::init();
     return self::$tables;
   }
-  static public function daoToClass()
-  {
+  static public function daoToClass() {
     self::init();
     return self::$daoToClass;
   }
-  static public function getCoreTables()
-  {
+  static public function getCoreTables() {
     return self::tables();
   }
-  static public function isCoreTable($tableName)
-  {
+  static public function isCoreTable($tableName) {
     return FALSE !== array_search($tableName, self::tables());
   }
-  static public function getCanonicalClassName($className)
-  {
+  static public function getCanonicalClassName($className) {
     return str_replace('_BAO_', '_DAO_', $className);
   }
-  static public function getClasses()
-  {
+  static public function getClasses() {
     return array_values(self::daoToClass());
   }
-  static public function getClassForTable($tableName)
-  {
+  static public function getClassForTable($tableName) {
     return CRM_Utils_Array::value($tableName, self::tables());
   }
-  static public function getFullName($daoName)
-  {
+  static public function getFullName($daoName) {
     return CRM_Utils_Array::value($daoName, self::daoToClass());
   }
-  static public function getBriefName($className)
-  {
+  static public function getBriefName($className) {
     return CRM_Utils_Array::value($className, array_flip(self::daoToClass()));
   }
   /**
    * @param string $className DAO or BAO name
    * @return string|FALSE SQL table name
    */
-  static public function getTableForClass($className)
-  {
+  static public function getTableForClass($className) {
     return array_search(self::getCanonicalClassName($className) , self::tables());
   }
-  static public function reinitializeCache($fresh = FALSE)
-  {
+  static public function reinitializeCache($fresh = FALSE) {
     self::init($fresh);
   }
 }

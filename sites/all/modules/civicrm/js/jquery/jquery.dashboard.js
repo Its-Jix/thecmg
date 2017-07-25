@@ -1,8 +1,8 @@
 /**
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -36,8 +36,11 @@
  *      Draggable
  *      UI Core
  *
+ * NOTE: This file is viewed as "legacy" and shouldn't be used to
+ * develop new functionality. Its lint problems are grandfathered
+ * (although if someone wants to cleanup+test, please feel welcome).
  */
-
+/* jshint ignore:start */
 (function($) { // Create closure.
   // Constructor for dashboard object.
   $.fn.dashboard = function(options) {
@@ -78,19 +81,19 @@
       var params = {};
 
       // For each column...
-      for (var c in dashboard.columns) {
+      for (var c2 in dashboard.columns) {
 
         // IDs of the sortable elements in this column.
-        if( typeof dashboard.columns[c] == 'object' ) var ids = dashboard.columns[c].element.sortable('toArray');
+        var ids = (typeof dashboard.columns[c2] == 'object') ? dashboard.columns[c2].element.sortable('toArray') : undefined;
 
         // For each id...
         for (var w in ids) {
           // Chop 'widget-' off of the front so that we have the real widget id.
-          if( typeof ids[w] == 'string' ) var id = ids[w].substring('widget-'.length);
+          var id = (typeof ids[w] == 'string') ? ids[w].substring('widget-'.length) : undefined;
 
           // Add one flat property to the params object that will look like an array element to the PHP server.
           // Unfortunately jQuery doesn't do this for us.
-          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
+          if ( typeof dashboard.widgets[id] == 'object' ) params['columns[' + c2 + '][' + id + ']'] = (dashboard.widgets[id].minimized ? '1' : '0');
         }
       }
 
@@ -146,7 +149,7 @@
     /**
      * Private properties of dashboard.
      */
-    
+
     // Used to determine whether there are any incomplete ajax requests pending initialization of the dashboard.
     var asynchronousRequestCounter = 0;
 
@@ -182,7 +185,7 @@
               initialWidgets: Array(),
               element: $('<ul id="column-' + c + '" class="column column-' + c + '"></ul>').appendTo(dashboard.element)
           };
-        
+
           // Add the empty placeholder now, hide it and save it.
           col.emptyPlaceholder = $(markup).appendTo(col.element).hide();
 
@@ -196,7 +199,7 @@
                   initialColumn: col,
                   minimized: ( widgets[c][widgetID[1]] > 0  ? true : false )
               });
-          
+
               //set empty Dashboard to false
               emptyDashboard = false;
           }
@@ -205,7 +208,7 @@
       if ( emptyDashboard ) {
           emptyDashboardCondition( );
       }
-      
+
       invokeCallback(opts.callbacks.init, dashboard);
     }
 
@@ -214,7 +217,7 @@
         cj(".show-refresh").hide( );
         cj("#empty-message").show( );
     }
-    
+
     // Contructors for each widget call this when initialization has finished so that dashboard can complete it's intitialization.
     function completeInit() {
       // Don't do anything if any widgets are waiting for ajax requests to complete in order to finish initialization.
@@ -230,18 +233,18 @@
         handle: '.widget-header',
 
         // The class of placeholder elements (the 'ghost' widget showing where the dragged item would land if released now.)
-        placeholder: 'placeholder',   
-        activate: function(event, ui) { 
-		  var h= cj(ui.item).height(); 
+        placeholder: 'placeholder',
+        activate: function(event, ui) {
+		  var h= cj(ui.item).height();
 		  $('.placeholder').css('height', h +'px'); },
-         	    
+
         opacity: 0.2,
 
         // Maks sure that only widgets are sortable, and not empty placeholders.
         items: '> .widget',
-        
+
         forcePlaceholderSize: true,
-        
+
         // Callback functions.
         update: resorted,
         start: hideEmptyPlaceholders
@@ -266,7 +269,7 @@
     // Callback for when a user starts resorting a list.  Hides all the empty placeholders.
     function hideEmptyPlaceholders(e, ui) {
         for (var c in dashboard.columns) {
-            if( typeof dashboard.columns[c] == 'object ' ) dashboard.columns[c].emptyPlaceholder.hide();
+            if( (typeof dashboard.columns[c]) == 'object' ) dashboard.columns[c].emptyPlaceholder.hide();
         }
     }
 
@@ -365,10 +368,10 @@
         }
 
         // Things get messy here.
-        // @todo Refactor to use currentState and targetedState properties to determine what needs 
-        // to be done to get to any desired state on any UI or AJAX event – since these don't always 
-        // match.  
-        // E.g.  When a user starts a new UI event before the Ajax event handler from a previous 
+        // @todo Refactor to use currentState and targetedState properties to determine what needs
+        // to be done to get to any desired state on any UI or AJAX event – since these don't always
+        // match.
+        // E.g.  When a user starts a new UI event before the Ajax event handler from a previous
         // UI event gets invoked.
 
         // Hide the settings first of all.
@@ -413,7 +416,7 @@
         }
         CRM.loadPage(widget.fullscreenUrl);
       };
-      
+
       // Exit fullscreen mode.
       widget.exitFullscreen = function() {
         // This is just a wrapper for dashboard.exitFullscreen() which does the heavy lifting.
@@ -422,7 +425,7 @@
 
       // Adds controls to a widget.  id is for internal use and image file name in images/dashboard/ (a .gif).
       widget.addControl = function(id, control) {
-          var markup = '<a class="widget-icon ' + id + '-icon" alt="' + control.description + '" title="' + control.description + '"></a>';    
+          var markup = '<a class="widget-icon ' + id + '-icon" alt="' + control.description + '" title="' + control.description + '"></a>';
           control.element = $(markup).prependTo($('.widget-controls', widget.element)).click(control.callback);
       };
 
@@ -435,7 +438,7 @@
 
       // Removes the widget from the dashboard, and saves columns.
       widget.remove = function() {
-          if ( confirm( 'Are you sure you want to remove "' + widget.title + '"?') ) {  
+          if ( confirm( 'Are you sure you want to remove "' + widget.title + '"?') ) {
               invokeCallback(opts.widgetCallbacks.remove, widget);
               widget.element.fadeOut(opts.animationSpeed, function() {
                   $(this).remove();
@@ -578,14 +581,14 @@
         if (!widget.throbber) {
           widget.throbber = $(opts.throbberMarkup).appendTo($('.widget-wrapper', widget.element));
         }
-      };
+      }
 
       // Event handler/callback for cancel button clicks.
       // @todo test this gets caught by all browsers when the cancel button is 'clicked' via the keyboard.
       function cancelEditSettings() {
         widget.toggleSettings();
         return false;
-      };
+      }
 
       // Helper function to execute external script on the server.
       // @todo It would be nice to provide some context to the script.  How?
@@ -594,7 +597,7 @@
           $.getScript(url);
         }
       }
-    };
+    }
   };
 
   // Public static properties of dashboard.  Default settings.

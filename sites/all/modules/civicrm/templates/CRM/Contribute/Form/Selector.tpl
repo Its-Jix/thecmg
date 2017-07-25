@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -32,7 +32,6 @@
     {if !$single and $context eq 'Search' }
         <th scope="col" title="Select Rows">{$form.toggleSelect.html}</th>
     {/if}
-    {assign var="softCreditColumns" value=0}
     {foreach from=$columnHeaders item=header}
         <th scope="col">
         {if $header.sort}
@@ -40,14 +39,11 @@
           {$sort->_response.$key.link}
         {else}
           {$header.name}
-	  {/if}
+    {/if}
         </th>
-	{if $header.name eq "Soft Credit For"}
-	  {assign var='softCreditColumns' value=1}
-	{/if}
     {/foreach}
   </tr>
-  </thead> 
+  </thead>
 
   {counter start=0 skip=1 print=false}
   {foreach from=$rows item=row}
@@ -65,7 +61,7 @@
     {else}
       <td class="right bold crm-contribution-amount"><span class="nowrap">{$row.total_amount|crmMoney:$row.currency}</span> {if $row.amount_level }<br /> ({$row.amount_level}){/if}
       {if $row.contribution_recur_id}
-	<br /> {ts}(Recurring Contribution){/ts}
+  <br /> {ts}(Recurring Contribution){/ts}
       {/if}
       </td>
     {/if}

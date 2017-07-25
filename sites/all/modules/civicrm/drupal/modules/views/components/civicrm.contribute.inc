@@ -1,7 +1,7 @@
 <?php
 /*
   +--------------------------------------------------------------------+
-  | CiviCRM version 4.4                                                |
+  | CiviCRM version 4.6                                                |
   +--------------------------------------------------------------------+
   | This file is a part of CiviCRM.                                    |
   |                                                                    |
@@ -217,6 +217,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
@@ -237,6 +238,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
@@ -256,6 +258,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
@@ -276,6 +279,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
@@ -605,7 +609,8 @@ function _civicrm_contribute_data(&$data, $enabled) {
     ),
     'relationship' => array(
       'base' => 'civicrm_contact',
-      'field' => 'id',
+      'left_field' => 'id',
+      'field' => 'contact_id',
       'handler' => 'views_handler_relationship',
       'label' => t('Soft Contribution -> Contact Record'),
     ),
@@ -617,6 +622,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument',
@@ -742,6 +748,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument',
@@ -1125,6 +1132,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',
@@ -1365,6 +1373,7 @@ function _civicrm_contribute_data(&$data, $enabled) {
     'field' => array(
       'handler' => 'civicrm_handler_field_money',
       'click sortable' => TRUE,
+      'currency field' => 'currency',
     ),
     'argument' => array(
       'handler' => 'views_handler_argument_numeric',

@@ -2474,27 +2474,33 @@ class DB_DataObject extends DB_DataObject_Overload
             return $this->raiseError($result);
         }
 
-        /* CRM-3225 */
-        if (function_exists('variable_get') && variable_get('dev_query', 0)) {
-            // this is for drupal devel module
-            // If devel.module query logging is enabled, prepend a comment with the username and calling function
-            // to the SQL string.
-            $bt = debug_backtrace();
-            // t() may not be available yet so we don't wrap 'Anonymous'
-            $name = $user->uid ? $user->name : variable_get('anonymous', 'Anonymous');
-            $query = $bt[3]['function'] ."\n/* ". $name .' */ '. str_replace("\n ", '', $string);
-            list($usec, $sec) = explode(' ', microtime());
-            $stop = (float)$usec + (float)$sec;
-            $diff = $stop - $time;
-            $queries[] = array($query, $diff);
-        }
+        $action = strtolower(substr(trim($string),0,6));
 
-        if (!empty($_DB_DATAOBJECT['CONFIG']['debug'])) {
-            $t= explode(' ',microtime());
-            $_DB_DATAOBJECT['QUERYENDTIME'] = $t[0]+$t[1];
-            $this->debug('QUERY DONE IN  '.($t[0]+$t[1]-$time)." seconds", 'query',1);
+        if (!empty($_DB_DATAOBJECT['CONFIG']['debug']) || defined('CIVICRM_DEBUG_LOG_QUERY')) {
+          $timeTaken = sprintf("%0.6f", microtime(TRUE) - $time);
+          $alertLevel = $this->getAlertLevel($timeTaken);
+
+          $message = "$alertLevel QUERY DONE IN $timeTaken  seconds.";
+          if (in_array($action, array('insert', 'update', 'delete')) && $_DB_driver == 'DB') {
+            $message .= " " . $DB->affectedRows() . " row(s)s subject to $action action";
+          }
+          elseif (is_a($result, 'DB_result') && method_exists($result, 'numrows')) {
+            $message .= " Result is {$result->numRows()} rows by {$result->numCols()} columns. ";
+          }
+          elseif ($result === 1) {
+            $message .= " No further information is available for this type of query";
+          }
+          else {
+            echo $message .= " not quite sure why this query does not have more info";
+          }
+          if (defined('CIVICRM_DEBUG_LOG_QUERY')) {
+            CRM_Core_Error::debug_log_message($message, FALSE, 'sql_log');
+          }
+          else {
+            $this->debug($message, 'query', 1);
+          }
         }
-        switch (strtolower(substr(trim($string),0,6))) {
+        switch ($action) {
             case 'insert':
             case 'update':
             case 'delete':
@@ -4158,7 +4164,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @access  public
      * @return  none
      */
-    function debugLevel($v = null)
+    public static function debugLevel($v = null)
     {
         global $_DB_DATAOBJECT;
         if (empty($_DB_DATAOBJECT['CONFIG'])) {
@@ -4238,7 +4244,7 @@ class DB_DataObject extends DB_DataObject_Overload
      * @access   public
      * @return   object an error object
      */
-    function _loadConfig()
+    public static function _loadConfig()
     {
         global $_DB_DATAOBJECT;
 
@@ -4287,6 +4293,10 @@ class DB_DataObject extends DB_DataObject_Overload
 
 
 
+  public function lastInsertId() {
+    $DB = &$_DB_DATAOBJECT['CONNECTIONS'][$this->_database_dsn_md5];
+    return $DB->lastInsertId();
+  }
 
 }
 // technially 4.3.2RC1 was broken!!

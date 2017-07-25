@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -35,16 +35,16 @@
     <tbody>
        {foreach from=$dedupeExceptions item=exception key=id}
        <tr id="dupeRow_{$id}" class="{cycle values="odd-row,even-row"}">
-     <td>{$exception.main.name}</td>
-     <td>{$exception.other.name}</td>
-     <td><a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.main.id}, {$exception.other.id}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a></td>
+          <td><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.main.id`"}>{$exception.main.name}</a></td>
+          <td><a href ={crmURL p='civicrm/contact/view' q="reset=1&cid=`$exception.other.id`"}>{$exception.other.name}</a></td>
+          <td><a id='duplicateContacts' href="#" title={ts}Remove Exception{/ts} onClick="processDupes( {$exception.main.id}, {$exception.other.id}, 'nondupe-dupe', 'dedupe-exception' );return false;">&raquo; {ts}Remove Exception{/ts}</a></td>
        </tr>
        {/foreach}
     </tbody>
 </table>
 <div class="clear"><br /></div>
 <div class="action-link">
-    <a href="{crmURL p="civicrm/contact/deduperules" q="reset=1"}" class="button"><span>{ts}Done{/ts}</span></a>
+    {crmButton p="civicrm/contact/deduperules" q="reset=1" icon="close"}{ts}Done{/ts}{/crmButton}
 </div>
 
 

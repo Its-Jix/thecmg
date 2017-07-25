@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -52,10 +52,10 @@
       <div class="bold" style="padding: 1em; background-color: rgba(255, 255, 255, 0.76);">
         <p>
           <img style="display:block; float:left; width:40px; margin-right:10px;" src="{$config->resourceBase}i/logo_lg.png">
-          {ts 1='https://civicrm.org/membership'}If you feel that CiviCRM is valuable to your organization, consider that thousands of organizations worldwide also feel the same way. Protect your investment, and theirs, by <a href="%1" target="_blank">ensuring that CiviCRM remains stable, sustainable and consistently improving through membership</a>. ~Donald Lobo {/ts}
+          {ts 1="https://civicrm.org/become-a-member?src=ug&sid=$sid" 2="https://civicrm.org/contribute?src=ug&sid=$sid"}Congrats! You’ve successfully upgraded to the latest CiviCRM LTS version. Emphasizing stability over the newest features, CiviCRM LTS delivers solid functionality and is well supported by a group of CiviCRM enthusiasts and avid contributors. You can support ongoing maintenance of CiviCRM by <a href="%1" target="_blank">becoming a member</a> or by <a href="%2" target="_blank">making a donation</a> today. ~ Coleman Watts, CiviCRM Product Manager{/ts}
         </p>
         <p>
-          {ts 1='https://civicrm.org/register-site'}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}
+          {ts 1="https://civicrm.org/register-your-site?src=ug&sid=$sid"}Not ready for a membership yet? You can still help us learn how to improve CiviCRM by <a href="%1" target="_blank">registering your site</a>.{/ts}
         </p>
       </div>
       <p><span class="crm-status-icon success"> </span>{$message}</p>

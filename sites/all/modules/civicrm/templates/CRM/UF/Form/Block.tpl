@@ -1,8 +1,8 @@
 {*
  +--------------------------------------------------------------------+
- | CiviCRM version 4.5                                                |
+ | CiviCRM version 4.6                                                |
  +--------------------------------------------------------------------+
- | Copyright CiviCRM LLC (c) 2004-2014                                |
+ | Copyright CiviCRM LLC (c) 2004-2015                                |
  +--------------------------------------------------------------------+
  | This file is a part of CiviCRM.                                    |
  |                                                                    |
@@ -43,7 +43,7 @@
           {/if}
         {/if}
 
-        {if $mode ne 8 && $action ne 1028 && $action ne 4}
+        {if $mode ne 8 && $action ne 1028 && $action ne 4 && !$hideFieldset}
         <fieldset class="crm-profile crm-profile-id-{$field.group_id} crm-profile-name-{$field.groupName}"><legend>{$field.groupTitle}</legend>
         {/if}
 
@@ -108,15 +108,16 @@
         {else}
           <div class="crm-section editrow_{$n}-section form-item" id="editrow-{$n}">
             <div class="label">
-              {if $prefix}{$form.$prefix.$n.label}{else}{$form.$n.label}{/if}
+              {if $prefix}
+                {$form.$prefix.$n.label}
+              {else}
+                {$form.$n.label}
+              {/if}
             </div>
             <div class="content">
               {if $n|substr:0:3 eq 'im-'}
                 {assign var="provider" value=$n|cat:"-provider_id"}
                 {$form.$provider.html}&nbsp;
-              {elseif $n|substr:0:4 eq 'url-'}
-                {assign var="websiteType" value=$n|cat:"-website_type_id"}
-                {$form.$websiteType.html}&nbsp;
               {/if}
 
               {if $n eq 'email_greeting' or  $n eq 'postal_greeting' or $n eq 'addressee'}
@@ -134,8 +135,18 @@
                 {if $form.$phone_ext_field.html}
                   &nbsp;{$form.$phone_ext_field.html}
                 {/if}
+              {elseif $field.html_type eq 'File' && ($viewOnlyFileValues OR $viewOnlyPrefixFileValues)}
+                {if $prefix}
+                  {$viewOnlyPrefixFileValues.$prefix.$n}
+                {else}
+                  {$viewOnlyFileValues.$n}
+                {/if}
               {else}
-                {if $prefix}{$form.$prefix.$n.html}{else}{$form.$n.html}{/if}
+                {if $prefix}
+                  {$form.$prefix.$n.html}
+                {else}
+                  {$form.$n.html}
+                {/if}
               {/if}
 
             {*CRM-4564*}
@@ -167,7 +178,7 @@
       </div>
     {/if}
 
-    {if $mode ne 8 && $action neq 1028}
+    {if $mode ne 8 && $action neq 1028 && !$hideFieldset}
     </fieldset>
     {/if}
 

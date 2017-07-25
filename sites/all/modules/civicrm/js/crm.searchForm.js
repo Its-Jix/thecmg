@@ -24,6 +24,7 @@
   }
 
   function clearSelections(e) {
+    /* jshint validthis: true */
     if (selected) {
       var $form = $(this).closest('form');
       $('input.select-row, input.select-rows', $form).prop('checked', false).closest('tr').removeClass('crm-row-selected');
@@ -59,7 +60,7 @@
       }
       // Master checkbox
       else if ($el.hasClass('select-rows')) {
-        params.name = $('input.select-row').map(function() {return $(this).attr('id')}).get().join('-');
+        params.name = $('input.select-row').map(function() {return $(this).attr('id');}).get().join('-');
       }
     }
     $.getJSON(url, params, function(data) {
