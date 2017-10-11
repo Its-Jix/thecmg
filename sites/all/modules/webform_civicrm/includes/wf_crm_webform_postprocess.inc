@@ -707,6 +707,11 @@ class wf_crm_webform_postprocess extends wf_crm_webform_base {
     if (!empty($this->enabled[$fid . 'contact_id'])) {
       $this->submissionValue($this->enabled[$fid . 'contact_id'], $cid);
     }
+    if (!empty($this->enabled[$fid . 'user_id'])) {
+      $user_id = wf_crm_user_cid($cid, 'contact');
+      $user_id = $user_id ? $user_id : '';
+      $this->submissionValue($this->enabled[$fid . 'user_id'], $user_id);
+    }
     if (!empty($this->enabled[$fid . 'existing'])) {
       $this->submissionValue($this->enabled[$fid . 'existing'], $cid);
     }
@@ -960,6 +965,10 @@ class wf_crm_webform_postprocess extends wf_crm_webform_base {
         if ($perm == 1 || $perm == 2) {
           $perm = $perm == 1 ? 2 : 1;
         }
+      }
+      //initialise start_date for create action.
+      if (empty($existing) && !array_key_exists('start_date', $params)) {
+        $params['start_date'] = 'now';
       }
       $params += $existing;
       $params['contact_id_a'] = $cid1;
@@ -1510,7 +1519,7 @@ class wf_crm_webform_postprocess extends wf_crm_webform_base {
         $this->totalContribution += $item['line_total'] = $item['unit_price'] * (int) $item['qty'];
       }
     }
-    return $this->totalContribution;
+    return round($this->totalContribution, 2);
   }
 
   /**
@@ -1820,7 +1829,7 @@ class wf_crm_webform_postprocess extends wf_crm_webform_base {
 
     $params['contactID'] = $params['contact_id'];
     $params['currency'] = $params['currencyID'] = $this->contribution_page['currency'];
-    $params['total_amount'] = $this->totalContribution;
+    $params['total_amount'] = round($this->totalContribution, 2);
     // Some processors want this one way, some want it the other
     $params['amount'] = $params['total_amount'];
 
@@ -1837,8 +1846,17 @@ class wf_crm_webform_postprocess extends wf_crm_webform_base {
     // @see webform_civicrm_civicrm_alterPaymentProcessorParams
     $params['webform_redirect_cancel'] = $this->getIpnRedirectUrl('cancel');
     $params['webform_redirect_success'] = $this->getIpnRedirectUrl('success');
-
-    $paymentProcessor->doTransferCheckout($params, 'contribute');
+    
+    if (method_exists($paymentProcessor, 'doTransferCheckout')) {
+      // doTransferCheckout is deprecated but some processors might still implement it.
+      // Somewhere around 4.6 it was replaced by doPayment as the method of choice, 
+      // but to be safe still call it if it exists for now.
+      $paymentProcessor->doTransferCheckout($params, 'contribute');
+    }
+    else {
+      $paymentProcessor->doPayment($params);
+    }    
+    
   }
 
   /**
@@ -1876,22 +1894,30 @@ class wf_crm_webform_postprocess extends wf_crm_webform_base {
     $params['currency'] = $params['currencyID'] = $this->contribution_page['currency'];
     $params['skipRecentView'] = $params['skipLineItem'] = 1;
     $params['contact_id'] = $this->ent['contact'][1]['id'];
-    $params['total_amount'] = $this->totalContribution;
+    $params['total_amount'] = round($this->totalContribution, 2);
 
     // Some processors use this for matching and updating the contribution status
     if (!$this->contributionIsPayLater) {
       $params['invoice_id'] = $this->data['contribution'][1]['contribution'][1]['invoiceID'] = md5(uniqid(rand(), TRUE));
     }
 
-    // tax integration
-    // TODO: needs review if this is changed in 4.6
+    // Sales tax integration
     if (!is_null($this->tax_rate)) {
-      $params['non_deductible_amount']  = $this->totalContribution;
-      $params['tax_amount'] = ($params['total_amount'] / ($this->tax_rate + 100)) * $this->tax_rate;
+      $params['tax_amount'] = round(($params['total_amount'] / ($this->tax_rate + 100)) * $this->tax_rate, 2);
     }
     $params['description'] = t('Webform Payment: @title', array('@title' => $this->node->title));
     if (!isset($params['source'])) {
       $params['source'] = $this->settings['new_contact_source'];
+    }
+
+    // Calculate non-deductible amount for income tax purposes
+    $financialTypeId = $params['financial_type_id'];
+    $resultDeduct = wf_civicrm_api('FinancialType', 'get', array('return' => "is_deductible",'id' => $financialTypeId));
+    if ($resultDeduct['values'][$financialTypeId]['is_deductible'] == 1) {
+      // deductible
+      $params['non_deductible_amount'] = 0;
+    } else {
+      $params['non_deductible_amount']  = $params['total_amount'];
     }
 
     // pass all submitted values to payment processor
