@@ -3,7 +3,7 @@
  * Defines the question form styles.
  */
 #quiz_progress {
-  padding: .25em .5em;
+  padding: 0.25em 0.5em;
   background: $light-blue;
   color: white;
 }
@@ -14,17 +14,47 @@
 }
 
 #quiz-question-answering-form {
-
-  background-color:#ececeb;
+  background-color: #ececeb;
   @media screen and (max-width: $mobile-breakpoint) {
-    font-size: .9em;
+    font-size: 0.9em;
+  }
+
+  table {
+    border-collapse: collapse;
+    border-spacing: 0;
+    margin-bottom: 0;
+    margin-left: 0;
+    width: auto;
+
+    tr.even,
+    tr.odd {
+      border-bottom-color: transparent;
+    }
+
+    tr:first-child td,
+    tr:first-child th {
+      font-weight: inherit;
+      text-transform: none;
+    }
+
+    tbody tr:nth-child(even) td:not([class*="ui-datepicker"]),
+    tbody tr:nth-child(odd) td:not([class*="ui-datepicker"]) {
+      background-color: transparent;
+    }
+
+    .forum-table td,
+    .forum-table th,
+    td,
+    th {
+      border: 0;
+      padding: 0;
+    }
   }
 
   .node-teaser {
-
-    h2 a,
+    .links,
     .question_type_name,
-    .links {
+    h2 a {
       display: none;
     }
   }
@@ -33,9 +63,8 @@
     @include action-next-element;
     float: right;
     padding-left: 3em;
-
     @media screen and (max-width: $mobile-breakpoint) {
-      padding-left: .5em;
+      padding-left: 0.5em;
     }
   }
 
@@ -43,19 +72,17 @@
     @include action-element;
     padding-left: 3em;
     padding-right: 3em;
-
     @media screen and (max-width: $mobile-breakpoint) {
-      padding-left: .5em;
-      padding-right: .5em;
+      padding-left: 0.5em;
+      padding-right: 0.5em;
     }
   }
 
   input#edit-back {
     @include action-prev-element;
     padding-right: 3em;
-
     @media screen and (max-width: $mobile-breakpoint) {
-      padding-right: .5em;
+      padding-right: 0.5em;
     }
   }
 
@@ -75,12 +102,21 @@
   }
 }
 
+.node-multichoice,
+.quiz-report {
+  table {
+    tr:first-child td,
+    tr:first-child th {
+      font-weight: inherit;
+      text-transform: none;
+    }
+  }
+}
+
 #quiz-jumper {
   color: black;
 }
 
-.quiz-report-score.form-text
-{
+.quiz-report-score.form-text {
   color: black;
 }
-
