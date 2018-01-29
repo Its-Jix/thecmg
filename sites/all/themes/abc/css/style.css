@@ -1,4 +1,4 @@
-/* style.css, v5.01 2015/09/15
+/* style.css, v5.02 2017/12/04
  *
  * ABC responsive theme for Drupal 7
  * Dr. Florian Radut, florian@radut.net
@@ -323,7 +323,7 @@ ul.breadcrumb li {
 .by {
 	text-align: right; /* LTR */
 	font-size: .75em;
-	margin: 0 5px;
+	margin: 0 .3em -1.6em .3em;
 }
 .by a:hover {
 	text-decoration: none;
@@ -426,6 +426,9 @@ ul.breadcrumb li {
 }
 li.topic_reply {
 	list-style-type: none;
+}
+.sitemap-box h2, .byy {
+	display: none;
 }
 .pane-content .title a {
 	font-size: 1.4em;
@@ -648,6 +651,20 @@ ul li.collapsed {
 	top: -2px;
 }
 
+/* Dropdown delay */
+.pure-menu-children {
+	display: block;
+	opacity: 0;
+	visibility: hidden;
+	-webkit-transition: all 0.5s ease-in;
+	-moz-transition: all 0.5s ease-in;
+	-o-transition: all 0.5s ease-in;
+	transition: all 0.5s ease-in;
+}
+.pure-menu-item:hover > .pure-menu-children {
+	opacity: 1;
+	visibility: visible;
+}
 
 /* Dropdown arrows */
 .pure-menu-has-children > .pure-menu-link:after,
@@ -1064,9 +1081,6 @@ div.messages,
 	.nb1 #section1, .nb2 #section2, .nbl #sidebar-left, .nbr #sidebar-right, 
 	.pure-menu-horizontal, .logoimg, #name-and-slogan {
 		display: none;
-	}
-	.by {
-		visibility: hidden;
 	}
 	.pure-menu-heading, .menu-toggle {
 		display: block;

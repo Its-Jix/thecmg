@@ -118,6 +118,10 @@
 </div>
 <?php endif; ?>
 
+<?php if ($is_front): ?>
+  <?php print dev_link() ?>
+<?php endif; ?>
+
 <?php if (($main_menu) && theme_get_setting('menu2')): ?>
   <div role="navigation" aria-label="Menu 2">
   <?php print theme('links', array(

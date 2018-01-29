@@ -13,8 +13,11 @@ ul.links li {
 	padding: 10px 19px 12px 0;
 	background: transparent url(../images/all/icon-comment_rtl.png) right center no-repeat !important;
 }
-.by, .comment .new {
+.comment .new {
 	float: left;
+}
+.by {
+	text-align: left;
 }
 .node .user-picture, .comment .user-picture {
 	float: left;

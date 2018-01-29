@@ -26,7 +26,6 @@
 <?php print $page_top ?>
 <?php print $page ?>
 <?php print $page_bottom ?>
-<div class="by"><a href="https://www.eucopyright.com/" title="EU Copyright">eu&#169;</a></div>
 
 <!--[if IE 9]>
 <script type="text/javascript" async src="<?php print $base_path . $path_to_abc ?>/js/classList.min.js"></script>
